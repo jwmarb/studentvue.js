@@ -1,0 +1,5 @@
+{
+  "name": "index",
+  "main": "src/index.d.ts",
+  "out": "../lib/index.d.ts"
+}
