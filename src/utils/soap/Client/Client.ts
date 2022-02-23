@@ -47,7 +47,7 @@ export default class Client {
       paramStr: {},
       ...options,
     };
-    return new Promise(async (res, reject) => {
+    return new Promise<T>(async (res, reject) => {
       const builder = new XMLBuilder({
         ignoreAttributes: false,
         arrayNodeName: 'soap:Envelope',
