@@ -48,8 +48,8 @@ export default class Client {
           'soap:Body': {
             ProcessWebServiceRequest: {
               '@_xmlns': 'http://edupoint.com/webservices/',
-              userID: 'EdupointDistrictInfo',
-              password: 'Edup01nt',
+              userID: this.username,
+              password: this.password,
               ...defaultOptions,
               ...{ paramStr: Client.parseParamStr(defaultOptions.paramStr ?? {}) },
             },
@@ -62,7 +62,7 @@ export default class Client {
 
         const parser = new XMLParser({});
         const result: ParsedRequestResult = parser.parse(data);
-        const parserTwo = new XMLParser({ ignoreAttributes: false });
+        const parserTwo = new XMLParser({ ignoreAttributes: false, isArray: () => true });
         const obj: T | ParsedRequestError | undefined = parserTwo.parse(
           result['soap:Envelope']['soap:Body'].ProcessWebServiceRequestResponse.ProcessWebServiceRequestResult
         );
@@ -88,7 +88,7 @@ export default class Client {
     return paramStr;
   }
 
-  public static processAnonymousRequest<T>(url: string, options: Partial<RequestOptions> = {}): Promise<T | undefined> {
+  public static processAnonymousRequest<T>(url: string, options: Partial<RequestOptions> = {}): Promise<T> {
     const defaultOptions: RequestOptions = {
       skipLoginLog: 1,
       parent: 0,
@@ -97,7 +97,7 @@ export default class Client {
       paramStr: {},
       ...options,
     };
-    return new Promise<T | undefined>(async (res, reject) => {
+    return new Promise<T>(async (res, reject) => {
       const builder = new XMLBuilder({
         ignoreAttributes: false,
         arrayNodeName: 'soap:Envelope',
@@ -126,7 +126,7 @@ export default class Client {
         const parser = new XMLParser({});
         const result: ParsedRequestResult = parser.parse(data);
         const parserTwo = new XMLParser({ ignoreAttributes: false });
-        const obj: T | ParsedRequestError | undefined = parserTwo.parse(
+        const obj: T | ParsedRequestError = parserTwo.parse(
           result['soap:Envelope']['soap:Body'].ProcessWebServiceRequestResponse.ProcessWebServiceRequestResult
         );
 

@@ -5,6 +5,7 @@ export declare interface StudentInfo {
     lastName: string;
   };
   id: string;
+  address: string;
   gender: string;
   grade: string;
   birthDate: string;
@@ -20,19 +21,26 @@ export declare interface StudentInfo {
   };
   orgYearGu: string;
   homeRoom: string;
-  counselorName: string;
+  counselor: {
+    name: string;
+    email: string;
+    staffGu: string;
+  };
   photo: string;
   emergencyContacts: EmergencyContact[];
   physician: {
     name: string;
     phone: string;
     extn: string;
+    hospital: string;
   };
   dentist: {
     name: string;
     phone: string;
     extn: string;
+    office: string;
   };
+  lockerInfoRecords: string;
   additionalInfo: AdditionalInfo[];
 }
 

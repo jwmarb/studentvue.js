@@ -3,6 +3,17 @@ import StudentVue from '..';
 import RequestException from '../StudentVue/RequestException/RequestException';
 import { SchoolDistrict } from '../StudentVue/StudentVue.interfaces';
 
+/**
+ * Add your user credentials from credentials.json
+ * The JSON must be formatted like this:
+ * {
+ *  "username": "myUsername",
+ *  "password": "myPassword",
+ *  "district": "https://student.tusd1.org/"
+ * }
+ */
+import credentials from './credentials.json';
+
 function readable(value: unknown): string {
   return JSON.stringify(value, null, 2);
 }
@@ -43,7 +54,7 @@ describe('StudentVue', () => {
     }
   });
   it('Returns an empty array if no districts found', async () => {
-    expect.assertions(1);
+    expect.assertions(2);
     try {
       const notFound = await StudentVue.findDistricts('Word');
       expect(notFound).toBe(expect.arrayContaining<SchoolDistrict>([]));
@@ -53,8 +64,17 @@ describe('StudentVue', () => {
   });
 
   it('Throws an error on invalid district url', async () => {
-    const district = 'https://student.tusd1.org/';
     expect.assertions(1);
-    // return expect(StudentVue.login(district, "100"))
+
+    try {
+      const client = await StudentVue.login(credentials.district, {
+        username: credentials.username,
+        password: credentials.password,
+      });
+
+      console.log(readable(client));
+    } catch (e) {
+      expect(e).toBeDefined();
+    }
   });
 });
