@@ -2,7 +2,7 @@ export declare interface RequestOptions {
   skipLoginLog?: number;
   parent?: number;
   webServiceHandleName?: string;
-  methodName?: string;
+  methodName: string;
   paramStr?: Record<string, unknown>;
 }
 

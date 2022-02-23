@@ -1,5 +1,6 @@
 import { XMLParser } from 'fast-xml-parser';
 import StudentVue from '..';
+import RequestException from '../StudentVue/RequestException/RequestException';
 import { SchoolDistrict } from '../StudentVue/StudentVue.interfaces';
 
 function readable(value: unknown): string {
@@ -32,8 +33,28 @@ describe('StudentVue', () => {
   });
 
   it('Throws an error on invalid zipcode', async () => {
-    await expect(StudentVue.findDistricts('8888888888')).rejects.toThrow(
-      'Please enter zip code with atleast 3 characters and not more than 5 characters.'
-    );
+    expect.assertions(1);
+    try {
+      await StudentVue.findDistricts('8888888888');
+    } catch (e) {
+      expect((e as RequestException).message).toEqual(
+        'Please enter zip code with atleast 3 characters and not more than 5 characters.'
+      );
+    }
+  });
+  it('Returns an empty array if no districts found', async () => {
+    expect.assertions(1);
+    try {
+      const notFound = await StudentVue.findDistricts('Word');
+      expect(notFound).toBe(expect.arrayContaining<SchoolDistrict>([]));
+    } catch (e) {
+      expect(e).toBeDefined();
+    }
+  });
+
+  it('Throws an error on invalid district url', async () => {
+    const district = 'https://student.tusd1.org/';
+    expect.assertions(1);
+    // return expect(StudentVue.login(district, "100"))
   });
 });
