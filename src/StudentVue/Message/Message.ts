@@ -1,7 +1,7 @@
 import { LoginCredentials } from '../../utils/soap/Client/Client.interfaces';
 import soap from '../../utils/soap/soap';
 import Attachment from '../Attachment/Attachment';
-import { MessageUpdatedXMLObject, MessageXMLObject } from './Message.xml';
+import { MessageXMLObject } from './Message.xml';
 import Icon from '../Icon/Icon';
 
 export default class Message extends soap.Client {
