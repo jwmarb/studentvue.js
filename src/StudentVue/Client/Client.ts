@@ -3,8 +3,10 @@ import { AdditionalInfo, AdditionalInfoItem, StudentInfo } from './Client.interf
 import { StudentInfoXMLObject } from './Interfaces/xml/StudentInfo';
 
 export default class Client extends soap.Client {
-  constructor(username: string, password: string, district: string) {
+  private hostUrl: string;
+  constructor(username: string, password: string, district: string, hostUrl: string) {
     super(username, password, district);
+    this.hostUrl = hostUrl;
   }
 
   public studentInfo(): Promise<StudentInfo> {
