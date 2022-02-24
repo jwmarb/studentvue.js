@@ -1,6 +1,11 @@
 import axios from 'axios';
 import { XMLBuilder, XMLParser } from 'fast-xml-parser';
-import { ParsedRequestError, RequestOptions, ParsedRequestResult } from '../../../utils/soap/Client/Client.interfaces';
+import {
+  ParsedRequestError,
+  RequestOptions,
+  ParsedRequestResult,
+  ParsedAnonymousRequestError,
+} from '../../../utils/soap/Client/Client.interfaces';
 import RequestException from '../../../StudentVue/RequestException/RequestException';
 
 export default class Client {
@@ -26,7 +31,7 @@ export default class Client {
     this.__district__ = district;
   }
 
-  protected processRequest<T>(options: RequestOptions): Promise<T | undefined> {
+  protected processRequest<T>(options: RequestOptions): Promise<T> {
     const defaultOptions: RequestOptions = {
       skipLoginLog: 1,
       parent: 0,
@@ -63,11 +68,11 @@ export default class Client {
         const parser = new XMLParser({});
         const result: ParsedRequestResult = parser.parse(data);
         const parserTwo = new XMLParser({ ignoreAttributes: false, isArray: () => true });
-        const obj: T | ParsedRequestError | undefined = parserTwo.parse(
+        const obj: T | ParsedRequestError = parserTwo.parse(
           result['soap:Envelope']['soap:Body'].ProcessWebServiceRequestResponse.ProcessWebServiceRequestResult
         );
 
-        if (obj != null && 'RT_ERROR' in obj) return reject(new RequestException(obj));
+        if ('RT_ERROR' in obj) return reject(new RequestException(obj));
 
         res(obj);
       } catch (e) {
@@ -126,11 +131,11 @@ export default class Client {
         const parser = new XMLParser({});
         const result: ParsedRequestResult = parser.parse(data);
         const parserTwo = new XMLParser({ ignoreAttributes: false });
-        const obj: T | ParsedRequestError = parserTwo.parse(
+        const obj: T | ParsedAnonymousRequestError = parserTwo.parse(
           result['soap:Envelope']['soap:Body'].ProcessWebServiceRequestResponse.ProcessWebServiceRequestResult
         );
 
-        if (obj != null && 'RT_ERROR' in obj) return reject(new RequestException(obj));
+        if ('RT_ERROR' in obj) return reject(new RequestException(obj));
 
         res(obj);
       } catch (e) {
