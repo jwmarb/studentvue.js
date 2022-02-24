@@ -1,5 +1,6 @@
 import { XMLParser } from 'fast-xml-parser';
 import StudentVue from '..';
+import { StudentInfo } from '../StudentVue/Client/Client.interfaces';
 import RequestException from '../StudentVue/RequestException/RequestException';
 import { SchoolDistrict } from '../StudentVue/StudentVue.interfaces';
 
@@ -63,18 +64,34 @@ describe('StudentVue', () => {
     }
   });
 
-  it('Throws an error on invalid district url', async () => {
-    expect.assertions(1);
+  it('Throws an error on invalid district url', () => {
+    return StudentVue.login('', {
+      username: credentials.username,
+      password: credentials.password,
+    }).catch((e) => {
+      expect((e as RequestException).message).toBe('District URL cannot be an empty string');
+    });
+  });
 
+  it('Throws an error on invalid login credentials', () => {
+    return Promise.all([
+      StudentVue.login(credentials.district, { username: credentials.username, password: 'abc123' }).catch((e) => {
+        expect((e as RequestException).message).toBe('The user name or password is incorrect.');
+      }),
+      StudentVue.login(credentials.district, { username: 'abc123', password: credentials.password }).catch((e) => {
+        expect((e as RequestException).message).toBe('Invalid user id or password');
+      }),
+    ]);
+  });
+
+  it('Returns Client class object upon successful login', async () => {
     try {
-      const client = await StudentVue.login(credentials.district, {
+      const [client, studentInfo] = await StudentVue.login(credentials.district, {
         username: credentials.username,
         password: credentials.password,
       });
-
-      console.log(readable(client));
-    } catch (e) {
-      expect(e).toBeDefined();
-    }
+      expect(studentInfo).toBeDefined();
+      expect(client).toBeDefined();
+    } catch (e) {}
   });
 });
