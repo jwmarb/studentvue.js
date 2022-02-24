@@ -26,6 +26,14 @@ export default class Client {
     return this.__password__;
   }
 
+  protected get credentials(): LoginCredentials {
+    return {
+      username: this.username,
+      password: this.password,
+      districtUrl: this.district,
+    };
+  }
+
   constructor(credentials: LoginCredentials) {
     this.__username__ = credentials.username;
     this.__password__ = credentials.password;
