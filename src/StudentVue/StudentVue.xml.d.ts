@@ -56,6 +56,9 @@ export declare interface StudentInfoXMLObject {
           UserDefinedGroupBoxes: [
             {
               UserDefinedGroupBox: {
+                '@_GroupBoxLabel': [string];
+                '@_GroupBoxID': [string];
+                '@_VCID': [string];
                 UserDefinedItems: [
                   {
                     UserDefinedItem: {
