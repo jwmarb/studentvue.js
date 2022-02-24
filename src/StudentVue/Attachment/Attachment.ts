@@ -39,8 +39,8 @@ export default class Attachment extends soap.Client {
     });
   }
 
-  public get fileExtension(): string | undefined {
-    return this._name.match(/(\.[^.]+)$/)[0];
+  public get fileExtension(): string | null {
+    return (this._name.match(/(\.[^.]+)$/) ?? [null])[0];
   }
 
   public get attachmentGu(): string {

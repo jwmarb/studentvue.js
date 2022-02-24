@@ -94,4 +94,15 @@ describe('StudentVue', () => {
       expect(client).toBeDefined();
     } catch (e) {}
   });
+
+  it('Gets a list of messages', async () => {
+    const [client] = await StudentVue.login(credentials.district, {
+      username: credentials.username,
+      password: credentials.password,
+    });
+
+    const messages = await client.messages();
+
+    expect(messages).toBeDefined();
+  });
 });
