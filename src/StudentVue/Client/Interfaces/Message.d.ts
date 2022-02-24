@@ -2,7 +2,7 @@ import Attachment from '../../Attachment/Attachment';
 import Icon from '../../Icon/Icon';
 
 export declare interface Message {
-  icon: Icon; // should be Icon class
+  icon: Icon;
   id: string;
   beginDate: string;
   type: string;
@@ -20,5 +20,5 @@ export declare interface Message {
     html: string;
     raw: string;
   };
-  attachments: Attachment[]; // should be Attachment class
+  attachments: Attachment[];
 }
