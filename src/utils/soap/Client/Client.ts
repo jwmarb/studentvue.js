@@ -18,11 +18,11 @@ export default class Client {
     return this.__district__;
   }
 
-  protected get username(): string {
+  private get username(): string {
     return this.__username__;
   }
 
-  protected get password(): string {
+  private get password(): string {
     return this.__password__;
   }
 
