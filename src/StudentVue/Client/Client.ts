@@ -1,11 +1,12 @@
+import { LoginCredentials } from '../../utils/soap/Client/Client.interfaces';
 import soap from '../../utils/soap/soap';
 import { AdditionalInfo, AdditionalInfoItem, StudentInfo } from './Client.interfaces';
 import { StudentInfoXMLObject } from './Interfaces/xml/StudentInfo';
 
 export default class Client extends soap.Client {
   private hostUrl: string;
-  constructor(username: string, password: string, district: string, hostUrl: string) {
-    super(username, password, district);
+  constructor(credentials: LoginCredentials, hostUrl: string) {
+    super(credentials);
     this.hostUrl = hostUrl;
   }
 
