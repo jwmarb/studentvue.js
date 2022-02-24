@@ -1,6 +1,6 @@
 import soap from '../../utils/soap/soap';
-import { StudentInfoXMLObject } from '../StudentVue.xml';
 import { AdditionalInfo, AdditionalInfoItem, StudentInfo } from './Client.interfaces';
+import { StudentInfoXMLObject } from './Interfaces/xml/StudentInfo';
 
 export default class Client extends soap.Client {
   constructor(username: string, password: string, district: string) {
