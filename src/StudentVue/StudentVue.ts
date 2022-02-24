@@ -4,17 +4,20 @@ import soap from '../utils/soap/soap';
 import { DistrictListXMLObject } from './StudentVue.xml';
 import RequestException from './RequestException/RequestException';
 import url from 'url';
+import { StudentInfo } from './Client/Client.interfaces';
 
 export { Client };
 export default class StudentVue {
-  public static login(districtUrl: string, credentials: UserCredentials): Promise<unknown> {
+  public static login(districtUrl: string, credentials: UserCredentials): Promise<[Client, StudentInfo]> {
     return new Promise(async (res, rej) => {
+      if (districtUrl.length === 0)
+        return rej(new RequestException({ message: 'District URL cannot be an empty string' }));
       try {
         const host = url.parse(districtUrl).host;
         const endpoint: string = `https://${host}/Service/PXPCommunication.asmx`;
         const client = new Client(credentials.username, credentials.password, endpoint);
         const studentInfo = await client.studentInfo();
-        res(studentInfo);
+        res([client, studentInfo]);
       } catch (e) {
         rej(e);
       }
