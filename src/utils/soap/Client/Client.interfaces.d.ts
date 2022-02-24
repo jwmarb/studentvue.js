@@ -18,6 +18,15 @@ export declare interface ParsedRequestResult {
 }
 
 export declare interface ParsedRequestError {
+  RT_ERROR: [
+    {
+      '@_ERROR_MESSAGE': [string];
+      STACK_TRACE: [string];
+    }
+  ];
+}
+
+export declare interface ParsedAnonymousRequestError {
   RT_ERROR: {
     '@_ERROR_MESSAGE': string;
     STACK_TRACE: string;
