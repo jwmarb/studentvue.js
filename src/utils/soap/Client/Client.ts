@@ -83,15 +83,8 @@ export default class Client {
   }
 
   private static parseParamStr(input: object): string {
-    let paramStr = '<Parms>';
-    Object.entries(input).forEach(([key, value]) => {
-      paramStr += '<' + key + '>';
-      paramStr += value;
-      paramStr += '</' + key + '>';
-    });
-    paramStr += '</Parms>';
-
-    return paramStr;
+    const builder = new XMLBuilder({ ignoreAttributes: false, arrayNodeName: 'Params', suppressEmptyNode: true });
+    return `<Parms>${builder.build(input)}</Parms>`;
   }
 
   public static processAnonymousRequest<T>(url: string, options: Partial<RequestOptions> = {}): Promise<T> {
