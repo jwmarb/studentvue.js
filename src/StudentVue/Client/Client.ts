@@ -1,21 +1,19 @@
 import soap from '../../utils/soap/soap';
 import { StudentInfoXMLObject } from '../StudentVue.xml';
-import { AdditionalInfo, StudentInfo } from './Client.interfaces';
+import { AdditionalInfo, AdditionalInfoItem, StudentInfo } from './Client.interfaces';
 
 export default class Client extends soap.Client {
   constructor(username: string, password: string, district: string) {
     super(username, password, district);
   }
 
-  public studentInfo(): Promise<unknown> {
-    return new Promise(async (res, rej) => {
+  public studentInfo(): Promise<StudentInfo> {
+    return new Promise<StudentInfo>(async (res, rej) => {
       try {
         const xmlObjectData: StudentInfoXMLObject = await super.processRequest({
           methodName: 'StudentInfo',
           paramStr: { childIntId: 0 },
         });
-
-        res(xmlObjectData);
 
         res({
           student: {
@@ -39,10 +37,10 @@ export default class Client extends soap.Client {
             office: xmlObjectData.StudentInfo[0].Address[0].Dentist[0]['@_Office'][0],
           },
           physician: {
-            name: xmlObjectData.StudentInfo[0].Address.Physician[0]['@_Name'],
-            phone: xmlObjectData.StudentInfo[0].Address[0].Physician[0]['@_Phone'],
-            extn: xmlObjectData.StudentInfo[0].Address[0].Physician[0]['@_Extn'],
-            hospital: xmlObjectData.StudentInfo[0].Address[0].Physician[0]['@_Hospital'],
+            name: xmlObjectData.StudentInfo[0].Address[0].Physician[0]['@_Name'][0],
+            phone: xmlObjectData.StudentInfo[0].Address[0].Physician[0]['@_Phone'][0],
+            extn: xmlObjectData.StudentInfo[0].Address[0].Physician[0]['@_Extn'][0],
+            hospital: xmlObjectData.StudentInfo[0].Address[0].Physician[0]['@_Hospital'][0],
           },
           email: xmlObjectData.StudentInfo[0].Address[0].EMail[0],
           emergencyContacts: xmlObjectData.StudentInfo[0].Address[0].EmergencyContacts[0].EmergencyContact.map(
@@ -69,10 +67,21 @@ export default class Client extends soap.Client {
           },
           additionalInfo: xmlObjectData.StudentInfo[0].Address[0].UserDefinedGroupBoxes[0].UserDefinedGroupBox.map(
             (definedBox) => ({
-              id: definedBox.UserDefinedItems[0].UserDefinedItem,
+              id: definedBox['@_GroupBoxID'][0],
+              type: definedBox['@_GroupBoxLabel'][0],
+              vcId: definedBox['@_VCID'][0],
+              items: definedBox.UserDefinedItems[0].UserDefinedItem.map((item) => ({
+                source: {
+                  element: item['@_SourceElement'][0],
+                  object: item['@_SourceObject'][0],
+                },
+                vcId: item['@_VCID'][0],
+                value: item['@_Value'][0],
+                type: item['@_ItemType'][0],
+              })) as AdditionalInfoItem[],
             })
           ) as AdditionalInfo[],
-        });
+        } as StudentInfo);
       } catch (e) {
         rej(e);
       }
