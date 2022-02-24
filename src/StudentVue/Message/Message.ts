@@ -1,7 +1,7 @@
 import { LoginCredentials } from '../../utils/soap/Client/Client.interfaces';
 import soap from '../../utils/soap/soap';
 import Attachment from '../Attachment/Attachment';
-import { MessageXMLObject } from './Message.xml';
+import { MessageUpdatedXMLObject, MessageXMLObject } from './Message.xml';
 import Icon from '../Icon/Icon';
 
 export default class Message extends soap.Client {
@@ -71,5 +71,34 @@ export default class Message extends soap.Client {
     this.hostUrl = hostUrl;
     this.xmlObject = xmlObject;
     this.credentials = credentials;
+  }
+
+  private set isRead(newValue: boolean) {
+    this.isRead = newValue;
+  }
+
+  public markAsRead(): Promise<true> {
+    return new Promise<true>(async (res, rej) => {
+      if (this.isRead) return res(true);
+      try {
+        await super.processRequest({
+          methodName: 'UpdatePXPMessage',
+          paramStr: {
+            childIntId: 0,
+            MessageListing: {
+              '@_xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+              '@_xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+              '@_MarkAsRead': 'true',
+              '@_Type': this.xmlObject['@_Type'],
+              '@_ID': this.xmlObject['@_ID'],
+            },
+          },
+        });
+        this.isRead = true;
+        res(true);
+      } catch (e) {
+        rej(e);
+      }
+    });
   }
 }
