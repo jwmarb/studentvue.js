@@ -6,6 +6,12 @@ export declare interface RequestOptions {
   paramStr?: Record<string, unknown>;
 }
 
+export declare interface LoginCredentials {
+  username: string;
+  password: string;
+  districtUrl: string;
+}
+
 export declare interface ParsedRequestResult {
   '?xml': string;
   'soap:Envelope': {

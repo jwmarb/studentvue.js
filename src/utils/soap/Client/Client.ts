@@ -5,6 +5,7 @@ import {
   RequestOptions,
   ParsedRequestResult,
   ParsedAnonymousRequestError,
+  LoginCredentials,
 } from '../../../utils/soap/Client/Client.interfaces';
 import RequestException from '../../../StudentVue/RequestException/RequestException';
 
@@ -25,10 +26,10 @@ export default class Client {
     return this.__password__;
   }
 
-  constructor(username: string, password: string, district: string) {
-    this.__username__ = username;
-    this.__password__ = password;
-    this.__district__ = district;
+  constructor(credentials: LoginCredentials) {
+    this.__username__ = credentials.username;
+    this.__password__ = credentials.password;
+    this.__district__ = credentials.districtUrl;
   }
 
   protected processRequest<T>(options: RequestOptions): Promise<T> {
