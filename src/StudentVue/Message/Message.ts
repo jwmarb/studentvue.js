@@ -7,7 +7,6 @@ import Icon from '../Icon/Icon';
 export default class Message extends soap.Client {
   private xmlObject: MessageXMLObject['MessageListings'][0]['MessageListing'][0];
   private hostUrl: string;
-  private credentials: LoginCredentials;
   public get icon(): Icon {
     return new Icon(this.xmlObject['@_IconURL'], this.hostUrl);
   }
@@ -58,7 +57,7 @@ export default class Message extends soap.Client {
   }
   public get attachments(): Attachment[] {
     return this.xmlObject.AttachmentDatas[0].AttachmentData.map(
-      (data) => new Attachment(data['@_AttachmentName'], data['@_SmAttachmentGU'], this.credentials)
+      (data) => new Attachment(data['@_AttachmentName'], data['@_SmAttachmentGU'], super.credentials)
     );
   }
 
@@ -70,7 +69,6 @@ export default class Message extends soap.Client {
     super(credentials);
     this.hostUrl = hostUrl;
     this.xmlObject = xmlObject;
-    this.credentials = credentials;
   }
 
   private set isRead(newValue: boolean) {
