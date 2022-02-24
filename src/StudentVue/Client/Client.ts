@@ -2,12 +2,32 @@ import { LoginCredentials } from '../../utils/soap/Client/Client.interfaces';
 import soap from '../../utils/soap/soap';
 import { AdditionalInfo, AdditionalInfoItem, StudentInfo } from './Client.interfaces';
 import { StudentInfoXMLObject } from './Interfaces/xml/StudentInfo';
+import Message from '../Message/Message';
+import { MessageXMLObject } from '../Message/Message.xml';
 
 export default class Client extends soap.Client {
   private hostUrl: string;
   constructor(credentials: LoginCredentials, hostUrl: string) {
     super(credentials);
     this.hostUrl = hostUrl;
+  }
+
+  public messages(): Promise<Message[]> {
+    return new Promise(async (res, rej) => {
+      try {
+        const xmlObject: MessageXMLObject = await super.processRequest({
+          methodName: 'GetPXPMessages',
+          paramStr: { childIntId: 0 },
+        });
+        res(
+          xmlObject.MessageListings[0].MessageListing.map(
+            (message) => new Message(message, super.credentials, this.hostUrl)
+          )
+        );
+      } catch (e) {
+        rej(e);
+      }
+    });
   }
 
   public studentInfo(): Promise<StudentInfo> {
