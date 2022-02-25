@@ -5,79 +5,64 @@ import { MessageXMLObject } from './Message.xml';
 import Icon from '../Icon/Icon';
 
 export default class Message extends soap.Client {
-  private xmlObject: MessageXMLObject['MessageListings'][0]['MessageListing'][0];
+  private xmlObject: MessageXMLObject['PXPMessagesData'][0]['MessageListings'][0]['MessageListing'][0];
   private hostUrl: string;
-  public get icon(): Icon {
-    return new Icon(this.xmlObject['@_IconURL'], this.hostUrl);
-  }
 
-  public get id(): string {
-    return this.xmlObject['@_ID'];
-  }
-  public get beginDate(): string {
-    return this.xmlObject['@_BeginDate'];
-  }
+  public readonly icon: Icon;
+  public readonly id: string;
+  public readonly beginDate;
 
-  public get type(): string {
-    return this.xmlObject['@_Type'];
-  }
-  public get htmlContent(): string {
-    return this.xmlObject['@_Content'];
-  }
-  public get isRead(): boolean {
-    return JSON.parse(this.xmlObject['@_Read']);
-  }
-  public get isDeletable(): boolean {
-    return JSON.parse(this.xmlObject['@_Deletable']);
-  }
-  public get from(): {
+  public readonly type: string;
+  public readonly htmlContent: string;
+  private read: boolean;
+  private deletable: boolean;
+  public readonly from: {
     name: string;
     staffGu: string;
     email: string;
     smMsgPersonGu: string;
-  } {
-    return {
-      name: this.xmlObject['@_From'],
-      staffGu: this.xmlObject['@_StaffGU'],
-      smMsgPersonGu: this.xmlObject['@_SMMsgPersonGU'],
-      email: this.xmlObject['@_Email'],
-    };
-  }
-  public get module(): string {
-    return this.xmlObject['@_Module'];
-  }
-  public get subject(): {
+  };
+  public readonly module: string;
+  public readonly subject: {
     html: string;
     raw: string;
-  } {
-    return {
-      html: this.xmlObject['@_Subject'],
-      raw: this.xmlObject['@_SubjectNoHTML'],
-    };
-  }
-  public get attachments(): Attachment[] {
-    return this.xmlObject.AttachmentDatas[0].AttachmentData.map(
-      (data) => new Attachment(data['@_AttachmentName'], data['@_SmAttachmentGU'], super.credentials)
-    );
-  }
+  };
+  public readonly attachments: Attachment[];
 
   constructor(
-    xmlObject: MessageXMLObject['MessageListings'][0]['MessageListing'][0],
+    xmlObject: MessageXMLObject['PXPMessagesData'][0]['MessageListings'][0]['MessageListing'][0],
     credentials: LoginCredentials,
     hostUrl: string
   ) {
     super(credentials);
     this.hostUrl = hostUrl;
     this.xmlObject = xmlObject;
-  }
-
-  private set isRead(newValue: boolean) {
-    this.isRead = newValue;
+    this.icon = new Icon(this.xmlObject['@_IconURL'], this.hostUrl);
+    this.id = this.xmlObject['@_ID'];
+    this.type = this.xmlObject['@_Type'];
+    this.beginDate = this.xmlObject['@_BeginDate'];
+    this.htmlContent = this.xmlObject['@_Content'];
+    this.read = JSON.parse(this.xmlObject['@_Read']);
+    this.deletable = JSON.parse(this.xmlObject['@_Deletable']);
+    this.from = {
+      name: this.xmlObject['@_From'],
+      staffGu: this.xmlObject['@_StaffGU'],
+      smMsgPersonGu: this.xmlObject['@_SMMsgPersonGU'],
+      email: this.xmlObject['@_Email'],
+    };
+    this.module = this.xmlObject['@_Module'];
+    this.subject = {
+      html: this.xmlObject['@_Subject'],
+      raw: this.xmlObject['@_SubjectNoHTML'],
+    };
+    this.attachments = this.xmlObject.AttachmentDatas[0].AttachmentData.map(
+      (data) => new Attachment(data['@_AttachmentName'], data['@_SmAttachmentGU'], super.credentials)
+    );
   }
 
   public markAsRead(): Promise<true> {
     return new Promise<true>(async (res, rej) => {
-      if (this.isRead) return res(true);
+      if (this.read) return res(true);
       try {
         await super.processRequest({
           methodName: 'UpdatePXPMessage',
@@ -92,7 +77,8 @@ export default class Message extends soap.Client {
             },
           },
         });
-        this.isRead = true;
+        this.read = true;
+
         res(true);
       } catch (e) {
         rej(e);
