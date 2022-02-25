@@ -6,7 +6,7 @@ export default class Icon {
     this.hostUrl = hostUrl;
   }
 
-  public get uri(): string {
+  public getURI(): string {
     return this.hostUrl + this.path;
   }
 }
