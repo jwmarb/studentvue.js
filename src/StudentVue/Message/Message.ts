@@ -90,9 +90,9 @@ export default class Message extends soap.Client {
             MessageListing: {
               '@_xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
               '@_xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+              '@_ID': this.xmlObject['@_ID'][0],
+              '@_Type': this.xmlObject['@_Type'][0],
               '@_MarkAsRead': 'true',
-              '@_Type': this.xmlObject['@_Type'],
-              '@_ID': this.xmlObject['@_ID'],
             },
           },
         });
