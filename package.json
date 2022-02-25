@@ -8,7 +8,7 @@
     "test": "npx jest",
     "build": "npm run build:compile && npm run build:types",
     "build:compile": "babel src --out-dir lib --extensions \".ts\" --source-maps inline",
-    "build:types": "dts-bundle --configJson dts-bundle.json"
+    "build:types": "tsc && dts-bundle --configJson dts-bundle.json"
   },
   "keywords": [],
   "author": "",
