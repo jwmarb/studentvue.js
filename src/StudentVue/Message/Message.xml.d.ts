@@ -18,14 +18,16 @@ export declare interface MessageXMLObject {
             '@_Email': string;
             '@_StaffGU': string;
             '@_SMMsgPersonGU': string;
-            AttachmentDatas: [
-              {
-                AttachmentData: {
-                  '@_AttachmentName': string;
-                  '@_SmAttachmentGU': string;
-                }[];
-              }
-            ];
+            AttachmentDatas:
+              | [
+                  {
+                    AttachmentData: {
+                      '@_AttachmentName': string;
+                      '@_SmAttachmentGU': string;
+                    }[];
+                  }
+                ]
+              | string[];
           }[];
         }
       ];
