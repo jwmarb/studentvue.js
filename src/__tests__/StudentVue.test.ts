@@ -15,11 +15,7 @@ import { SchoolDistrict } from '../StudentVue/StudentVue.interfaces';
  */
 import credentials from './credentials.json';
 
-function readable(value: unknown): string {
-  return JSON.stringify(value, null, 2);
-}
-
-describe('StudentVue', () => {
+describe.skip('StudentVue', () => {
   it('Gets school districts', async () => {
     try {
       const synergy = await StudentVue.findDistricts('85757');
@@ -93,16 +89,5 @@ describe('StudentVue', () => {
       expect(studentInfo).toBeDefined();
       expect(client).toBeDefined();
     } catch (e) {}
-  });
-
-  it('Gets a list of messages', async () => {
-    const [client] = await StudentVue.login(credentials.district, {
-      username: credentials.username,
-      password: credentials.password,
-    });
-
-    const messages = await client.messages();
-
-    expect(messages).toBeDefined();
   });
 });
