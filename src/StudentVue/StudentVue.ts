@@ -16,7 +16,7 @@ export default class StudentVue {
         const host = url.parse(districtUrl).host;
         const endpoint: string = `https://${host}/Service/PXPCommunication.asmx`;
         const client = new Client(
-          { username: credentials.username, password: credentials.username, districtUrl: endpoint },
+          { username: credentials.username, password: credentials.password, districtUrl: endpoint },
           `https://${host}/`
         );
         const studentInfo = await client.studentInfo();
