@@ -20,7 +20,7 @@ export default class Client extends soap.Client {
           paramStr: { childIntId: 0 },
         });
         res(
-          xmlObject.MessageListings[0].MessageListing.map(
+          xmlObject.PXPMessagesData[0].MessageListings[0].MessageListing.map(
             (message) => new Message(message, super.credentials, this.hostUrl)
           )
         );
