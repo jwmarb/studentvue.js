@@ -4,13 +4,15 @@ import soap from '../../utils/soap/soap';
 import { AttachmentXMLObject } from './Attachment.xml';
 
 export default class Attachment extends soap.Client {
-  private _name: string;
-  private _attachmentGu: string;
+  public readonly name: string;
+  public readonly attachmentGu: string;
+  public readonly fileExtension: string | null;
 
   public constructor(name: string, attachmentGu: string, session: LoginCredentials) {
     super(session);
-    this._name = name;
-    this._attachmentGu = attachmentGu;
+    this.name = name;
+    this.attachmentGu = attachmentGu;
+    this.fileExtension = (name.match(/(\.[^.]+)$/) ?? [null])[0];
   }
 
   /**
@@ -37,17 +39,5 @@ export default class Attachment extends soap.Client {
         reject(e);
       }
     });
-  }
-
-  public get fileExtension(): string | null {
-    return (this._name.match(/(\.[^.]+)$/) ?? [null])[0];
-  }
-
-  public get attachmentGu(): string {
-    return this._attachmentGu;
-  }
-
-  public get name(): string {
-    return this._name;
   }
 }
