@@ -55,9 +55,12 @@ export default class Message extends soap.Client {
       html: xmlObject['@_Subject'],
       raw: xmlObject['@_SubjectNoHTML'],
     };
-    this.attachments = xmlObject.AttachmentDatas[0].AttachmentData.map(
-      (data) => new Attachment(data['@_AttachmentName'], data['@_SmAttachmentGU'], super.credentials)
-    );
+    this.attachments =
+      typeof xmlObject.AttachmentDatas[0] !== 'string'
+        ? xmlObject.AttachmentDatas[0].AttachmentData.map(
+            (data) => new Attachment(data['@_AttachmentName'], data['@_SmAttachmentGU'], credentials)
+          )
+        : [];
   }
 
   public isRead(): boolean {
