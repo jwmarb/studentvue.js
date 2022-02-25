@@ -60,6 +60,22 @@ export default class Message extends soap.Client {
     );
   }
 
+  public isRead(): boolean {
+    return this.read;
+  }
+
+  public isDeletable(): boolean {
+    return this.deletable;
+  }
+
+  private setRead(read: boolean) {
+    this.read = read;
+  }
+
+  private setDeletable(deletable: boolean) {
+    this.deletable = deletable;
+  }
+
   public markAsRead(): Promise<true> {
     return new Promise<true>(async (res, rej) => {
       if (this.read) return res(true);
@@ -77,7 +93,7 @@ export default class Message extends soap.Client {
             },
           },
         });
-        this.read = true;
+        this.setRead(true);
 
         res(true);
       } catch (e) {
