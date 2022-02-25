@@ -37,25 +37,25 @@ export default class Message extends soap.Client {
     super(credentials);
     this.hostUrl = hostUrl;
     this.xmlObject = xmlObject;
-    this.icon = new Icon(this.xmlObject['@_IconURL'], this.hostUrl);
-    this.id = this.xmlObject['@_ID'];
-    this.type = this.xmlObject['@_Type'];
-    this.beginDate = this.xmlObject['@_BeginDate'];
-    this.htmlContent = this.xmlObject['@_Content'];
-    this.read = JSON.parse(this.xmlObject['@_Read']);
-    this.deletable = JSON.parse(this.xmlObject['@_Deletable']);
+    this.icon = new Icon(xmlObject['@_IconURL'], this.hostUrl);
+    this.id = xmlObject['@_ID'];
+    this.type = xmlObject['@_Type'];
+    this.beginDate = xmlObject['@_BeginDate'];
+    this.htmlContent = xmlObject['@_Content'];
+    this.read = JSON.parse(xmlObject['@_Read']);
+    this.deletable = JSON.parse(xmlObject['@_Deletable']);
     this.from = {
-      name: this.xmlObject['@_From'],
-      staffGu: this.xmlObject['@_StaffGU'],
-      smMsgPersonGu: this.xmlObject['@_SMMsgPersonGU'],
-      email: this.xmlObject['@_Email'],
+      name: xmlObject['@_From'],
+      staffGu: xmlObject['@_StaffGU'],
+      smMsgPersonGu: xmlObject['@_SMMsgPersonGU'],
+      email: xmlObject['@_Email'],
     };
-    this.module = this.xmlObject['@_Module'];
+    this.module = xmlObject['@_Module'];
     this.subject = {
-      html: this.xmlObject['@_Subject'],
-      raw: this.xmlObject['@_SubjectNoHTML'],
+      html: xmlObject['@_Subject'],
+      raw: xmlObject['@_SubjectNoHTML'],
     };
-    this.attachments = this.xmlObject.AttachmentDatas[0].AttachmentData.map(
+    this.attachments = xmlObject.AttachmentDatas[0].AttachmentData.map(
       (data) => new Attachment(data['@_AttachmentName'], data['@_SmAttachmentGU'], super.credentials)
     );
   }
