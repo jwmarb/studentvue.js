@@ -91,8 +91,14 @@ export default class Client {
   }
 
   private static parseParamStr(input: object): string {
-    const builder = new XMLBuilder({ ignoreAttributes: false, arrayNodeName: 'Params', suppressEmptyNode: true });
-    return `<Parms>${builder.build(input)}</Parms>`;
+    const builder = new XMLBuilder({
+      ignoreAttributes: false,
+      arrayNodeName: 'Params',
+      suppressEmptyNode: true,
+      suppressBooleanAttributes: false,
+    });
+    const xml = `<Parms>${builder.build(input)}</Parms>`;
+    return xml;
   }
 
   public static processAnonymousRequest<T>(url: string, options: Partial<RequestOptions> = {}): Promise<T> {
