@@ -5,6 +5,12 @@ declare module 'index' {
     export * from 'index/StudentVue/StudentVue';
     export * from 'index/StudentVue/Client/Client';
     export * from 'index/StudentVue/Client/Client.interfaces';
+    export * from 'index/utils/soap/Client/Client.interfaces';
+    export * from 'index/StudentVue/Icon/Icon';
+    export * from 'index/StudentVue/Message/Message';
+    export * from 'index/StudentVue/RequestException/RequestException';
+    export * from 'index/StudentVue/Client/Interfaces/StudentInfo';
+    export * from 'index/utils/types';
 }
 
 declare module 'index/StudentVue/StudentVue.interfaces' {
@@ -24,25 +30,230 @@ declare module 'index/StudentVue/StudentVue.interfaces' {
 declare module 'index/StudentVue/StudentVue' {
     import { SchoolDistrict, UserCredentials } from 'index/StudentVue/StudentVue.interfaces';
     import Client from 'index/StudentVue/Client/Client';
+    import RequestException from 'index/StudentVue/RequestException/RequestException';
+    import { StudentInfo } from 'index/StudentVue/Client/Client.interfaces';
+    import Message from 'index/StudentVue/Message/Message';
+    import Attachment from 'index/StudentVue/Attachment/Attachment';
+    import Icon from 'index/StudentVue/Icon/Icon';
+    export { Client, Message, Attachment, Icon, RequestException };
     export default class StudentVue {
-        static login(districtUrl: string, credentials: UserCredentials): Promise<Client>;
+        static login(districtUrl: string, credentials: UserCredentials): Promise<[Client, StudentInfo]>;
         static findDistricts(zipCode: string): Promise<SchoolDistrict[]>;
     }
 }
 
 declare module 'index/StudentVue/Client/Client' {
+    import { LoginCredentials } from 'index/utils/soap/Client/Client.interfaces';
     import soap from 'index/utils/soap/soap';
+    import { StudentInfo } from 'index/StudentVue/Client/Client.interfaces';
+    import Message from 'index/StudentVue/Message/Message';
     export default class Client extends soap.Client {
-        constructor(username: string, password: string);
+        constructor(credentials: LoginCredentials, hostUrl: string);
+        messages(): Promise<Message[]>;
+        studentInfo(): Promise<StudentInfo>;
     }
 }
 
 declare module 'index/StudentVue/Client/Client.interfaces' {
-    export interface StudentInfo {
-        nickname: string;
+    export * from 'index/StudentVue/Client/Interfaces/StudentInfo';
+    export * from 'index/StudentVue/Client/Client';
+}
+
+declare module 'index/utils/soap/Client/Client.interfaces' {
+    export interface RequestOptions {
+        skipLoginLog?: number;
+        parent?: number;
+        webServiceHandleName?: string;
+        methodName: string;
+        paramStr?: Record<string, unknown>;
     }
     
-    export * from 'index/StudentVue/Client/Client';
+    export interface LoginCredentials {
+        username: string;
+        password: string;
+        districtUrl: string;
+    }
+    
+    export interface ParsedRequestResult {
+        '?xml': string;
+        'soap:Envelope': {
+            'soap:Body': {
+                ProcessWebServiceRequestResponse: {
+                    ProcessWebServiceRequestResult: string;
+                };
+            };
+        };
+    }
+    
+    export interface ParsedRequestError {
+        RT_ERROR: [
+            {
+                '@_ERROR_MESSAGE': [string];
+                STACK_TRACE: [string];
+            }
+        ];
+    }
+    
+    export interface ParsedAnonymousRequestError {
+        RT_ERROR: {
+            '@_ERROR_MESSAGE': string;
+            STACK_TRACE: string;
+        };
+    }
+}
+
+declare module 'index/StudentVue/Icon/Icon' {
+    export default class Icon {
+        constructor(path: string, hostUrl: string);
+        get uri(): string;
+    }
+}
+
+declare module 'index/StudentVue/Message/Message' {
+    import { LoginCredentials } from 'index/utils/soap/Client/Client.interfaces';
+    import soap from 'index/utils/soap/soap';
+    import Attachment from 'index/StudentVue/Attachment/Attachment';
+    import { MessageXMLObject } from 'index/StudentVue/Message/Message.xml';
+    import Icon from 'index/StudentVue/Icon/Icon';
+    export default class Message extends soap.Client {
+        readonly icon: Icon;
+        readonly id: string;
+        readonly beginDate: string;
+        readonly type: string;
+        readonly htmlContent: string;
+        readonly from: {
+            name: string;
+            staffGu: string;
+            email: string;
+            smMsgPersonGu: string;
+        };
+        readonly module: string;
+        readonly subject: {
+            html: string;
+            raw: string;
+        };
+        readonly attachments: Attachment[];
+        constructor(xmlObject: MessageXMLObject['PXPMessagesData'][0]['MessageListings'][0]['MessageListing'][0], credentials: LoginCredentials, hostUrl: string);
+        isRead(): boolean;
+        isDeletable(): boolean;
+        markAsRead(): Promise<true>;
+    }
+}
+
+declare module 'index/StudentVue/RequestException/RequestException' {
+    import { ParsedAnonymousRequestError, ParsedRequestError } from 'index/utils/soap/Client/Client.interfaces';
+    export default class RequestException {
+        get message(): string;
+        get stack(): string | undefined;
+        constructor(obj: ParsedRequestError | {
+            message: string;
+            stack?: string;
+        } | ParsedAnonymousRequestError);
+    }
+}
+
+declare module 'index/StudentVue/Client/Interfaces/StudentInfo' {
+    export interface StudentInfo {
+        student: {
+            name: string;
+            nickname: string;
+            lastName: string;
+        };
+        id: string;
+        address: string;
+        gender: string;
+        grade: string;
+        birthDate: string;
+        email: string;
+        phone: string;
+        homeLanguage: string;
+        currentSchool: string;
+        track: string;
+        homeRoomTeacher: {
+            name: string;
+            email: string;
+            staffGu: string;
+        };
+        orgYearGu: string;
+        homeRoom: string;
+        counselor: {
+            name: string;
+            email: string;
+            staffGu: string;
+        };
+        photo: string;
+        emergencyContacts: EmergencyContact[];
+        physician: {
+            name: string;
+            phone: string;
+            extn: string;
+            hospital: string;
+        };
+        dentist: {
+            name: string;
+            phone: string;
+            extn: string;
+            office: string;
+        };
+        lockerInfoRecords: string;
+        additionalInfo: AdditionalInfo[];
+    }
+    
+    export interface AdditionalInfo {
+        type: string;
+        id: string;
+        vcId: string;
+        items: AdditionalInfoItem[];
+    }
+    
+    export interface AdditionalInfoItem {
+        type: string;
+        source: {
+            object: string;
+            element: string;
+        };
+        vcId: string;
+        value: string;
+    }
+    
+    export interface EmergencyContact {
+        name: string;
+        relationship: string;
+        phone: {
+            home: string;
+            work: string;
+            other: string;
+            mobile: string;
+        };
+    }
+}
+
+declare module 'index/utils/types' {
+    export type Base64String = string;
+}
+
+declare module 'index/StudentVue/Attachment/Attachment' {
+    import { Base64String } from 'index/utils/types';
+    import { LoginCredentials } from 'index/utils/soap/Client/Client.interfaces';
+    import soap from 'index/utils/soap/soap';
+    export default class Attachment extends soap.Client {
+        constructor(name: string, attachmentGu: string, session: LoginCredentials);
+        /**
+          * Fetches the attachment from synergy servers.
+          * Unfortunately, the api does not offer a URL path to the file
+          * @returns base64 string
+          *
+          * @example
+          * ```js
+          * const base64 = await someAttachment.get();
+          * console.log(base64) // -> UEsDBBQABgAIAAAAIQCj77s...
+          * ```
+          */
+        get(): Promise<Base64String>;
+        get fileExtension(): string | null;
+        get attachmentGu(): string;
+        get name(): string;
+    }
 }
 
 declare module 'index/utils/soap/soap' {
@@ -53,24 +264,52 @@ declare module 'index/utils/soap/soap' {
     export default _default;
 }
 
-declare module 'index/utils/soap/Client/Client' {
-    import { RequestOptions } from 'index/utils/soap/Client/Client.interfaces';
-    export default class Client {
-        protected get username(): string;
-        protected get password(): string;
-        constructor(username: string, password: string);
-        protected processRequest<T>(): Promise<T>;
-        protected processAnonymousRequest<T>(options?: RequestOptions): Promise<T>;
+declare module 'index/StudentVue/Message/Message.xml' {
+    export interface MessageXMLObject {
+        PXPMessagesData: [
+            {
+                MessageListings: [
+                    {
+                        MessageListing: {
+                            '@_IconURL': [string];
+                            '@_ID': [string];
+                            '@_BeginDate': [string];
+                            '@_Type': [string];
+                            '@_Subject': [string];
+                            '@_Content': [string]; // This is a long html in a string
+                            '@_Read': [string];
+                            '@_Deletable': [string];
+                            '@_From': [string];
+                            '@_SubjectNoHTML': [string];
+                            '@_Module': [string];
+                            '@_Email': [string];
+                            '@_StaffGU': [string];
+                            '@_SMMsgPersonGU': [string];
+                            AttachmentDatas:
+                                | [
+                                        {
+                                            AttachmentData: {
+                                                '@_AttachmentName': [string];
+                                                '@_SmAttachmentGU': [string];
+                                            }[];
+                                        }
+                                    ]
+                                | string[];
+                        }[];
+                    }
+                ];
+            }
+        ];
     }
 }
 
-declare module 'index/utils/soap/Client/Client.interfaces' {
-    export interface RequestOptions {
-        skipLoginLog?: number;
-        parent?: number;
-        webServiceHandleName?: string;
-        methodName?: string;
-        paramStr?: Record<string, unknown>;
+declare module 'index/utils/soap/Client/Client' {
+    import { RequestOptions, LoginCredentials } from 'index/utils/soap/Client/Client.interfaces';
+    export default class Client {
+        protected get credentials(): LoginCredentials;
+        constructor(credentials: LoginCredentials);
+        protected processRequest<T>(options: RequestOptions): Promise<T>;
+        static processAnonymousRequest<T>(url: string, options?: Partial<RequestOptions>): Promise<T>;
     }
 }
 
