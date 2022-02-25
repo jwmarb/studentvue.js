@@ -3,4 +3,8 @@ export * from './StudentVue/StudentVue';
 export * from './StudentVue/Client/Client';
 export * from './StudentVue/Client/Client.interfaces';
 export * from './utils/soap/Client/Client.interfaces';
+export * from './StudentVue/Icon/Icon';
+export * from './StudentVue/Message/Message';
+export * from './StudentVue/RequestException/RequestException';
+export * from './StudentVue/Client/Interfaces/StudentInfo';
 export * from './utils/types';
