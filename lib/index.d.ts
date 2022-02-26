@@ -47,10 +47,12 @@ declare module 'index/StudentVue/Client/Client' {
     import soap from 'index/utils/soap/soap';
     import { StudentInfo } from 'index/StudentVue/Client/Client.interfaces';
     import Message from 'index/StudentVue/Message/Message';
+    import { CalendarOptions } from 'index/StudentVue/Client/Interfaces/Calendar';
     export default class Client extends soap.Client {
         constructor(credentials: LoginCredentials, hostUrl: string);
         messages(): Promise<Message[]>;
         studentInfo(): Promise<StudentInfo>;
+        calendar(options?: CalendarOptions): Promise<unknown>;
     }
 }
 
@@ -105,7 +107,7 @@ declare module 'index/utils/soap/Client/Client.interfaces' {
 declare module 'index/StudentVue/Icon/Icon' {
     export default class Icon {
         constructor(path: string, hostUrl: string);
-        get uri(): string;
+        getURI(): string;
     }
 }
 
@@ -237,6 +239,9 @@ declare module 'index/StudentVue/Attachment/Attachment' {
     import { LoginCredentials } from 'index/utils/soap/Client/Client.interfaces';
     import soap from 'index/utils/soap/soap';
     export default class Attachment extends soap.Client {
+        readonly name: string;
+        readonly attachmentGu: string;
+        readonly fileExtension: string | null;
         constructor(name: string, attachmentGu: string, session: LoginCredentials);
         /**
           * Fetches the attachment from synergy servers.
@@ -250,9 +255,6 @@ declare module 'index/StudentVue/Attachment/Attachment' {
           * ```
           */
         get(): Promise<Base64String>;
-        get fileExtension(): string | null;
-        get attachmentGu(): string;
-        get name(): string;
     }
 }
 
@@ -262,6 +264,56 @@ declare module 'index/utils/soap/soap' {
         Client: typeof Client;
     };
     export default _default;
+}
+
+declare module 'index/StudentVue/Client/Interfaces/Calendar' {
+    import EventType from 'index/Constants/EventType';
+    import { Icon } from 'index/StudentVue/StudentVue';
+    
+    export interface CalendarOptions {
+        interval?: {
+            start?: Date | number;
+            end?: Date | number;
+        };
+    }
+    
+    export interface Calendar {
+        schoolDate: {
+            start: Date | number;
+            end: Date | number;
+        };
+        outputRange: {
+            start: Date | number;
+            end: Date | number;
+        };
+        events: (AssignmentEvent | HolidayEvent | RegularEvent)[];
+    }
+    
+    export interface Event {
+        date: Date;
+        title: string;
+        type: EventType;
+        startTime: string;
+    }
+    
+    export interface AssignmentEvent extends Event {
+        agu: string;
+        link: string;
+        dgu: string;
+        viewType: string;
+        addLinkData: string;
+    }
+    
+    export interface HolidayEvent extends Event {}
+    
+    export interface RegularEvent extends Event {
+        agu: string;
+        dgu: string;
+        link: string;
+        viewType: string;
+        addLinkData: string;
+        description: string;
+    }
 }
 
 declare module 'index/StudentVue/Message/Message.xml' {
@@ -311,5 +363,14 @@ declare module 'index/utils/soap/Client/Client' {
         protected processRequest<T>(options: RequestOptions): Promise<T>;
         static processAnonymousRequest<T>(url: string, options?: Partial<RequestOptions>): Promise<T>;
     }
+}
+
+declare module 'index/Constants/EventType' {
+    enum EventType {
+        ASSIGNMENT = "Assignment",
+        REGULAR = "Regular",
+        HOLIDAY = "Holiday"
+    }
+    export default EventType;
 }
 

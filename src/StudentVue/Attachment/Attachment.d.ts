@@ -2,8 +2,9 @@ import { Base64String } from '../../utils/types';
 import { LoginCredentials } from '../../utils/soap/Client/Client.interfaces';
 import soap from '../../utils/soap/soap';
 export default class Attachment extends soap.Client {
-    private _name;
-    private _attachmentGu;
+    readonly name: string;
+    readonly attachmentGu: string;
+    readonly fileExtension: string | null;
     constructor(name: string, attachmentGu: string, session: LoginCredentials);
     /**
      * Fetches the attachment from synergy servers.
@@ -17,7 +18,4 @@ export default class Attachment extends soap.Client {
      * ```
      */
     get(): Promise<Base64String>;
-    get fileExtension(): string | null;
-    get attachmentGu(): string;
-    get name(): string;
 }

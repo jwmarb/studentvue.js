@@ -71,22 +71,27 @@ export default class Client {
         },
       });
 
-      try {
-        const { data } = await axios.post<string>(this.district, xml, { headers: { 'Content-Type': 'text/xml' } });
+      axios
+        .post<string>(this.district, xml, { headers: { 'Content-Type': 'text/xml' } })
+        .then(({ data }) => {
+          const parser = new XMLParser({});
+          const result: ParsedRequestResult = parser.parse(data);
+          const parserTwo = new XMLParser({
+            ignoreAttributes: false,
+            isArray: () => true,
+            processEntities: false,
+            parseAttributeValue: false,
+          });
 
-        const parser = new XMLParser({});
-        const result: ParsedRequestResult = parser.parse(data);
-        const parserTwo = new XMLParser({ ignoreAttributes: false, isArray: () => true });
-        const obj: T | ParsedRequestError = parserTwo.parse(
-          result['soap:Envelope']['soap:Body'].ProcessWebServiceRequestResponse.ProcessWebServiceRequestResult
-        );
+          const obj: T | ParsedRequestError = parserTwo.parse(
+            result['soap:Envelope']['soap:Body'].ProcessWebServiceRequestResponse.ProcessWebServiceRequestResult
+          );
 
-        if ('RT_ERROR' in obj) return reject(new RequestException(obj));
+          if ('RT_ERROR' in obj) return reject(new RequestException(obj));
 
-        res(obj);
-      } catch (e) {
-        reject(e);
-      }
+          res(obj);
+        })
+        .catch(reject);
     });
   }
 
@@ -139,8 +144,12 @@ export default class Client {
         const parser = new XMLParser({});
         const result: ParsedRequestResult = parser.parse(data);
         const parserTwo = new XMLParser({ ignoreAttributes: false });
+
         const obj: T | ParsedAnonymousRequestError = parserTwo.parse(
-          result['soap:Envelope']['soap:Body'].ProcessWebServiceRequestResponse.ProcessWebServiceRequestResult
+          result['soap:Envelope']['soap:Body'].ProcessWebServiceRequestResponse.ProcessWebServiceRequestResult.replace(
+            /&gt;/g,
+            '>'
+          ).replace(/&lt;/g, '<')
         );
 
         if ('RT_ERROR' in obj) return reject(new RequestException(obj));

@@ -4,6 +4,13 @@ import { AdditionalInfo, AdditionalInfoItem, StudentInfo } from './Client.interf
 import { StudentInfoXMLObject } from './Interfaces/xml/StudentInfo';
 import Message from '../Message/Message';
 import { MessageXMLObject } from '../Message/Message.xml';
+import { AssignmentEventXMLObject, CalendarXMLObject, RegularEventXMLObject } from './Interfaces/xml/Calendar';
+import { AssignmentEvent, Calendar, CalendarOptions, Event, HolidayEvent, RegularEvent } from './Interfaces/Calendar';
+import { eachMonthOfInterval, isAfter, isBefore, isThisMonth } from 'date-fns';
+import { Icon } from '../StudentVue';
+import EventType from '../../Constants/EventType';
+import _ from 'lodash';
+import asyncPool from 'tiny-async-pool';
 
 export default class Client extends soap.Client {
   private hostUrl: string;
@@ -105,6 +112,96 @@ export default class Client extends soap.Client {
             })
           ) as AdditionalInfo[],
         } as StudentInfo);
+      } catch (e) {
+        rej(e);
+      }
+    });
+  }
+
+  private fetchEventsWithinInterval(date: Date) {
+    return super.processRequest<CalendarXMLObject>({
+      methodName: 'StudentCalendar',
+      paramStr: { childIntId: 0, RequestDate: date.toISOString() },
+    });
+  }
+
+  public calendar(options: CalendarOptions): Promise<unknown> {
+    return new Promise(async (res, rej) => {
+      try {
+        let schoolStartDate: Date | number = options.interval.start;
+        let schoolEndDate: Date | number = options.interval.end;
+
+        const monthsWithinSchoolYear = eachMonthOfInterval({ start: schoolStartDate, end: schoolEndDate });
+        const allEventsWithinSchoolYear: CalendarXMLObject[] = await asyncPool(7, monthsWithinSchoolYear, (date) =>
+          this.fetchEventsWithinInterval(date)
+        );
+        let memo: Calendar | null = null;
+        const events = allEventsWithinSchoolYear.reduce((prev, events) => {
+          if (memo == null)
+            memo = {
+              schoolDate: {
+                start: new Date(events.CalendarListing[0]['@_SchoolBegDate'][0]),
+                end: new Date(events.CalendarListing[0]['@_SchoolEndDate'][0]),
+              },
+              outputRange: {
+                start: schoolStartDate,
+                end: schoolEndDate,
+              },
+              events: [],
+            };
+          let rest: Calendar = {
+            ...memo, // This is to prevent re-initializing Date objects in order to improve performance
+            events: [
+              ...(prev.events ? prev.events : []),
+              ...(events.CalendarListing[0].EventLists[0].EventList.map((event) => {
+                switch (event['@_DayType'][0]) {
+                  case EventType.ASSIGNMENT: {
+                    const assignmentEvent = event as AssignmentEventXMLObject;
+                    return {
+                      title: assignmentEvent['@_Title'][0],
+                      addLinkData: assignmentEvent['@_AddLinkData'][0],
+                      agu: assignmentEvent['@_AGU'][0],
+                      date: new Date(assignmentEvent['@_Date'][0]),
+                      dgu: assignmentEvent['@_DGU'][0],
+                      link: assignmentEvent['@_Link'][0],
+                      startTime: assignmentEvent['@_StartTime'][0],
+                      type: EventType.ASSIGNMENT,
+                      viewType: assignmentEvent['@_ViewType'][0],
+                    } as AssignmentEvent;
+                  }
+                  case EventType.HOLIDAY: {
+                    return {
+                      title: event['@_Title'][0],
+                      type: EventType.HOLIDAY,
+                      startTime: event['@_StartTime'][0],
+                      date: new Date(event['@_Date'][0]),
+                    } as HolidayEvent;
+                  }
+                  case EventType.REGULAR: {
+                    const regularEvent = event as RegularEventXMLObject;
+                    return {
+                      title: regularEvent['@_Title'][0],
+                      agu: regularEvent['@_AGU'] ? regularEvent['@_AGU'] : undefined,
+                      date: new Date(regularEvent['@_Date'][0]),
+                      description: regularEvent['@_EvtDescription'] ? regularEvent['@_EvtDescription'][0] : undefined,
+                      dgu: regularEvent['@_DGU'] ? regularEvent['@_DGU'][0] : undefined,
+                      link: regularEvent['@_Link'] ? regularEvent['@_Link'][0] : undefined,
+                      startTime: regularEvent['@_StartTime'][0],
+                      type: EventType.REGULAR,
+                      viewType: regularEvent['@_ViewType'] ? regularEvent['@_ViewType'][0] : undefined,
+                      addLinkData: regularEvent['@_AddLinkData'] ? regularEvent['@_AddLinkData'][0] : undefined,
+                    } as RegularEvent;
+                  }
+                }
+              }) as Event[]),
+            ] as Event[],
+          };
+
+          return rest;
+        }, {} as Calendar);
+
+        res({ ...events, events: _.uniqBy(events.events, (item) => item.title) } as Calendar);
+        // res(allEventsWithinSchoolYear);
       } catch (e) {
         rej(e);
       }
