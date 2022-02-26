@@ -5,4 +5,6 @@ module.exports = {
   modulePaths: ['<rootDir>/src/'],
   silent: false,
   verbose: true,
+  detectOpenHandles: false,
+  transform: {},
 };
