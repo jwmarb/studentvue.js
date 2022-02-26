@@ -125,6 +125,15 @@ export default class Client extends soap.Client {
     });
   }
 
+  /**
+   *
+   * @param options Calendar options
+   * @returns Returns a Calendar object
+   * @example
+   * ```js
+   * client.calendar({ interval: { start: new Date('5/1/2022'), end: new Date('8/1/2021') }, concurrency: null }); // -> Limitless concurrency (not recommended)
+   * ```
+   */
   public calendar(options: CalendarOptions): Promise<Calendar> {
     const defaultOptions: CalendarOptions = {
       concurrency: 7,
