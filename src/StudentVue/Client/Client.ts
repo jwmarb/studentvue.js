@@ -125,16 +125,23 @@ export default class Client extends soap.Client {
     });
   }
 
-  public calendar(options: CalendarOptions): Promise<unknown> {
+  public calendar(options: CalendarOptions): Promise<Calendar> {
+    const defaultOptions: CalendarOptions = {
+      concurrency: 7,
+      ...options,
+    };
     return new Promise(async (res, rej) => {
       try {
         let schoolStartDate: Date | number = options.interval.start;
         let schoolEndDate: Date | number = options.interval.end;
 
         const monthsWithinSchoolYear = eachMonthOfInterval({ start: schoolStartDate, end: schoolEndDate });
-        const allEventsWithinSchoolYear: CalendarXMLObject[] = await asyncPool(7, monthsWithinSchoolYear, (date) =>
-          this.fetchEventsWithinInterval(date)
-        );
+        const allEventsWithinSchoolYear: CalendarXMLObject[] =
+          defaultOptions.concurrency == null
+            ? await Promise.all(monthsWithinSchoolYear.map((date) => this.fetchEventsWithinInterval(date)))
+            : await asyncPool(defaultOptions.concurrency, monthsWithinSchoolYear, (date) =>
+                this.fetchEventsWithinInterval(date)
+              );
         let memo: Calendar | null = null;
         const events = allEventsWithinSchoolYear.reduce((prev, events) => {
           if (memo == null)

@@ -6,6 +6,7 @@ export declare interface CalendarOptions {
     start: Date | number;
     end: Date | number;
   };
+  concurrency?: number | null;
 }
 
 export declare interface Calendar {
