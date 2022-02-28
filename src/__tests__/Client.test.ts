@@ -19,6 +19,7 @@ jest.setTimeout(60000);
  */
 import credentials from './credentials.json';
 import { Calendar } from '../StudentVue/Client/Interfaces/Calendar';
+import { isThisMonth } from 'date-fns';
 
 jest.spyOn(StudentVue, 'login').mockImplementation((districtUrl, credentials) => {
   const host = url.parse(districtUrl).host;
@@ -32,6 +33,7 @@ jest.spyOn(StudentVue, 'login').mockImplementation((districtUrl, credentials) =>
 
 let client: Client;
 let messages: Message[];
+let calendar: Calendar;
 
 beforeAll(async () => {
   const [session] = await StudentVue.login(credentials.district, {
@@ -39,9 +41,10 @@ beforeAll(async () => {
     password: credentials.password,
   });
   messages = await session.messages();
+  calendar = await session.calendar({ interval: { start: Date.now(), end: Date.now() } });
   client = session;
 
-  return { client, messages };
+  return { client, messages, calendar };
 });
 
 describe('User Info', () => {
@@ -95,11 +98,13 @@ describe('User Messages', () => {
   });
 });
 
-describe.only('Calendar events', () => {
-  it('gets all events within school year', async () => {
-    // expect(calendar.events.length).toBeGreaterThan(0);
-    const calendar = await client.calendar({ interval: { start: new Date('10/01/21'), end: new Date('5/01/22') } });
-    console.log(calendar);
+describe('Calendar events', () => {
+  it('is defined', async () => {
     expect(calendar).toBeDefined();
+  });
+
+  it('is events of this month', async () => {
+    expect(isThisMonth(calendar.outputRange.start)).toBe(true);
+    expect(isThisMonth(calendar.outputRange.end)).toBe(true);
   });
 });
