@@ -20,6 +20,7 @@ jest.setTimeout(60000);
 import credentials from './credentials.json';
 import { Calendar } from '../StudentVue/Client/Interfaces/Calendar';
 import { isThisMonth } from 'date-fns';
+import ResourceType from '../Constants/ResourceType';
 
 jest.spyOn(StudentVue, 'login').mockImplementation((districtUrl, credentials) => {
   const host = url.parse(districtUrl).host;
@@ -106,5 +107,29 @@ describe('Calendar events', () => {
   it('is events of this month', async () => {
     expect(isThisMonth(calendar.outputRange.start)).toBe(true);
     expect(isThisMonth(calendar.outputRange.end)).toBe(true);
+  });
+});
+
+describe.only('Gradebook', () => {
+  it('fetches gradebook with matching type', async () => {
+    const gradebook = await client.gradebook(1);
+
+    expect(gradebook).toBeDefined();
+    expect(gradebook.error).toBeFalsy();
+    expect(gradebook.courses.length).toBeGreaterThan(0);
+    expect(gradebook.reportingPeriod.current.index).toBe(1);
+    expect(gradebook.reportingPeriod.available).toStrictEqual(
+      expect.arrayContaining([expect.objectContaining({ index: expect.any(Number) })])
+    );
+    expect(
+      gradebook.courses
+        .map((course) => course.marks.map((mark) => mark.assignments.map((assignment) => assignment.resources)))
+        .flat(4)
+    ).toStrictEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ type: ResourceType.URL }),
+        expect.objectContaining({ type: ResourceType.FILE }),
+      ])
+    );
   });
 });
