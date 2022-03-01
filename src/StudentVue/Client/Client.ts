@@ -7,16 +7,159 @@ import { MessageXMLObject } from '../Message/Message.xml';
 import { AssignmentEventXMLObject, CalendarXMLObject, RegularEventXMLObject } from './Interfaces/xml/Calendar';
 import { AssignmentEvent, Calendar, CalendarOptions, Event, HolidayEvent, RegularEvent } from './Interfaces/Calendar';
 import { eachMonthOfInterval, isAfter, isBefore, isThisMonth } from 'date-fns';
-import { Icon } from '../StudentVue';
+import { FileResourceXMLObject, GradebookXMLObject, URLResourceXMLObject } from './Interfaces/xml/Gradebook';
 import EventType from '../../Constants/EventType';
 import _ from 'lodash';
+import {
+  Assignment,
+  FileResource,
+  Gradebook,
+  Mark,
+  Resource,
+  URLResource,
+  WeightedCategory,
+} from './Interfaces/Gradebook';
 import asyncPool from 'tiny-async-pool';
+import ResourceType from '../../Constants/ResourceType';
 
 export default class Client extends soap.Client {
   private hostUrl: string;
   constructor(credentials: LoginCredentials, hostUrl: string) {
     super(credentials);
     this.hostUrl = hostUrl;
+  }
+
+  public gradebook(reportingPeriodIndex?: number): Promise<Gradebook> {
+    return new Promise(async (res, rej) => {
+      try {
+        const xmlObject: GradebookXMLObject = await super.processRequest({
+          methodName: 'Gradebook',
+          paramStr: { childIntId: 0, ...(reportingPeriodIndex ? { ReportingPeriod: reportingPeriodIndex } : {}) },
+        });
+        res({
+          error: xmlObject.Gradebook[0]['@_ErrorMessage'][0],
+          type: xmlObject.Gradebook[0]['@_Type'][0],
+          reportingPeriod: {
+            current: {
+              index:
+                reportingPeriodIndex ??
+                Number(
+                  xmlObject.Gradebook[0].ReportingPeriods[0].ReportPeriod.find(
+                    (x) => x['@_GradePeriod'][0] === xmlObject.Gradebook[0].ReportingPeriod[0]['@_GradePeriod'][0]
+                  )?.['@_Index'][0]
+                ),
+              date: {
+                start: new Date(xmlObject.Gradebook[0].ReportingPeriod[0]['@_StartDate'][0]),
+                end: new Date(xmlObject.Gradebook[0].ReportingPeriod[0]['@_EndDate'][0]),
+              },
+              name: xmlObject.Gradebook[0].ReportingPeriod[0]['@_GradePeriod'][0],
+            },
+            available: xmlObject.Gradebook[0].ReportingPeriods[0].ReportPeriod.map((period) => ({
+              date: { start: new Date(period['@_StartDate'][0]), end: new Date(period['@_EndDate'][0]) },
+              name: period['@_GradePeriod'][0],
+              index: Number(period['@_Index'][0]),
+            })),
+          },
+          courses: xmlObject.Gradebook[0].Courses[0].Course.map((course) => ({
+            period: Number(course['@_Period'][0]),
+            title: course['@_Title'][0],
+            room: course['@_Room'][0],
+            staff: {
+              name: course['@_Staff'][0],
+              email: course['@_StaffEMail'][0],
+              staffGu: course['@_StaffGU'][0],
+            },
+            marks: course.Marks[0].Mark.map((mark) => ({
+              name: mark['@_MarkName'][0],
+              calculatedScore: {
+                string: mark['@_CalculatedScoreString'][0],
+                raw: Number(mark['@_CalculatedScoreRaw'][0]),
+              },
+              weightedCategories:
+                typeof mark['GradeCalculationSummary'][0] !== 'string'
+                  ? mark['GradeCalculationSummary'][0].AssignmentGradeCalc.map(
+                      (weighted) =>
+                        ({
+                          type: weighted['@_Type'][0],
+                          calculatedMark: weighted['@_CalculatedMark'][0],
+                          weight: {
+                            evaluated: weighted['@_WeightedPct'][0],
+                            standard: weighted['@_Weight'][0],
+                          },
+                          points: {
+                            current: Number(weighted['@_Points'][0]),
+                            possible: Number(weighted['@_PointsPossible'][0]),
+                          },
+                        } as WeightedCategory)
+                    )
+                  : [],
+              assignments: mark.Assignments[0].Assignment.map((assignment) => ({
+                gradebookId: assignment['@_GradebookID'][0],
+                name: assignment['@_Measure'][0],
+                type: assignment['@_Type'][0],
+                date: {
+                  start: new Date(assignment['@_Date'][0]),
+                  due: new Date(assignment['@_DueDate'][0]),
+                },
+                score: {
+                  type: assignment['@_ScoreType'][0],
+                  value: assignment['@_Score'][0],
+                },
+                points: assignment['@_Points'][0],
+                notes: assignment['@_Notes'][0],
+                teacherId: assignment['@_TeacherID'][0],
+                description: assignment['@_MeasureDescription'][0],
+                hasDropbox: JSON.parse(assignment['@_HasDropBox'][0]),
+                studentId: assignment['@_StudentID'][0],
+                dropboxDate: {
+                  start: new Date(assignment['@_DropStartDate'][0]),
+                  end: new Date(assignment['@_DropEndDate'][0]),
+                },
+                resources:
+                  typeof assignment.Resources[0] !== 'string'
+                    ? (assignment.Resources[0].Resource.map((rsrc) => {
+                        switch (rsrc['@_Type'][0]) {
+                          case 'File':
+                            const fileRsrc = rsrc as FileResourceXMLObject;
+                            return {
+                              type: ResourceType.FILE,
+                              file: {
+                                type: fileRsrc['@_FileType'][0],
+                                name: fileRsrc['@_FileName'][0],
+                                uri: this.hostUrl + fileRsrc['@_ServerFileName'][0],
+                              },
+                              resource: {
+                                date: new Date(fileRsrc['@_ResourceDate'][0]),
+                                id: fileRsrc['@_ResourceID'][0],
+                                name: fileRsrc['@_ResourceName'][0],
+                              },
+                            } as FileResource;
+                          case 'URL':
+                            const urlRsrc = rsrc as URLResourceXMLObject;
+                            return {
+                              url: urlRsrc['@_URL'][0],
+                              type: ResourceType.URL,
+                              resource: {
+                                date: new Date(urlRsrc['@_ResourceDate'][0]),
+                                id: urlRsrc['@_ResourceID'][0],
+                                name: urlRsrc['@_ResourceName'][0],
+                                description: urlRsrc['@_ResourceDescription'][0],
+                              },
+                              path: urlRsrc['@_ServerFileName'][0],
+                            } as URLResource;
+                          default:
+                            rej(`Type ${rsrc['@_Type'][0]} does not exist as a type. Add it to type declarations.`);
+                        }
+                      }) as (FileResource | URLResource)[])
+                    : [],
+              })) as Assignment[],
+            })) as Mark[],
+          })),
+        } as Gradebook);
+      } catch (e) {
+        rej(e);
+      }
+    });
   }
 
   public messages(): Promise<Message[]> {
