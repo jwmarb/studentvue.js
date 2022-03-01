@@ -1,4 +1,5 @@
 import ResourceType from '../../../Constants/ResourceType';
+import { Staff } from '../Client.interfaces';
 
 export declare interface Gradebook {
   error: string;
@@ -23,11 +24,7 @@ export declare interface Course {
   period: number;
   title: string;
   room: string;
-  staff: {
-    name: string;
-    email: string;
-    staffGu: string;
-  };
+  staff: Staff;
   marks: Mark[];
 }
 

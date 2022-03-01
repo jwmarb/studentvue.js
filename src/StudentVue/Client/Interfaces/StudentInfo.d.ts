@@ -1,3 +1,5 @@
+import { Staff } from '../Client.interfaces';
+
 export declare interface StudentInfo {
   student: {
     name: string;
@@ -21,11 +23,7 @@ export declare interface StudentInfo {
   };
   orgYearGu: string;
   homeRoom: string;
-  counselor: {
-    name: string;
-    email: string;
-    staffGu: string;
-  };
+  counselor: Staff;
   photo: string;
   emergencyContacts: EmergencyContact[];
   physician: {
