@@ -11,6 +11,8 @@ declare module 'index' {
     export * from 'index/StudentVue/RequestException/RequestException';
     export * from 'index/StudentVue/Client/Interfaces/StudentInfo';
     export * from 'index/utils/types';
+    export * from 'index/Constants/ResourceType';
+    export * from 'index/Constants/EventType';
 }
 
 declare module 'index/StudentVue/StudentVue.interfaces' {
@@ -47,18 +49,72 @@ declare module 'index/StudentVue/Client/Client' {
     import soap from 'index/utils/soap/soap';
     import { StudentInfo } from 'index/StudentVue/Client/Client.interfaces';
     import Message from 'index/StudentVue/Message/Message';
-    import { CalendarOptions } from 'index/StudentVue/Client/Interfaces/Calendar';
+    import { Calendar, CalendarOptions } from 'index/StudentVue/Client/Interfaces/Calendar';
+    import { Gradebook } from 'index/StudentVue/Client/Interfaces/Gradebook';
+    import { Attendance } from 'index/StudentVue/Client/Interfaces/Attendance';
     export default class Client extends soap.Client {
-        constructor(credentials: LoginCredentials, hostUrl: string);
-        messages(): Promise<Message[]>;
-        studentInfo(): Promise<StudentInfo>;
-        calendar(options?: CalendarOptions): Promise<unknown>;
+            constructor(credentials: LoginCredentials, hostUrl: string);
+            /**
+                * Returns the attendance of the student
+                * @returns Returns an Attendance object
+                * @example
+                * ```js
+                * client.attendance()
+                *  .then(console.log); // -> { type: 'Period', period: {...}, schoolName: 'University High School', absences: [...], periodInfos: [...] }
+                * ```
+                */
+            attendance(): Promise<Attendance>;
+            /**
+                * Returns the gradebook of the student
+                * @param reportingPeriodIndex The timeframe that the gradebook should return
+                * @returns Returns a Gradebook object
+                * @example
+                * ```js
+                * const gradebook = await client.gradebook();
+                * console.log(gradebook); // { error: '', type: 'Traditional', reportingPeriod: {...}, courses: [...] };
+                *
+                * await client.gradebook(0) // Some schools will have ReportingPeriodIndex 0 as "1st Quarter Progress"
+                * await client.gradebook(7) // Some schools will have ReportingPeriodIndex 7 as "4th Quarter"
+                * ```
+                */
+            gradebook(reportingPeriodIndex?: number): Promise<Gradebook>;
+            messages(): Promise<Message[]>;
+            /**
+                * Gets the info of a student
+                * @returns StudentInfo object
+                * @example
+                * ```js
+                * studentInfo().then(console.log) // -> { student: { name: 'Evan Davis', nickname: '', lastName: 'Davis' }, ...}
+                * ```
+                */
+            studentInfo(): Promise<StudentInfo>;
+            /**
+                *
+                * @param options Options to provide for calendar method. This is optional
+                * @returns Returns a Calendar object
+                * @example
+                * ```js
+                * client.calendar({ interval: { start: new Date('5/1/2022'), end: new Date('8/1/2021') }, concurrency: null }); // -> Limitless concurrency (not recommended)
+                *
+                * const calendar = await client.calendar();
+                * console.log(calendar); // -> { schoolDate: {...}, outputRange: {...}, events: [...] }
+                * ```
+                */
+            calendar(options: CalendarOptions): Promise<Calendar>;
     }
 }
 
 declare module 'index/StudentVue/Client/Client.interfaces' {
     export * from 'index/StudentVue/Client/Interfaces/StudentInfo';
+    export * from 'index/StudentVue/Client/Interfaces/Gradebook';
+    export * from 'index/StudentVue/Client/Interfaces/Calendar';
+    export * from 'index/StudentVue/Client/Interfaces/Attendance';
     export * from 'index/StudentVue/Client/Client';
+    export interface Staff {
+        name: string;
+        email: string;
+        staffGu: string;
+    }
 }
 
 declare module 'index/utils/soap/Client/Client.interfaces' {
@@ -118,27 +174,69 @@ declare module 'index/StudentVue/Message/Message' {
     import { MessageXMLObject } from 'index/StudentVue/Message/Message.xml';
     import Icon from 'index/StudentVue/Icon/Icon';
     export default class Message extends soap.Client {
-        readonly icon: Icon;
-        readonly id: string;
-        readonly beginDate: string;
-        readonly type: string;
-        readonly htmlContent: string;
-        readonly from: {
-            name: string;
-            staffGu: string;
-            email: string;
-            smMsgPersonGu: string;
-        };
-        readonly module: string;
-        readonly subject: {
-            html: string;
-            raw: string;
-        };
-        readonly attachments: Attachment[];
-        constructor(xmlObject: MessageXMLObject['PXPMessagesData'][0]['MessageListings'][0]['MessageListing'][0], credentials: LoginCredentials, hostUrl: string);
-        isRead(): boolean;
-        isDeletable(): boolean;
-        markAsRead(): Promise<true>;
+            readonly icon: Icon;
+            readonly id: string;
+            readonly beginDate: string;
+            readonly type: string;
+            readonly htmlContent: string;
+            readonly from: {
+                    name: string;
+                    staffGu: string;
+                    email: string;
+                    smMsgPersonGu: string;
+            };
+            readonly module: string;
+            readonly subject: {
+                    html: string;
+                    raw: string;
+            };
+            readonly attachments: Attachment[];
+            constructor(xmlObject: MessageXMLObject['PXPMessagesData'][0]['MessageListings'][0]['MessageListing'][0], credentials: LoginCredentials, hostUrl: string);
+            /**
+                * Check if a message has been read
+                * @returns Returns a boolean declaring whether or not the message has been previously read
+                */
+            isRead(): boolean;
+            /**
+                * Check if a message is deletable
+                * @returns Returns a boolean declaring whether or not the message is deletable
+                */
+            isDeletable(): boolean;
+            /**
+                * Marks the message as read
+                * @returns Returns true to show that it has been marked as read
+                * @example
+                * ```js
+                * const messages = await client.messages();
+                * messages.every((msg) => msg.isRead()) // -> false
+                * messages.forEach(async (msg) => !msg.isRead() && await msg.markAsRead());
+                * messages.every((msg) => msg.isRead()) // -> true
+                * const refetchedMessages = await client.messages(); // See if it updated on the server
+                * messages.every((msg) => msg.isRead()) // -> true
+                * ```
+                * @example
+                * ```tsx
+                * // In a React project...
+                * import React from 'react';
+                *
+                * const Message = (props) => {
+                *  const { message } = props;
+                *
+                *  async function handleOnClick() {
+                *    await message.markAsRead();
+                *  }
+                *
+                *  return (
+                *    <button onClick={handleOnClick} style={{ color: message.isRead() ? undefined : 'red' }}>
+                *      <p>{message.subject.raw}</p>
+                *    </button>
+                *  )
+                * }
+                *
+                * export default Message;
+                * ```
+                */
+            markAsRead(): Promise<true>;
     }
 }
 
@@ -155,6 +253,8 @@ declare module 'index/StudentVue/RequestException/RequestException' {
 }
 
 declare module 'index/StudentVue/Client/Interfaces/StudentInfo' {
+    import { Staff } from 'index/StudentVue/Client/Client.interfaces';
+    
     export interface StudentInfo {
         student: {
             name: string;
@@ -178,11 +278,7 @@ declare module 'index/StudentVue/Client/Interfaces/StudentInfo' {
         };
         orgYearGu: string;
         homeRoom: string;
-        counselor: {
-            name: string;
-            email: string;
-            staffGu: string;
-        };
+        counselor: Staff;
         photo: string;
         emergencyContacts: EmergencyContact[];
         physician: {
@@ -234,6 +330,23 @@ declare module 'index/utils/types' {
     export type Base64String = string;
 }
 
+declare module 'index/Constants/ResourceType' {
+    enum ResourceType {
+        FILE = "File",
+        URL = "URL"
+    }
+    export default ResourceType;
+}
+
+declare module 'index/Constants/EventType' {
+    enum EventType {
+        ASSIGNMENT = "Assignment",
+        REGULAR = "Regular",
+        HOLIDAY = "Holiday"
+    }
+    export default EventType;
+}
+
 declare module 'index/StudentVue/Attachment/Attachment' {
     import { Base64String } from 'index/utils/types';
     import { LoginCredentials } from 'index/utils/soap/Client/Client.interfaces';
@@ -271,10 +384,11 @@ declare module 'index/StudentVue/Client/Interfaces/Calendar' {
     import { Icon } from 'index/StudentVue/StudentVue';
     
     export interface CalendarOptions {
-        interval?: {
-            start?: Date | number;
-            end?: Date | number;
+        interval: {
+            start: Date | number;
+            end: Date | number;
         };
+        concurrency?: number | null;
     }
     
     export interface Calendar {
@@ -307,12 +421,171 @@ declare module 'index/StudentVue/Client/Interfaces/Calendar' {
     export interface HolidayEvent extends Event {}
     
     export interface RegularEvent extends Event {
-        agu: string;
-        dgu: string;
-        link: string;
-        viewType: string;
-        addLinkData: string;
+        agu?: string;
+        dgu?: string;
+        link?: string;
+        viewType?: string;
+        addLinkData?: string;
+        description?: string;
+    }
+}
+
+declare module 'index/StudentVue/Client/Interfaces/Gradebook' {
+    import ResourceType from 'index/Constants/ResourceType';
+    import { Staff } from 'index/StudentVue/Client/Client.interfaces';
+    
+    export interface Gradebook {
+        error: string;
+        type: string;
+        reportingPeriod: {
+            current: ReportingPeriod;
+            available: ReportingPeriod[];
+        };
+        courses: Course[];
+    }
+    
+    export interface ReportingPeriod {
+        index: number;
+        name: string;
+        date: {
+            start: Date;
+            end: Date;
+        };
+    }
+    
+    export interface Course {
+        period: number;
+        title: string;
+        room: string;
+        staff: Staff;
+        marks: Mark[];
+    }
+    
+    export interface Mark {
+        name: string;
+        calculatedScore: {
+            string: string;
+            raw: number;
+        };
+        weightedCategories: WeightedCategory[];
+        assignments: Assignment[];
+    }
+    
+    export interface WeightedCategory {
+        calculatedMark: string;
+        type: string;
+        weight: {
+            evaluated: string;
+            standard: string;
+        };
+        points: {
+            current: number;
+            possible: number;
+        };
+    }
+    
+    export interface Assignment {
+        gradebookId: string;
+        name: string;
+        type: string;
+        date: {
+            start: Date;
+            due: Date;
+        };
+        score: {
+            type: string;
+            value: string;
+        };
+        points: string;
+        notes: string;
+        teacherId: string;
         description: string;
+        hasDropbox: boolean;
+        studentId: string;
+        dropboxDate: {
+            start: Date;
+            end: Date;
+        };
+        resources: (FileResource | URLResource)[];
+    }
+    
+    export interface FileResource extends Resource {
+        file: {
+            type: string;
+            name: string;
+            uri: string;
+        };
+        resource: {
+            date: Date;
+            id: string;
+            name: string;
+        };
+        type: ResourceType.FILE;
+    }
+    
+    export interface URLResource extends Resource {
+        url: string;
+        type: ResourceType.URL;
+        resource: {
+            date: Date;
+            id: string;
+            name: string;
+            description: string;
+        };
+        path: string;
+    }
+    
+    export interface Resource {
+        classId: string;
+    
+        gradebookId: string;
+    
+        sequence: string;
+        teacherId: string;
+    }
+}
+
+declare module 'index/StudentVue/Client/Interfaces/Attendance' {
+    import { Staff } from 'index/StudentVue/Client/Client.interfaces';
+    
+    export interface Attendance {
+        type: string;
+        period: {
+            total: number;
+            start: number;
+            end: number;
+        };
+        schoolName: string;
+        absences: Absence[];
+        periodInfos: PeriodInfo[];
+    }
+    
+    export interface Absence {
+        date: Date;
+        reason: string;
+        note: string;
+        description: string;
+        periods: AbsentPeriod[];
+    }
+    
+    export interface AbsentPeriod {
+        period: number;
+        name: string;
+        reason: string;
+        course: string;
+        staff: Staff;
+        orgYearGu: string;
+    }
+    
+    export interface PeriodInfo {
+        period: number;
+        total: {
+            excused: number;
+            tardies: number;
+            unexcused: number;
+            activities: number;
+            unexcusedTardies: number;
+        };
     }
 }
 
@@ -360,17 +633,38 @@ declare module 'index/utils/soap/Client/Client' {
     export default class Client {
         protected get credentials(): LoginCredentials;
         constructor(credentials: LoginCredentials);
+        /**
+          * Create a POST request to synergy servers to fetch data
+          * @param options Options to provide when making a XML request to the servers
+          * @returns Returns an XML object that must be defined in a type declaration file.
+          * @link See https://github.com/StudentVue/docs
+          * @example
+          * ```js
+          * super.processRequest({ methodName: 'Refer to StudentVue/docs', paramStr: { AnythingThatCanBePassed: true, AsLongAsItMatchesTheDocumentation: true }});
+          * // This will make the XML request below:
+          * ```
+          *
+          * ```xml
+          * <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+          <soap:Body>
+              <ProcessWebServiceRequest xmlns="http://edupoint.com/webservices/">
+                  <userID>STUDENT_USERNAME</userID>
+                  <password>STUDENT_PASSWORD</password>
+                  <skipLoginLog>1</skipLoginLog>
+                  <parent>0</parent>
+                  <webServiceHandleName>PXPWebServices</webServiceHandleName>
+                  <methodName>Refer to StudentVue/docs</methodName>
+                  <paramStr>
+                    <AnythingThatCanBePassed>true</AnythingThatCanBePassed>
+                    <AsLongAsItMatchesTheDocumentation>true</AsLongAsItMatchesTheDocumentation>
+                  </paramStr>
+              </ProcessWebServiceRequest>
+          </soap:Body>
+      </soap:Envelope>
+          * ```
+          */
         protected processRequest<T>(options: RequestOptions): Promise<T>;
         static processAnonymousRequest<T>(url: string, options?: Partial<RequestOptions>): Promise<T>;
     }
-}
-
-declare module 'index/Constants/EventType' {
-    enum EventType {
-        ASSIGNMENT = "Assignment",
-        REGULAR = "Regular",
-        HOLIDAY = "Holiday"
-    }
-    export default EventType;
 }
 
