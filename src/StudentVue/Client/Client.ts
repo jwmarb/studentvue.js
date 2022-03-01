@@ -8,25 +8,77 @@ import { AssignmentEventXMLObject, CalendarXMLObject, RegularEventXMLObject } fr
 import { AssignmentEvent, Calendar, CalendarOptions, Event, HolidayEvent, RegularEvent } from './Interfaces/Calendar';
 import { eachMonthOfInterval, isAfter, isBefore, isThisMonth } from 'date-fns';
 import { FileResourceXMLObject, GradebookXMLObject, URLResourceXMLObject } from './Interfaces/xml/Gradebook';
+import { AttendanceXMLObject } from './Interfaces/xml/Attendance';
 import EventType from '../../Constants/EventType';
 import _ from 'lodash';
-import {
-  Assignment,
-  FileResource,
-  Gradebook,
-  Mark,
-  Resource,
-  URLResource,
-  WeightedCategory,
-} from './Interfaces/Gradebook';
+import { Assignment, FileResource, Gradebook, Mark, URLResource, WeightedCategory } from './Interfaces/Gradebook';
 import asyncPool from 'tiny-async-pool';
 import ResourceType from '../../Constants/ResourceType';
+import { AbsentPeriod, Attendance, PeriodInfo } from './Interfaces/Attendance';
 
 export default class Client extends soap.Client {
   private hostUrl: string;
   constructor(credentials: LoginCredentials, hostUrl: string) {
     super(credentials);
     this.hostUrl = hostUrl;
+  }
+
+  public attendance(): Promise<Attendance> {
+    return new Promise(async (res, rej) => {
+      try {
+        const attendanceXMLObject: AttendanceXMLObject = await super.processRequest({
+          methodName: 'Attendance',
+          paramStr: {
+            childIntId: 0,
+          },
+        });
+
+        const xmlObject = attendanceXMLObject.Attendance[0];
+
+        res({
+          type: xmlObject['@_Type'][0],
+          period: {
+            total: Number(xmlObject['@_PeriodCount'][0]),
+            start: Number(xmlObject['@_StartPeriod'][0]),
+            end: Number(xmlObject['@_EndPeriod'][0]),
+          },
+          schoolName: xmlObject['@_SchoolName'][0],
+          absences: xmlObject.Absences[0].Absence.map((absence) => ({
+            date: new Date(absence['@_AbsenceDate'][0]),
+            reason: absence['@_Reason'][0],
+            note: absence['@_Note'][0],
+            description: absence['@_CodeAllDayDescription'][0],
+            periods: absence.Periods[0].Period.map(
+              (period) =>
+                ({
+                  period: Number(period['@_Number'][0]),
+                  name: period['@_Name'][0],
+                  reason: period['@_Reason'][0],
+                  course: period['@_Course'][0],
+                  staff: {
+                    name: period['@_Staff'][0],
+                    staffGu: period['@_StaffGU'][0],
+                    email: period['@_StaffEMail'][0],
+                  },
+                  orgYearGu: period['@_OrgYearGU'][0],
+                } as AbsentPeriod)
+            ),
+          })),
+          periodInfos: xmlObject.TotalActivities[0].PeriodTotal.map((pd, i) => ({
+            period: Number(pd['@_Number'][0]),
+            total: {
+              excused: Number(xmlObject.TotalExcused[0].PeriodTotal[i]['@_Total'][0]),
+              tardies: Number(xmlObject.TotalTardies[0].PeriodTotal[i]['@_Total'][0]),
+              unexcused: Number(xmlObject.TotalUnexcused[0].PeriodTotal[i]['@_Total'][0]),
+              activities: Number(xmlObject.TotalActivities[0].PeriodTotal[i]['@_Total'][0]),
+              unexcusedTardies: Number(xmlObject.TotalUnexcusedTardies[0].PeriodTotal[i]['@_Total'][0]),
+            },
+          })) as PeriodInfo[],
+        } as Attendance);
+      } catch (e) {
+        rej(e);
+      }
+    });
   }
 
   public gradebook(reportingPeriodIndex?: number): Promise<Gradebook> {
