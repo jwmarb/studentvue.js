@@ -21,6 +21,7 @@ import credentials from './credentials.json';
 import { Calendar } from '../StudentVue/Client/Interfaces/Calendar';
 import { isThisMonth } from 'date-fns';
 import ResourceType from '../Constants/ResourceType';
+import { FileResource, Gradebook, Resource, URLResource } from '../StudentVue/Client/Interfaces/Gradebook';
 
 jest.spyOn(StudentVue, 'login').mockImplementation((districtUrl, credentials) => {
   const host = url.parse(districtUrl).host;
@@ -35,17 +36,32 @@ jest.spyOn(StudentVue, 'login').mockImplementation((districtUrl, credentials) =>
 let client: Client;
 let messages: Message[];
 let calendar: Calendar;
+let gradebook: Gradebook;
 
-beforeAll(async () => {
-  const [session] = await StudentVue.login(credentials.district, {
+let resources: (URLResource | FileResource)[];
+
+beforeAll(() => {
+  return StudentVue.login(credentials.district, {
     username: credentials.username,
     password: credentials.password,
-  });
-  messages = await session.messages();
-  calendar = await session.calendar({ interval: { start: Date.now(), end: Date.now() } });
-  client = session;
-
-  return { client, messages, calendar };
+  })
+    .then(([session]) => {
+      return Promise.all([
+        session,
+        session.messages(),
+        session.calendar({ interval: { start: Date.now(), end: Date.now() } }),
+        session.gradebook(),
+      ]);
+    })
+    .then(([session, _messages, _calendar, _gradebook]) => {
+      calendar = _calendar;
+      client = session;
+      gradebook = _gradebook;
+      resources = gradebook.courses
+        .map((course) => course.marks.map((mark) => mark.assignments.map((assignment) => assignment.resources)))
+        .flat(4);
+      client = session;
+    });
 });
 
 describe('User Info', () => {
@@ -112,24 +128,32 @@ describe('Calendar events', () => {
 
 describe.only('Gradebook', () => {
   it('fetches gradebook with matching type', async () => {
-    const gradebook = await client.gradebook(1);
-
     expect(gradebook).toBeDefined();
     expect(gradebook.error).toBeFalsy();
     expect(gradebook.courses.length).toBeGreaterThan(0);
-    expect(gradebook.reportingPeriod.current.index).toBe(1);
+    expect(gradebook.reportingPeriod.current.index).toEqual(expect.any(Number));
     expect(gradebook.reportingPeriod.available).toStrictEqual(
       expect.arrayContaining([expect.objectContaining({ index: expect.any(Number) })])
     );
-    expect(
-      gradebook.courses
-        .map((course) => course.marks.map((mark) => mark.assignments.map((assignment) => assignment.resources)))
-        .flat(4)
-    ).toStrictEqual(
+    expect(resources).toStrictEqual(
       expect.arrayContaining([
         expect.objectContaining({ type: ResourceType.URL }),
         expect.objectContaining({ type: ResourceType.FILE }),
       ])
+    );
+  });
+
+  it('resources have a valid URI', () => {
+    expect(resources).toStrictEqual(
+      expect.arrayContaining([expect.objectContaining({ file: expect.objectContaining({ uri: expect.any(String) }) })])
+    );
+  });
+
+  it('URL resources have a URL', () => {
+    if (resources.some((rsrc) => rsrc.type !== ResourceType.URL))
+      return console.warn('No URL resources found. Skipping...');
+    expect(resources).toStrictEqual(
+      expect.arrayContaining([expect.objectContaining<Partial<URLResource>>({ url: expect.any(String) })])
     );
   });
 });
