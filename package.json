@@ -2,7 +2,7 @@
   "name": "studentvue",
   "version": "1.0.0",
   "description": "",
-  "main": "lib/index.js",
+  "main": "lib",
   "types": "lib",
   "scripts": {
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules npx jest",
@@ -12,6 +12,9 @@
   },
   "keywords": [],
   "author": "",
+  "files": [
+    "lib"
+  ],
   "license": "ISC",
   "devDependencies": {
     "@babel/cli": "^7.17.6",
