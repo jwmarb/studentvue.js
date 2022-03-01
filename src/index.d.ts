@@ -8,3 +8,5 @@ export * from './StudentVue/Message/Message';
 export * from './StudentVue/RequestException/RequestException';
 export * from './StudentVue/Client/Interfaces/StudentInfo';
 export * from './utils/types';
+export * from './Constants/ResourceType';
+export * from './Constants/EventType';
