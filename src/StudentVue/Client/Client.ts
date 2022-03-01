@@ -23,6 +23,15 @@ export default class Client extends soap.Client {
     this.hostUrl = hostUrl;
   }
 
+  /**
+   * Returns the attendance of the student
+   * @returns Returns an Attendance object
+   * @example
+   * ```js
+   * client.attendance()
+   *  .then(console.log); // -> { type: 'Period', period: {...}, schoolName: 'University High School', absences: [...], periodInfos: [...] }
+   * ```
+   */
   public attendance(): Promise<Attendance> {
     return new Promise(async (res, rej) => {
       try {
@@ -81,6 +90,19 @@ export default class Client extends soap.Client {
     });
   }
 
+  /**
+   * Returns the gradebook of the student
+   * @param reportingPeriodIndex The timeframe that the gradebook should return
+   * @returns Returns a Gradebook object
+   * @example
+   * ```js
+   * const gradebook = await client.gradebook();
+   * console.log(gradebook); // { error: '', type: 'Traditional', reportingPeriod: {...}, courses: [...] };
+   *
+   * await client.gradebook(0) // Some schools will have ReportingPeriodIndex 0 as "1st Quarter Progress"
+   * await client.gradebook(7) // Some schools will have ReportingPeriodIndex 7 as "4th Quarter"
+   * ```
+   */
   public gradebook(reportingPeriodIndex?: number): Promise<Gradebook> {
     return new Promise(async (res, rej) => {
       try {
@@ -232,6 +254,14 @@ export default class Client extends soap.Client {
     });
   }
 
+  /**
+   * Gets the info of a student
+   * @returns StudentInfo object
+   * @example
+   * ```js
+   * studentInfo().then(console.log) // -> { student: { name: 'Evan Davis', nickname: '', lastName: 'Davis' }, ...}
+   * ```
+   */
   public studentInfo(): Promise<StudentInfo> {
     return new Promise<StudentInfo>(async (res, rej) => {
       try {
@@ -322,11 +352,14 @@ export default class Client extends soap.Client {
 
   /**
    *
-   * @param options Calendar options
+   * @param options Options to provide for calendar method. This is optional
    * @returns Returns a Calendar object
    * @example
    * ```js
    * client.calendar({ interval: { start: new Date('5/1/2022'), end: new Date('8/1/2021') }, concurrency: null }); // -> Limitless concurrency (not recommended)
+   *
+   * const calendar = await client.calendar();
+   * console.log(calendar); // -> { schoolDate: {...}, outputRange: {...}, events: [...] }
    * ```
    */
   public calendar(options: CalendarOptions): Promise<Calendar> {
