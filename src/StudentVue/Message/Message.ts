@@ -63,10 +63,18 @@ export default class Message extends soap.Client {
         : [];
   }
 
+  /**
+   * Check if a message has been read
+   * @returns Returns a boolean declaring whether or not the message has been previously read
+   */
   public isRead(): boolean {
     return this.read;
   }
 
+  /**
+   * Check if a message is deletable
+   * @returns Returns a boolean declaring whether or not the message is deletable
+   */
   public isDeletable(): boolean {
     return this.deletable;
   }
@@ -79,6 +87,40 @@ export default class Message extends soap.Client {
     this.deletable = deletable;
   }
 
+  /**
+   * Marks the message as read
+   * @returns Returns true to show that it has been marked as read
+   * @example
+   * ```js
+   * const messages = await client.messages();
+   * messages.every((msg) => msg.isRead()) // -> false
+   * messages.forEach(async (msg) => !msg.isRead() && await msg.markAsRead());
+   * messages.every((msg) => msg.isRead()) // -> true
+   * const refetchedMessages = await client.messages(); // See if it updated on the server
+   * messages.every((msg) => msg.isRead()) // -> true
+   * ```
+   * @example
+   * ```tsx
+   * // In a React project...
+   * import React from 'react';
+   *
+   * const Message = (props) => {
+   *  const { message } = props;
+   *
+   *  async function handleOnClick() {
+   *    await message.markAsRead();
+   *  }
+   *
+   *  return (
+   *    <button onClick={handleOnClick} style={{ color: message.isRead() ? undefined : 'red' }}>
+   *      <p>{message.subject.raw}</p>
+   *    </button>
+   *  )
+   * }
+   *
+   * export default Message;
+   * ```
+   */
   public markAsRead(): Promise<true> {
     return new Promise<true>(async (res, rej) => {
       if (this.read) return res(true);
