@@ -60,6 +60,7 @@ beforeAll(() => {
       calendar = _calendar;
       client = session;
       gradebook = _gradebook;
+      messages = _messages;
       attendance = _attendance;
       resources = gradebook.courses
         .map((course) => course.marks.map((mark) => mark.assignments.map((assignment) => assignment.resources)))
@@ -162,7 +163,7 @@ describe('Gradebook', () => {
   });
 });
 
-describe.only('Attendance', () => {
+describe('Attendance', () => {
   it('is defined', async () => {
     expect(attendance).toBeDefined();
   });
