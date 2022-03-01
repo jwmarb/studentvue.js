@@ -22,6 +22,7 @@ import { Calendar } from '../StudentVue/Client/Interfaces/Calendar';
 import { isThisMonth } from 'date-fns';
 import ResourceType from '../Constants/ResourceType';
 import { FileResource, Gradebook, Resource, URLResource } from '../StudentVue/Client/Interfaces/Gradebook';
+import { Attendance, PeriodInfo } from '../StudentVue/Client/Interfaces/Attendance';
 
 jest.spyOn(StudentVue, 'login').mockImplementation((districtUrl, credentials) => {
   const host = url.parse(districtUrl).host;
@@ -37,6 +38,7 @@ let client: Client;
 let messages: Message[];
 let calendar: Calendar;
 let gradebook: Gradebook;
+let attendance: Attendance;
 
 let resources: (URLResource | FileResource)[];
 
@@ -51,12 +53,14 @@ beforeAll(() => {
         session.messages(),
         session.calendar({ interval: { start: Date.now(), end: Date.now() } }),
         session.gradebook(),
+        session.attendance(),
       ]);
     })
-    .then(([session, _messages, _calendar, _gradebook]) => {
+    .then(([session, _messages, _calendar, _gradebook, _attendance]) => {
       calendar = _calendar;
       client = session;
       gradebook = _gradebook;
+      attendance = _attendance;
       resources = gradebook.courses
         .map((course) => course.marks.map((mark) => mark.assignments.map((assignment) => assignment.resources)))
         .flat(4);
@@ -126,7 +130,7 @@ describe('Calendar events', () => {
   });
 });
 
-describe.only('Gradebook', () => {
+describe('Gradebook', () => {
   it('fetches gradebook with matching type', async () => {
     expect(gradebook).toBeDefined();
     expect(gradebook.error).toBeFalsy();
@@ -154,6 +158,21 @@ describe.only('Gradebook', () => {
       return console.warn('No URL resources found. Skipping...');
     expect(resources).toStrictEqual(
       expect.arrayContaining([expect.objectContaining<Partial<URLResource>>({ url: expect.any(String) })])
+    );
+  });
+});
+
+describe.only('Attendance', () => {
+  it('is defined', async () => {
+    expect(attendance).toBeDefined();
+  });
+  it('periods are numbers', async () => {
+    expect(attendance.periodInfos).toStrictEqual(
+      expect.arrayContaining([
+        expect.objectContaining<Partial<PeriodInfo>>({
+          period: expect.any(Number),
+        }),
+      ])
     );
   });
 });
