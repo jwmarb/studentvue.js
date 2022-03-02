@@ -1,5 +1,5 @@
 import EventType from '../../../Constants/EventType';
-import { Icon } from '../../StudentVue';
+import { Icon } from '../../../index';
 
 export declare interface CalendarOptions {
   interval: {
