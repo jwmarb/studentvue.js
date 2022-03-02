@@ -31,6 +31,7 @@ export declare interface ScheduleXMLObject {
                       '@_StartDate': [string];
                       '@_SectionGU': [string];
                       '@_HideClassStartEndTime': [string];
+                      AttendanceCode: [string];
                     }[];
                   }
                 ];

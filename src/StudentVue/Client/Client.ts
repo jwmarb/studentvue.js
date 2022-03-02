@@ -1,6 +1,6 @@
 import { LoginCredentials } from '../../utils/soap/Client/Client.interfaces';
 import soap from '../../utils/soap/soap';
-import { AdditionalInfo, AdditionalInfoItem, StudentInfo } from './Client.interfaces';
+import { AdditionalInfo, AdditionalInfoItem, ClassScheduleInfo, StudentInfo } from './Client.interfaces';
 import { StudentInfoXMLObject } from './Interfaces/xml/StudentInfo';
 import Message from '../Message/Message';
 import { MessageXMLObject } from '../Message/Message.xml';
@@ -16,6 +16,7 @@ import asyncPool from 'tiny-async-pool';
 import ResourceType from '../../Constants/ResourceType';
 import { AbsentPeriod, Attendance, PeriodInfo } from './Interfaces/Attendance';
 import { ScheduleXMLObject } from './Interfaces/xml/Schedule';
+import { Schedule } from './Client.interfaces';
 
 export default class Client extends soap.Client {
   private hostUrl: string;
@@ -24,12 +25,73 @@ export default class Client extends soap.Client {
     this.hostUrl = hostUrl;
   }
 
-  public schedule(termIndex?: number): Promise<unknown> {
+  /**
+   * Gets the schedule of the student
+   * @param {number} termIndex The index of the term.
+   * @returns {Promise<Schedule>} Returns the schedule of the student
+   * @example
+   * ```js
+   * await schedule(0) // -> { term: { index: 0, name: '1st Qtr Progress' }, ... }
+   * ```
+   */
+  public schedule(termIndex?: number): Promise<Schedule> {
     return new Promise(async (res, rej) => {
       try {
         const xmlObject: ScheduleXMLObject = await super.processRequest({
           methodName: 'StudentClassList',
           paramStr: { childIntId: 0, ...(termIndex != null ? { TermIndex: termIndex } : {}) },
+        });
+
+        res({
+          term: {
+            index: Number(xmlObject.StudentClassSchedule[0]['@_TermIndex'][0]),
+            name: xmlObject.StudentClassSchedule[0]['@_TermIndexName'][0],
+          },
+          error: xmlObject.StudentClassSchedule[0]['@_ErrorMessage'][0],
+          today: xmlObject.StudentClassSchedule[0].TodayScheduleInfoData[0].SchoolInfos[0].SchoolInfo.map((school) => ({
+            name: school['@_SchoolName'][0],
+            bellScheduleName: school['@_BellSchedName'][0],
+            classes: school.Classes[0].ClassInfo.map(
+              (course) =>
+                ({
+                  period: Number(course['@_Period'][0]),
+                  attendanceCode: course.AttendanceCode[0],
+                  date: {
+                    start: new Date(course['@_StartDate'][0]),
+                    end: new Date(course['@_EndDate'][0]),
+                  },
+                  name: course['@_ClassName'][0],
+                  sectionGu: course['@_SectionGU'][0],
+                  teacher: {
+                    email: course['@_TeacherEmail'][0],
+                    emailSubject: course['@_EmailSubject'][0],
+                    name: course['@_TeacherName'][0],
+                    staffGu: course['@_StaffGU'][0],
+                    url: course['@_TeacherURL'][0],
+                  },
+                } as ClassScheduleInfo)
+            ),
+          })),
+          classes: xmlObject.StudentClassSchedule[0].ClassLists[0].ClassListing.map((studentClass) => ({
+            name: studentClass['@_CourseTitle'][0],
+            period: Number(studentClass['@_Period'][0]),
+            room: studentClass['@_RoomName'][0],
+            sectionGu: studentClass['@_SectionGU'][0],
+            teacher: {
+              name: studentClass['@_Teacher'][0],
+              email: studentClass['@_TeacherEmail'][0],
+              staffGu: studentClass['@_TeacherStaffGU'][0],
+            },
+          })),
+          terms: xmlObject.StudentClassSchedule[0].TermLists[0].TermListing.map((term) => ({
+            date: {
+              start: new Date(term['@_BeginDate'][0]),
+              end: new Date(term['@_EndDate'][0]),
+            },
+            index: Number(term['@_TermIndex'][0]),
+            name: term['@_TermName'][0],
+            schoolYearTermCodeGu: term['@_SchoolYearTrmCodeGU'][0],
+          })),
         });
       } catch (e) {
         rej(e);
