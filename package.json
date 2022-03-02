@@ -6,7 +6,7 @@
   "types": "lib",
   "scripts": {
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules npx jest",
-    "build": "npm run build:compile && npm run build:types",
+    "build": "node src/tools/cleanup.js lib && npm run build:compile && npm run build:types",
     "build:compile": "babel src --out-dir lib --extensions \".ts\" --source-maps inline",
     "build:types": "tsc && dts-bundle --configJson dts-bundle.json"
   },
