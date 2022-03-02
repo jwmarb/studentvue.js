@@ -153,8 +153,8 @@ declare module 'studentvue/StudentVue/Client/Client' {
             attendance(): Promise<Attendance>;
             /**
                 * Returns the gradebook of the student
-                * @param reportingPeriodIndex The timeframe that the gradebook should return
-                * @returns Returns a Gradebook object
+                * @param {number} reportingPeriodIndex The timeframe that the gradebook should return
+                * @returns {Promise<Gradebook>} Returns a Gradebook object
                 * @example
                 * ```js
                 * const gradebook = await client.gradebook();
@@ -165,6 +165,14 @@ declare module 'studentvue/StudentVue/Client/Client' {
                 * ```
                 */
             gradebook(reportingPeriodIndex?: number): Promise<Gradebook>;
+            /**
+                * Get a list of messages of the student
+                * @returns {Promise<Message[]>} Returns an array of messages of the student
+                * @example
+                * ```js
+                * await client.messages(); // -> [Message]
+                * ```
+                */
             messages(): Promise<Message[]>;
             /**
                 * Gets the info of a student
@@ -334,7 +342,7 @@ declare module 'studentvue/StudentVue/Message/Message.xml' {
 
 declare module 'studentvue/StudentVue/Client/Interfaces/Calendar' {
     import EventType from 'studentvue/Constants/EventType';
-    import { Icon } from 'studentvue/index';
+    import Icon from 'studentvue/StudentVue/Icon/Icon';
     
     export interface CalendarOptions {
         interval: {
