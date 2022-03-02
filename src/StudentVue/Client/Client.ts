@@ -15,12 +15,26 @@ import { Assignment, FileResource, Gradebook, Mark, URLResource, WeightedCategor
 import asyncPool from 'tiny-async-pool';
 import ResourceType from '../../Constants/ResourceType';
 import { AbsentPeriod, Attendance, PeriodInfo } from './Interfaces/Attendance';
+import { ScheduleXMLObject } from './Interfaces/xml/Schedule';
 
 export default class Client extends soap.Client {
   private hostUrl: string;
   constructor(credentials: LoginCredentials, hostUrl: string) {
     super(credentials);
     this.hostUrl = hostUrl;
+  }
+
+  public schedule(termIndex?: number): Promise<unknown> {
+    return new Promise(async (res, rej) => {
+      try {
+        const xmlObject: ScheduleXMLObject = await super.processRequest({
+          methodName: 'StudentClassList',
+          paramStr: { childIntId: 0, ...(termIndex != null ? { TermIndex: termIndex } : {}) },
+        });
+      } catch (e) {
+        rej(e);
+      }
+    });
   }
 
   /**
