@@ -1,10 +1,11 @@
 import { XMLParser } from 'fast-xml-parser';
 import StudentVue, { Client } from '../index';
-import { StudentInfo } from '../StudentVue/Client/Client.interfaces';
+import { Schedule, StudentInfo } from '../StudentVue/Client/Client.interfaces';
 import RequestException from '../StudentVue/RequestException/RequestException';
 import { SchoolDistrict } from '../StudentVue/StudentVue.interfaces';
 import url from 'url';
 import readable from '../utils/readable';
+import { expectTypeOf } from 'expect-type';
 import Message from '../StudentVue/Message/Message';
 jest.setTimeout(60000);
 
@@ -80,14 +81,13 @@ describe('User Info', () => {
   });
 });
 
-describe.only('User Messages', () => {
+describe('User Messages', () => {
   it('Message content greater than 200 characters', () => {
     const lessThan100Chars: Message[] = [];
     for (const msg of messages) {
       if (msg.htmlContent.length < 100) lessThan100Chars.push(msg);
     }
     expect(lessThan100Chars.length).toBe(0);
-    console.log(lessThan100Chars);
   });
   it('Fetches a list of messages', () => {
     expect(messages).toBeDefined();
@@ -183,5 +183,12 @@ describe('Attendance', () => {
         }),
       ])
     );
+  });
+});
+
+describe('Schedule', () => {
+  it('matches type', async () => {
+    const schedule = await client.schedule();
+    expectTypeOf(schedule).toMatchTypeOf<Schedule>();
   });
 });
