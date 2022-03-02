@@ -1,5 +1,5 @@
 import { XMLParser } from 'fast-xml-parser';
-import StudentVue, { Client } from '../StudentVue/StudentVue';
+import StudentVue, { Client } from '../index';
 import { StudentInfo } from '../StudentVue/Client/Client.interfaces';
 import RequestException from '../StudentVue/RequestException/RequestException';
 import { SchoolDistrict } from '../StudentVue/StudentVue.interfaces';
