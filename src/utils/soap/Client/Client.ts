@@ -111,10 +111,16 @@ export default class Client {
             isArray: () => true,
             processEntities: false,
             parseAttributeValue: false,
+            parseTagValue: false,
           });
 
           const obj: T | ParsedRequestError = parserTwo.parse(
-            result['soap:Envelope']['soap:Body'].ProcessWebServiceRequestResponse.ProcessWebServiceRequestResult
+            result['soap:Envelope'][
+              'soap:Body'
+            ].ProcessWebServiceRequestResponse.ProcessWebServiceRequestResult.replace(
+              /(?<=Content=").*(?="\sRead)/g,
+              btoa
+            )
           );
 
           if ('RT_ERROR' in obj) return reject(new RequestException(obj));

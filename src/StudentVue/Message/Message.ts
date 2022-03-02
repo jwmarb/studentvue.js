@@ -5,7 +5,6 @@ import { MessageXMLObject } from './Message.xml';
 import Icon from '../Icon/Icon';
 
 export default class Message extends soap.Client {
-  private xmlObject: MessageXMLObject['PXPMessagesData'][0]['MessageListings'][0]['MessageListing'][0];
   private hostUrl: string;
 
   public readonly icon: Icon;
@@ -34,14 +33,14 @@ export default class Message extends soap.Client {
     credentials: LoginCredentials,
     hostUrl: string
   ) {
+    console.log(xmlObject);
     super(credentials);
     this.hostUrl = hostUrl;
-    this.xmlObject = xmlObject;
     this.icon = new Icon(xmlObject['@_IconURL'][0], this.hostUrl);
     this.id = xmlObject['@_ID'][0];
     this.type = xmlObject['@_Type'][0];
     this.beginDate = xmlObject['@_BeginDate'][0];
-    this.htmlContent = xmlObject['@_Content'][0];
+    this.htmlContent = atob(xmlObject['@_Content'][0]);
     this.read = JSON.parse(xmlObject['@_Read'][0]);
     this.deletable = JSON.parse(xmlObject['@_Deletable'][0]);
     this.from = {
@@ -132,8 +131,8 @@ export default class Message extends soap.Client {
             MessageListing: {
               '@_xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
               '@_xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
-              '@_ID': this.xmlObject['@_ID'][0],
-              '@_Type': this.xmlObject['@_Type'][0],
+              '@_ID': this.id,
+              '@_Type': this.type,
               '@_MarkAsRead': 'true',
             },
           },
