@@ -4,7 +4,7 @@ import Attachment from '../Attachment/Attachment';
 import { MessageXMLObject } from './Message.xml';
 import Icon from '../Icon/Icon';
 export default class Message extends soap.Client {
-    private xmlObject;
+    readonly xmlObject: MessageXMLObject['PXPMessagesData'][0]['MessageListings'][0]['MessageListing'][0];
     private hostUrl;
     readonly icon: Icon;
     readonly id: string;
