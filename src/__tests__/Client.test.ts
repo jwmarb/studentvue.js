@@ -80,7 +80,15 @@ describe('User Info', () => {
   });
 });
 
-describe('User Messages', () => {
+describe.only('User Messages', () => {
+  it('Message content greater than 200 characters', () => {
+    const lessThan100Chars: Message[] = [];
+    for (const msg of messages) {
+      if (msg.htmlContent.length < 100) lessThan100Chars.push(msg);
+    }
+    expect(lessThan100Chars.length).toBe(0);
+    console.log(lessThan100Chars);
+  });
   it('Fetches a list of messages', () => {
     expect(messages).toBeDefined();
   });
