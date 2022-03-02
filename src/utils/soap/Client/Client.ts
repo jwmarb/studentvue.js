@@ -53,7 +53,7 @@ export default class Client {
    * 
    * ```xml
    * <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-    <soap:Body>
+      <soap:Body>
         <ProcessWebServiceRequest xmlns="http://edupoint.com/webservices/">
             <userID>STUDENT_USERNAME</userID>
             <password>STUDENT_PASSWORD</password>
@@ -66,7 +66,7 @@ export default class Client {
               <AsLongAsItMatchesTheDocumentation>true</AsLongAsItMatchesTheDocumentation>
             </paramStr>
         </ProcessWebServiceRequest>
-    </soap:Body>
+      </soap:Body>
 </soap:Envelope>
    * ```
    */
