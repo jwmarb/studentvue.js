@@ -10,15 +10,35 @@ export default class Attachment extends soap.Client {
 
   public constructor(name: string, attachmentGu: string, session: LoginCredentials) {
     super(session);
+    /**
+     * The name of the attachment.
+     * @type {string}
+     * @public
+     * @readonly
+     */
     this.name = name;
+
+    /**
+     * the GU of the attachment.
+     * @type {string}
+     * @public
+     * @readonly
+     */
     this.attachmentGu = attachmentGu;
+
+    /**
+     * The file extension of the attachment extracted using regex
+     * @type {string | null}
+     * @public
+     * @readonly
+     */
     this.fileExtension = (name.match(/(\.[^.]+)$/) ?? [null])[0];
   }
 
   /**
    * Fetches the attachment from synergy servers.
    * Unfortunately, the api does not offer a URL path to the file
-   * @returns base64 string
+   * @returns {string} base64 string
    *
    * @example
    * ```js
