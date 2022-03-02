@@ -33,7 +33,6 @@ export default class Message extends soap.Client {
     credentials: LoginCredentials,
     hostUrl: string
   ) {
-    console.log(xmlObject);
     super(credentials);
     this.hostUrl = hostUrl;
     this.icon = new Icon(xmlObject['@_IconURL'][0], this.hostUrl);
