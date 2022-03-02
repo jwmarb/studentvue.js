@@ -2,8 +2,8 @@
   "name": "studentvue",
   "version": "1.0.0",
   "description": "",
-  "main": "lib",
-  "types": "lib",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules npx jest",
     "build": "node src/tools/cleanup.js lib && npm run build:compile && npm run build:types",
