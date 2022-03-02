@@ -1,6 +1,4 @@
 export default class Icon {
-    private path;
-    private hostUrl;
+    readonly uri: string;
     constructor(path: string, hostUrl: string);
-    getURI(): string;
 }

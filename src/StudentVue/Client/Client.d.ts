@@ -5,9 +5,20 @@ import Message from '../Message/Message';
 import { Calendar, CalendarOptions } from './Interfaces/Calendar';
 import { Gradebook } from './Interfaces/Gradebook';
 import { Attendance } from './Interfaces/Attendance';
+import { Schedule } from './Client.interfaces';
 export default class Client extends soap.Client {
     private hostUrl;
     constructor(credentials: LoginCredentials, hostUrl: string);
+    /**
+     * Gets the schedule of the student
+     * @param {number} termIndex The index of the term.
+     * @returns {Promise<Schedule>} Returns the schedule of the student
+     * @example
+     * ```js
+     * await schedule(0) // -> { term: { index: 0, name: '1st Qtr Progress' }, ... }
+     * ```
+     */
+    schedule(termIndex?: number): Promise<Schedule>;
     /**
      * Returns the attendance of the student
      * @returns {Promise<Attendance>} Returns an Attendance object

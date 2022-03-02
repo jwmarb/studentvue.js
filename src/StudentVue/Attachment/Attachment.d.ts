@@ -9,7 +9,7 @@ export default class Attachment extends soap.Client {
     /**
      * Fetches the attachment from synergy servers.
      * Unfortunately, the api does not offer a URL path to the file
-     * @returns base64 string
+     * @returns {string} base64 string
      *
      * @example
      * ```js

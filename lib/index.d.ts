@@ -9,6 +9,7 @@ declare module 'studentvue' {
     export { default as Icon } from 'studentvue/StudentVue/Icon/Icon';
     export { default as Client } from 'studentvue/StudentVue/Client/Client';
     export { default as Attachment } from 'studentvue/StudentVue/Attachment/Attachment';
+    export * from 'studentvue/StudentVue/Client/Client.interfaces';
     export default StudentVue;
 }
 
@@ -23,6 +24,9 @@ declare module 'studentvue/StudentVue/StudentVue' {
 }
 
 declare module 'studentvue/Constants/ResourceType' {
+    /**
+      * The type the resource uses
+      */
     enum ResourceType {
         FILE = "File",
         URL = "URL"
@@ -126,8 +130,8 @@ declare module 'studentvue/StudentVue/Message/Message' {
 
 declare module 'studentvue/StudentVue/Icon/Icon' {
     export default class Icon {
+        readonly uri: string;
         constructor(path: string, hostUrl: string);
-        getURI(): string;
     }
 }
 
@@ -139,8 +143,19 @@ declare module 'studentvue/StudentVue/Client/Client' {
     import { Calendar, CalendarOptions } from 'studentvue/StudentVue/Client/Interfaces/Calendar';
     import { Gradebook } from 'studentvue/StudentVue/Client/Interfaces/Gradebook';
     import { Attendance } from 'studentvue/StudentVue/Client/Interfaces/Attendance';
+    import { Schedule } from 'studentvue/StudentVue/Client/Client.interfaces';
     export default class Client extends soap.Client {
             constructor(credentials: LoginCredentials, hostUrl: string);
+            /**
+                * Gets the schedule of the student
+                * @param {number} termIndex The index of the term.
+                * @returns {Promise<Schedule>} Returns the schedule of the student
+                * @example
+                * ```js
+                * await schedule(0) // -> { term: { index: 0, name: '1st Qtr Progress' }, ... }
+                * ```
+                */
+            schedule(termIndex?: number): Promise<Schedule>;
             /**
                 * Returns the attendance of the student
                 * @returns {Promise<Attendance>} Returns an Attendance object
@@ -211,7 +226,7 @@ declare module 'studentvue/StudentVue/Attachment/Attachment' {
         /**
           * Fetches the attachment from synergy servers.
           * Unfortunately, the api does not offer a URL path to the file
-          * @returns base64 string
+          * @returns {string} base64 string
           *
           * @example
           * ```js
@@ -220,6 +235,20 @@ declare module 'studentvue/StudentVue/Attachment/Attachment' {
           * ```
           */
         get(): Promise<Base64String>;
+    }
+}
+
+declare module 'studentvue/StudentVue/Client/Client.interfaces' {
+    export * from 'studentvue/StudentVue/Client/Interfaces/StudentInfo';
+    export * from 'studentvue/StudentVue/Client/Interfaces/Gradebook';
+    export * from 'studentvue/StudentVue/Client/Interfaces/Calendar';
+    export * from 'studentvue/StudentVue/Client/Interfaces/Attendance';
+    export * from 'studentvue/StudentVue/Client/Interfaces/Schedule';
+    export * from 'studentvue/StudentVue/Client/Client';
+    export interface Staff {
+        name: string;
+        email: string;
+        staffGu: string;
     }
 }
 
@@ -234,19 +263,6 @@ declare module 'studentvue/StudentVue/StudentVue.interfaces' {
     export interface UserCredentials {
         username: string;
         password: string;
-    }
-}
-
-declare module 'studentvue/StudentVue/Client/Client.interfaces' {
-    export * from 'studentvue/StudentVue/Client/Interfaces/StudentInfo';
-    export * from 'studentvue/StudentVue/Client/Interfaces/Gradebook';
-    export * from 'studentvue/StudentVue/Client/Interfaces/Calendar';
-    export * from 'studentvue/StudentVue/Client/Interfaces/Attendance';
-    export * from 'studentvue/StudentVue/Client/Client';
-    export interface Staff {
-        name: string;
-        email: string;
-        staffGu: string;
     }
 }
 
@@ -628,6 +644,62 @@ declare module 'studentvue/StudentVue/Client/Interfaces/StudentInfo' {
     }
 }
 
+declare module 'studentvue/StudentVue/Client/Interfaces/Schedule' {
+    import { Staff } from 'studentvue/StudentVue/Client/Client.interfaces';
+    
+    export interface Schedule {
+        term: {
+            index: number;
+            name: string;
+        };
+        error: string;
+        today: SchoolScheduleInfo[];
+        classes: ClassInfo[];
+        terms: TermInfo[];
+    }
+    
+    export interface SchoolScheduleInfo {
+        name: string;
+        bellScheduleName: string;
+        classes: ClassScheduleInfo[];
+    }
+    
+    export interface TermInfo {
+        index: number;
+        name: string;
+        date: {
+            start: Date;
+            end: Date;
+        };
+        schoolYearTermCodeGu: string;
+    }
+    
+    export interface ClassInfo {
+        period: number;
+        name: string;
+        room: string;
+        teacher: Staff;
+        sectionGu: string;
+    }
+    
+    export interface ClassScheduleInfo {
+        period: number;
+        name: string;
+        url: string;
+        time: {
+            start: Date;
+            end: Date;
+        };
+        date: {
+            start: Date;
+            end: Date;
+        };
+        attendanceCode: string;
+        sectionGu: string;
+        teacher: Staff & { url: string; emailSubject: string };
+    }
+}
+
 declare module 'studentvue/utils/soap/Client/Client' {
     import { RequestOptions, LoginCredentials } from 'studentvue/utils/soap/Client/Client.interfaces';
     export default class Client {
@@ -646,7 +718,7 @@ declare module 'studentvue/utils/soap/Client/Client' {
           *
           * ```xml
           * <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-          <soap:Body>
+            <soap:Body>
               <ProcessWebServiceRequest xmlns="http://edupoint.com/webservices/">
                   <userID>STUDENT_USERNAME</userID>
                   <password>STUDENT_PASSWORD</password>
@@ -659,7 +731,7 @@ declare module 'studentvue/utils/soap/Client/Client' {
                     <AsLongAsItMatchesTheDocumentation>true</AsLongAsItMatchesTheDocumentation>
                   </paramStr>
               </ProcessWebServiceRequest>
-          </soap:Body>
+            </soap:Body>
       </soap:Envelope>
           * ```
           */
