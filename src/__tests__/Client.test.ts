@@ -1,6 +1,6 @@
 import { XMLParser } from 'fast-xml-parser';
 import StudentVue, { Client } from '../index';
-import { Schedule, StudentInfo } from '../StudentVue/Client/Client.interfaces';
+import { Schedule, SchoolInfo, StudentInfo } from '../StudentVue/Client/Client.interfaces';
 import RequestException from '../StudentVue/RequestException/RequestException';
 import { SchoolDistrict } from '../StudentVue/StudentVue.interfaces';
 import url from 'url';
@@ -190,5 +190,12 @@ describe('Schedule', () => {
   it('matches type', async () => {
     const schedule = await client.schedule();
     expectTypeOf(schedule).toMatchTypeOf<Schedule>();
+  });
+});
+
+describe('School Info', () => {
+  it('matches type', async () => {
+    const schoolInfo = await client.schoolInfo();
+    expectTypeOf(schoolInfo).toMatchTypeOf<SchoolInfo>();
   });
 });
