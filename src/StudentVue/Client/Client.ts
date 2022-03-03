@@ -1,6 +1,6 @@
 import { LoginCredentials } from '../../utils/soap/Client/Client.interfaces';
 import soap from '../../utils/soap/soap';
-import { AdditionalInfo, AdditionalInfoItem, ClassScheduleInfo, StudentInfo } from './Client.interfaces';
+import { AdditionalInfo, AdditionalInfoItem, ClassScheduleInfo, SchoolInfo, StudentInfo } from './Client.interfaces';
 import { StudentInfoXMLObject } from './Interfaces/xml/StudentInfo';
 import Message from '../Message/Message';
 import { MessageXMLObject } from '../Message/Message.xml';
@@ -17,12 +17,52 @@ import ResourceType from '../../Constants/ResourceType';
 import { AbsentPeriod, Attendance, PeriodInfo } from './Interfaces/Attendance';
 import { ScheduleXMLObject } from './Interfaces/xml/Schedule';
 import { Schedule } from './Client.interfaces';
+import { SchoolInfoXMLObject } from './Interfaces/xml/SchoolInfo';
 
 export default class Client extends soap.Client {
   private hostUrl: string;
   constructor(credentials: LoginCredentials, hostUrl: string) {
     super(credentials);
     this.hostUrl = hostUrl;
+  }
+
+  public schoolInfo(): Promise<SchoolInfo> {
+    return new Promise(async (res, rej) => {
+      try {
+        const {
+          StudentSchoolInfoListing: [xmlObject],
+        }: SchoolInfoXMLObject = await super.processRequest({
+          methodName: 'StudentSchoolInfo',
+          paramStr: { childIntID: 0 },
+        });
+
+        res({
+          school: {
+            address: xmlObject['@_SchoolAddress'][0],
+            addressAlt: xmlObject['@_SchoolAddress2'][0],
+            city: xmlObject['@_SchoolCity'][0],
+            zipCode: xmlObject['@_SchoolZip'][0],
+            phone: xmlObject['@_Phone'][0],
+            altPhone: xmlObject['@_Phone2'][0],
+            principal: {
+              name: xmlObject['@_Principal'][0],
+              email: xmlObject['@_PrincipalEmail'][0],
+              staffGu: xmlObject['@_PrincipalGu'][0],
+            },
+          },
+          staff: xmlObject.StaffLists[0].StaffList.map((staff) => ({
+            name: staff['@_Name'][0],
+            email: staff['@_EMail'][0],
+            staffGu: staff['@_StaffGU'][0],
+            jobTitle: staff['@_Title'][0],
+            extn: staff['@_Extn'][0],
+            phone: staff['@_Phone'][0],
+          })),
+        });
+      } catch (e) {
+        rej(e);
+      }
+    });
   }
 
   /**
