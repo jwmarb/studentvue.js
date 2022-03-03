@@ -26,6 +26,18 @@ export default class Client extends soap.Client {
     this.hostUrl = hostUrl;
   }
 
+  /**
+   * Gets the student's school's information
+   * @returns {Promise<SchoolInfo>} Returns the information of the student's school
+   * @example
+   * ```js
+   * await client.schoolInfo();
+   *
+   * client.schoolInfo().then((schoolInfo) => {
+   *  console.log(_.uniq(schoolInfo.staff.map((staff) => staff.name))); // List all staff positions using lodash
+   * })
+   * ```
+   */
   public schoolInfo(): Promise<SchoolInfo> {
     return new Promise(async (res, rej) => {
       try {
