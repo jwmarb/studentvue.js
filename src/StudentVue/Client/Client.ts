@@ -18,12 +18,32 @@ import { AbsentPeriod, Attendance, PeriodInfo } from './Interfaces/Attendance';
 import { ScheduleXMLObject } from './Interfaces/xml/Schedule';
 import { Schedule } from './Client.interfaces';
 import { SchoolInfoXMLObject } from './Interfaces/xml/SchoolInfo';
+import { ReportCardsXMLObject } from '../ReportCard/ReportCard.xml';
+import ReportCard from '../ReportCard/ReportCard';
 
 export default class Client extends soap.Client {
   private hostUrl: string;
   constructor(credentials: LoginCredentials, hostUrl: string) {
     super(credentials);
     this.hostUrl = hostUrl;
+  }
+
+  public reportCards(): Promise<ReportCard[]> {
+    return new Promise(async (res, rej) => {
+      try {
+        const xmlObject: ReportCardsXMLObject = await super.processRequest({
+          methodName: 'GetReportCardInitialData',
+          paramStr: { childIntId: 0 },
+        });
+        res(
+          xmlObject.RCReportingPeriodData[0].RCReportingPeriods[0].RCReportingPeriod.map(
+            (xml) => new ReportCard(xml, super.credentials)
+          )
+        );
+      } catch (e) {
+        rej(e);
+      }
+    });
   }
 
   /**

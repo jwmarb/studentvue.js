@@ -7,4 +7,5 @@ export { default as Message } from './StudentVue/Message/Message';
 export { default as Icon } from './StudentVue/Icon/Icon';
 export { default as Client } from './StudentVue/Client/Client';
 export { default as Attachment } from './StudentVue/Attachment/Attachment';
+export { default as Document } from './StudentVue/Document/Document';
 export default StudentVue;
