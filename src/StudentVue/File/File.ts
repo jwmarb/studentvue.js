@@ -2,7 +2,7 @@ import { LoginCredentials } from '../../utils/soap/Client/Client.interfaces';
 import soap from '../../utils/soap/soap';
 import { Base64String } from '../../utils/types';
 
-export default abstract class Document<T> extends soap.Client {
+export default abstract class File<T> extends soap.Client {
   public readonly documentGu: string;
   private readonly methodName: string;
 
