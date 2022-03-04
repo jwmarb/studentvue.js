@@ -9,6 +9,8 @@ declare module 'studentvue' {
     export { default as Icon } from 'studentvue/StudentVue/Icon/Icon';
     export { default as Client } from 'studentvue/StudentVue/Client/Client';
     export { default as Attachment } from 'studentvue/StudentVue/Attachment/Attachment';
+    export * from 'studentvue/StudentVue/ReportCard';
+    export * from 'studentvue/StudentVue/Document';
     export * from 'studentvue/StudentVue/Client/Client.interfaces';
     export default StudentVue;
 }
@@ -138,14 +140,52 @@ declare module 'studentvue/StudentVue/Icon/Icon' {
 declare module 'studentvue/StudentVue/Client/Client' {
     import { LoginCredentials } from 'studentvue/utils/soap/Client/Client.interfaces';
     import soap from 'studentvue/utils/soap/soap';
-    import { StudentInfo } from 'studentvue/StudentVue/Client/Client.interfaces';
+    import { SchoolInfo, StudentInfo } from 'studentvue/StudentVue/Client/Client.interfaces';
     import Message from 'studentvue/StudentVue/Message/Message';
     import { Calendar, CalendarOptions } from 'studentvue/StudentVue/Client/Interfaces/Calendar';
     import { Gradebook } from 'studentvue/StudentVue/Client/Interfaces/Gradebook';
     import { Attendance } from 'studentvue/StudentVue/Client/Interfaces/Attendance';
     import { Schedule } from 'studentvue/StudentVue/Client/Client.interfaces';
+    import ReportCard from 'studentvue/StudentVue/ReportCard/ReportCard';
+    import Document from 'studentvue/StudentVue/Document/Document';
     export default class Client extends soap.Client {
             constructor(credentials: LoginCredentials, hostUrl: string);
+            /**
+                * Gets the student's documents from synergy servers
+                * @returns {Promise<Document[]}> Returns a list of student documents
+                * @example
+                * ```js
+                * const documents = await client.documents();
+                * const document = documents[0];
+                * const files = await document.get();
+                * const base64collection = files.map((file) => file.base64);
+                * ```
+                */
+            documents(): Promise<Document[]>;
+            /**
+                * Gets a list of report cards
+                * @returns {Promise<ReportCard[]>} Returns a list of report cards that can fetch a file
+                * @example
+                * ```js
+                * const reportCards = await client.reportCards();
+                * const files = await Promise.all(reportCards.map((card) => card.get()));
+                * const base64arr = files.map((file) => file.base64); // ["JVBERi0...", "dUIoa1...", ...];
+                * ```
+                */
+            reportCards(): Promise<ReportCard[]>;
+            /**
+                * Gets the student's school's information
+                * @returns {Promise<SchoolInfo>} Returns the information of the student's school
+                * @example
+                * ```js
+                * await client.schoolInfo();
+                *
+                * client.schoolInfo().then((schoolInfo) => {
+                *  console.log(_.uniq(schoolInfo.staff.map((staff) => staff.name))); // List all staff positions using lodash
+                * })
+                * ```
+                */
+            schoolInfo(): Promise<SchoolInfo>;
             /**
                 * Gets the schedule of the student
                 * @param {number} termIndex The index of the term.
@@ -238,12 +278,23 @@ declare module 'studentvue/StudentVue/Attachment/Attachment' {
     }
 }
 
+declare module 'studentvue/StudentVue/ReportCard' {
+    export { default as ReportCard } from 'studentvue/StudentVue/ReportCard/ReportCard';
+    export * from 'studentvue/StudentVue/ReportCard/ReportCard.interfaces';
+}
+
+declare module 'studentvue/StudentVue/Document' {
+    export * from 'studentvue/StudentVue/Document/Document.interface';
+    export { default as Document } from 'studentvue/StudentVue/Document/Document';
+}
+
 declare module 'studentvue/StudentVue/Client/Client.interfaces' {
     export * from 'studentvue/StudentVue/Client/Interfaces/StudentInfo';
     export * from 'studentvue/StudentVue/Client/Interfaces/Gradebook';
     export * from 'studentvue/StudentVue/Client/Interfaces/Calendar';
     export * from 'studentvue/StudentVue/Client/Interfaces/Attendance';
     export * from 'studentvue/StudentVue/Client/Interfaces/Schedule';
+    export * from 'studentvue/StudentVue/Client/Interfaces/SchoolInfo';
     export * from 'studentvue/StudentVue/Client/Client';
     export interface Staff {
         name: string;
@@ -566,8 +617,71 @@ declare module 'studentvue/StudentVue/Client/Interfaces/Attendance' {
     }
 }
 
+declare module 'studentvue/StudentVue/ReportCard/ReportCard' {
+    import { LoginCredentials } from 'studentvue/utils/soap/Client/Client.interfaces';
+    import File from 'studentvue/StudentVue/File/File';
+    import { ReportCardFile } from 'studentvue/StudentVue/ReportCard/ReportCard.interfaces';
+    import { ReportCardBase64XMLObject, ReportCardsXMLObject } from 'studentvue/StudentVue/ReportCard/ReportCard.xml';
+    export default class ReportCard extends File<ReportCardFile> {
+        readonly date: Date;
+        readonly periodName: string;
+        protected parseXMLObject(xmlObject: ReportCardBase64XMLObject): ReportCardFile;
+        constructor(xmlObj: ReportCardsXMLObject['RCReportingPeriodData'][0]['RCReportingPeriods'][0]['RCReportingPeriod'][0], credentials: LoginCredentials);
+    }
+}
+
+declare module 'studentvue/StudentVue/Document/Document' {
+    import { LoginCredentials } from 'studentvue/utils/soap/Client/Client.interfaces';
+    import File from 'studentvue/StudentVue/File/File';
+    import { DocumentFile } from 'studentvue/StudentVue/Document/Document.interface';
+    import { DocumentFileXMLObject, DocumentXMLObject } from 'studentvue/StudentVue/Document/Document.xml';
+    export default class Document extends File<DocumentFile[]> {
+        readonly file: {
+            name: string;
+            date: Date;
+            type: string;
+        };
+        readonly comment: string;
+        protected parseXMLObject(xmlObject: DocumentFileXMLObject): {
+            file: {
+                name: string;
+                type: string;
+                date: Date;
+            };
+            category: string;
+            notes: string;
+            base64: string;
+        }[];
+        constructor(xmlObj: DocumentXMLObject['StudentDocuments'][0]['StudentDocumentDatas'][0]['StudentDocumentData'][0], credentials: LoginCredentials);
+    }
+}
+
 declare module 'studentvue/utils/types' {
     export type Base64String = string;
+}
+
+declare module 'studentvue/StudentVue/ReportCard/ReportCard.interfaces' {
+    export interface ReportCardFile {
+        name: string;
+        document: {
+            type: string;
+            name: string;
+        };
+        base64: string;
+    }
+}
+
+declare module 'studentvue/StudentVue/Document/Document.interface' {
+    export interface DocumentFile {
+        file: {
+            name: string;
+            type: string;
+            date: Date;
+        };
+        category: string;
+        notes: string;
+        base64: string;
+    }
 }
 
 declare module 'studentvue/StudentVue/Client/Interfaces/StudentInfo' {
@@ -700,6 +814,28 @@ declare module 'studentvue/StudentVue/Client/Interfaces/Schedule' {
     }
 }
 
+declare module 'studentvue/StudentVue/Client/Interfaces/SchoolInfo' {
+    import { Staff } from 'studentvue/StudentVue/Client/Client.interfaces';
+    export interface SchoolInfo {
+        school: {
+            address: string;
+            addressAlt: string;
+            city: string;
+            zipCode: string;
+            phone: string;
+            altPhone: string;
+            principal: Staff;
+        };
+        staff: StaffInfo[];
+    }
+    
+    export interface StaffInfo extends Staff {
+        jobTitle: string;
+        extn: string;
+        phone: string;
+    }
+}
+
 declare module 'studentvue/utils/soap/Client/Client' {
     import { RequestOptions, LoginCredentials } from 'studentvue/utils/soap/Client/Client.interfaces';
     export default class Client {
@@ -737,6 +873,115 @@ declare module 'studentvue/utils/soap/Client/Client' {
           */
         protected processRequest<T>(options: RequestOptions): Promise<T>;
         static processAnonymousRequest<T>(url: string, options?: Partial<RequestOptions>): Promise<T>;
+    }
+}
+
+declare module 'studentvue/StudentVue/File/File' {
+    import { LoginCredentials } from 'studentvue/utils/soap/Client/Client.interfaces';
+    import soap from 'studentvue/utils/soap/soap';
+    export default abstract class File<T> extends soap.Client {
+            readonly documentGu: string;
+            constructor(credentials: LoginCredentials, documentGu: string, methodName: string);
+            /**
+                * Parse the XML object to translate it into an ordinary object. This method must be written for every class that extends Document (which gets the file from synergy servers using a POST fetch request)
+                * @param {unknown} xmlObject The XML Object passed after parsing
+                * @protected
+                * @returns {T} Returns a reformatted XML object to make it easier for code
+                * @example
+                * ```js
+                * const xmlObject = await super.processRequest({...}); // { "@_Attribute": [{ "@_Nested": [{...}, {...}]}]}
+                * parseXMLObject(xmlObject); // { attribute: { nested: [{...}, {...}] } }
+                *
+                * ```
+                */
+            protected abstract parseXMLObject(xmlObject: unknown): T;
+            /**
+                * Retrieve the file from synergy servers. After retrieving the xmlObject, this method calls parseXMLObject which must be defined to parse the xmlObject into a readable, typesafe object.
+                * @public
+                * @returns {Promise<T>} Returns a base64 object
+                * @example
+                * ```js
+                * const base64 = await document.get(); // { attribute: { nested: {...} }, base64: "base64 code" }
+                * ```
+                */
+            get(): Promise<T>;
+    }
+}
+
+declare module 'studentvue/StudentVue/ReportCard/ReportCard.xml' {
+    export interface ReportCardsXMLObject {
+        RCReportingPeriodData: [
+            {
+                RCReportingPeriods: [
+                    {
+                        RCReportingPeriod: {
+                            '@_ReportingPeriodGU': [string];
+                            '@_ReportingPeriodName': [string];
+                            '@_EndDate': [string];
+                            '@_DocumentGU': [string];
+                        }[];
+                    }
+                ];
+            }
+        ];
+    }
+    
+    export interface ReportCardBase64XMLObject {
+        DocumentData: [
+            {
+                '@_FileName': [string];
+                '@_DocFileName': [string];
+                '@_DocType': [string];
+                Base64Code: [string];
+            }
+        ];
+    }
+}
+
+declare module 'studentvue/StudentVue/Document/Document.xml' {
+    export interface DocumentXMLObject {
+        StudentDocuments: [
+            {
+                '@_showDateColumn': [string];
+                '@_showDocNameColumn': [string];
+                '@_StudentGU': [string];
+                '@_StudentSSY': [string];
+                StudentDocumentDatas: [
+                    {
+                        StudentDocumentData: {
+                            '@_DocumentGU': [string];
+                            '@_DocumentFileName': [string];
+                            '@_DocumentDate': [string];
+                            '@_DocumentType': [string];
+                            '@_StudentGU': [string];
+                            '@_DocumentComment': [string];
+                        }[];
+                    }
+                ];
+            }
+        ];
+    }
+    
+    export interface DocumentFileXMLObject {
+        StudentAttachedDocumentData: [
+            {
+                DocumentCategoryLookups: [''];
+                DocumentDatas: [
+                    {
+                        DocumentData: {
+                            '@_DocumentGU': [string];
+                            '@_StudentGU': [string];
+                            '@_DocDate': [string];
+                            '@_FileName': [string];
+                            '@_Category': [string];
+                            '@_Notes': [string];
+                            '@_DocType': [string];
+                            Base64Code: [string];
+                        }[];
+                    }
+                ];
+            }
+        ];
     }
 }
 
