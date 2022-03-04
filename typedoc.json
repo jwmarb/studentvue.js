@@ -1,0 +1,9 @@
+{
+  "excludeExternals": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "entryPoints": ["./src"],
+  "entryPointStrategy": "expand",
+  "exclude": ["**/{__tests__,utils}/**/*.ts", "**/.{xml}.d.ts"],
+  "out": "./docs"
+}
