@@ -28,6 +28,16 @@ export default class Client extends soap.Client {
     this.hostUrl = hostUrl;
   }
 
+  /**
+   * Gets a list of report cards
+   * @returns {Promise<ReportCard[]>} Returns a list of report cards that can fetch a file
+   * @example
+   * ```js
+   * const reportCards = await client.reportCards();
+   * const files = await Promise.all(reportCards.map((card) => card.get()));
+   * const base64arr = files.map((file) => file.base64); // ["JVBERi0...", "dUIoa1...", ...];
+   * ```
+   */
   public reportCards(): Promise<ReportCard[]> {
     return new Promise(async (res, rej) => {
       try {
