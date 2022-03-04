@@ -26,6 +26,7 @@ import { FileResource, Gradebook, Resource, URLResource } from '../StudentVue/Cl
 import { Attendance, PeriodInfo } from '../StudentVue/Client/Interfaces/Attendance';
 import { ReportCard } from '..';
 import { ReportCardFile } from '../StudentVue/ReportCard';
+import Document from '../StudentVue/Document/Document';
 
 jest.spyOn(StudentVue, 'login').mockImplementation((districtUrl, credentials) => {
   const host = url.parse(districtUrl).host;
@@ -43,6 +44,7 @@ let calendar: Calendar;
 let gradebook: Gradebook;
 let attendance: Attendance;
 let reportCards: ReportCard[];
+let documents: Document[];
 let resources: (URLResource | FileResource)[];
 
 beforeAll(() => {
@@ -58,15 +60,17 @@ beforeAll(() => {
         session.gradebook(),
         session.attendance(),
         session.reportCards(),
+        session.documents(),
       ]);
     })
-    .then(([session, _messages, _calendar, _gradebook, _attendance, _reportCards]) => {
+    .then(([session, _messages, _calendar, _gradebook, _attendance, _reportCards, _documents]) => {
       calendar = _calendar;
       client = session;
       gradebook = _gradebook;
       messages = _messages;
       attendance = _attendance;
       reportCards = _reportCards;
+      documents = _documents;
       resources = gradebook.courses
         .map((course) => course.marks.map((mark) => mark.assignments.map((assignment) => assignment.resources)))
         .flat(4);
@@ -215,5 +219,17 @@ describe('Report Card', () => {
     const file = await reportCard.get();
     expect(file.base64).toMatch(/^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/);
     expectTypeOf(file).toMatchTypeOf<ReportCardFile>();
+  });
+});
+
+describe('Documents', () => {
+  it('matches type', () => {
+    expectTypeOf(documents).toMatchTypeOf<Document[]>();
+  });
+
+  it('document is a base64', async () => {
+    const document = await documents[0].get();
+
+    expect(document[0].base64).toMatch(/^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/);
   });
 });
