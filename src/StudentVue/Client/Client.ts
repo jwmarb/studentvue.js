@@ -18,6 +18,10 @@ import { AbsentPeriod, Attendance, PeriodInfo } from './Interfaces/Attendance';
 import { ScheduleXMLObject } from './Interfaces/xml/Schedule';
 import { Schedule } from './Client.interfaces';
 import { SchoolInfoXMLObject } from './Interfaces/xml/SchoolInfo';
+import { ReportCardsXMLObject } from '../ReportCard/ReportCard.xml';
+import { DocumentXMLObject } from '../Document/Document.xml';
+import ReportCard from '../ReportCard/ReportCard';
+import Document from '../Document/Document';
 
 export default class Client extends soap.Client {
   private hostUrl: string;
@@ -27,12 +31,82 @@ export default class Client extends soap.Client {
   }
 
   /**
+<<<<<<< HEAD
    * Get the information of the student's school
    * @returns {Promise<SchoolInfo>} Returns the student's school information
    * @example
    * ```js
    * const info = await client.schoolInfo();
    * console.log(info); // -> { school: {...}, staff: [{ name: 'Allen Lambs', jobTitle: 'School Support Staff', ... }, ...] }
+=======
+   * Gets the student's documents from synergy servers
+   * @returns {Promise<Document[]}> Returns a list of student documents
+   * @example
+   * ```js
+   * const documents = await client.documents();
+   * const document = documents[0];
+   * const files = await document.get();
+   * const base64collection = files.map((file) => file.base64);
+   * ```
+   */
+  public documents(): Promise<Document[]> {
+    return new Promise(async (res, rej) => {
+      try {
+        const xmlObject: DocumentXMLObject = await super.processRequest({
+          methodName: 'GetStudentDocumentInitialData',
+          paramStr: { childIntId: 0 },
+        });
+
+        res(
+          xmlObject['StudentDocuments'][0].StudentDocumentDatas[0].StudentDocumentData.map(
+            (xml) => new Document(xml, super.credentials)
+          )
+        );
+      } catch (e) {
+        rej(e);
+      }
+    });
+  }
+
+  /**
+   * Gets a list of report cards
+   * @returns {Promise<ReportCard[]>} Returns a list of report cards that can fetch a file
+   * @example
+   * ```js
+   * const reportCards = await client.reportCards();
+   * const files = await Promise.all(reportCards.map((card) => card.get()));
+   * const base64arr = files.map((file) => file.base64); // ["JVBERi0...", "dUIoa1...", ...];
+   * ```
+   */
+  public reportCards(): Promise<ReportCard[]> {
+    return new Promise(async (res, rej) => {
+      try {
+        const xmlObject: ReportCardsXMLObject = await super.processRequest({
+          methodName: 'GetReportCardInitialData',
+          paramStr: { childIntId: 0 },
+        });
+        res(
+          xmlObject.RCReportingPeriodData[0].RCReportingPeriods[0].RCReportingPeriod.map(
+            (xml) => new ReportCard(xml, super.credentials)
+          )
+        );
+      } catch (e) {
+        rej(e);
+      }
+    });
+  }
+
+  /**
+   * Gets the student's school's information
+   * @returns {Promise<SchoolInfo>} Returns the information of the student's school
+   * @example
+   * ```js
+   * await client.schoolInfo();
+   *
+   * client.schoolInfo().then((schoolInfo) => {
+   *  console.log(_.uniq(schoolInfo.staff.map((staff) => staff.name))); // List all staff positions using lodash
+   * })
+>>>>>>> 763bbe2bec244bde28c5c370e8a66afce5ba3f25
    * ```
    */
   public schoolInfo(): Promise<SchoolInfo> {

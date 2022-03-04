@@ -1,14 +1,52 @@
 import { LoginCredentials } from '../../utils/soap/Client/Client.interfaces';
 import soap from '../../utils/soap/soap';
-import { StudentInfo } from './Client.interfaces';
+import { SchoolInfo, StudentInfo } from './Client.interfaces';
 import Message from '../Message/Message';
 import { Calendar, CalendarOptions } from './Interfaces/Calendar';
 import { Gradebook } from './Interfaces/Gradebook';
 import { Attendance } from './Interfaces/Attendance';
 import { Schedule } from './Client.interfaces';
+import ReportCard from '../ReportCard/ReportCard';
+import Document from '../Document/Document';
 export default class Client extends soap.Client {
     private hostUrl;
     constructor(credentials: LoginCredentials, hostUrl: string);
+    /**
+     * Gets the student's documents from synergy servers
+     * @returns {Promise<Document[]}> Returns a list of student documents
+     * @example
+     * ```js
+     * const documents = await client.documents();
+     * const document = documents[0];
+     * const files = await document.get();
+     * const base64collection = files.map((file) => file.base64);
+     * ```
+     */
+    documents(): Promise<Document[]>;
+    /**
+     * Gets a list of report cards
+     * @returns {Promise<ReportCard[]>} Returns a list of report cards that can fetch a file
+     * @example
+     * ```js
+     * const reportCards = await client.reportCards();
+     * const files = await Promise.all(reportCards.map((card) => card.get()));
+     * const base64arr = files.map((file) => file.base64); // ["JVBERi0...", "dUIoa1...", ...];
+     * ```
+     */
+    reportCards(): Promise<ReportCard[]>;
+    /**
+     * Gets the student's school's information
+     * @returns {Promise<SchoolInfo>} Returns the information of the student's school
+     * @example
+     * ```js
+     * await client.schoolInfo();
+     *
+     * client.schoolInfo().then((schoolInfo) => {
+     *  console.log(_.uniq(schoolInfo.staff.map((staff) => staff.name))); // List all staff positions using lodash
+     * })
+     * ```
+     */
+    schoolInfo(): Promise<SchoolInfo>;
     /**
      * Gets the schedule of the student
      * @param {number} termIndex The index of the term.
