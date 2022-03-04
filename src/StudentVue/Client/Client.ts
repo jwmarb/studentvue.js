@@ -31,14 +31,6 @@ export default class Client extends soap.Client {
   }
 
   /**
-<<<<<<< HEAD
-   * Get the information of the student's school
-   * @returns {Promise<SchoolInfo>} Returns the student's school information
-   * @example
-   * ```js
-   * const info = await client.schoolInfo();
-   * console.log(info); // -> { school: {...}, staff: [{ name: 'Allen Lambs', jobTitle: 'School Support Staff', ... }, ...] }
-=======
    * Gets the student's documents from synergy servers
    * @returns {Promise<Document[]}> Returns a list of student documents
    * @example
@@ -106,7 +98,6 @@ export default class Client extends soap.Client {
    * client.schoolInfo().then((schoolInfo) => {
    *  console.log(_.uniq(schoolInfo.staff.map((staff) => staff.name))); // List all staff positions using lodash
    * })
->>>>>>> 763bbe2bec244bde28c5c370e8a66afce5ba3f25
    * ```
    */
   public schoolInfo(): Promise<SchoolInfo> {
