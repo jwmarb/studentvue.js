@@ -30,6 +30,17 @@ export default class Client extends soap.Client {
     this.hostUrl = hostUrl;
   }
 
+  /**
+   * Gets the student's documents from synergy servers
+   * @returns {Promise<Document[]}> Returns a list of student documents
+   * @example
+   * ```js
+   * const documents = await client.documents();
+   * const document = documents[0];
+   * const files = await document.get();
+   * const base64collection = files.map((file) => file.base64);
+   * ```
+   */
   public documents(): Promise<Document[]> {
     return new Promise(async (res, rej) => {
       try {
