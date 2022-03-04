@@ -1,9 +1,9 @@
 import { LoginCredentials } from '../../utils/soap/Client/Client.interfaces';
-import Document from '../Document/Document';
+import File from '../File/File';
 import { ReportCardFile } from './ReportCard.interfaces';
 import { ReportCardBase64XMLObject, ReportCardsXMLObject } from './ReportCard.xml';
 
-export default class ReportCard extends Document<ReportCardFile> {
+export default class ReportCard extends File<ReportCardFile> {
   public readonly date: Date;
   public readonly periodName: string;
 
