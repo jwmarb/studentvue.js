@@ -9,7 +9,7 @@
     "build": "node src/tools/cleanup.js lib && npm run build:compile && npm run build:types",
     "build:compile": "babel src --out-dir lib --extensions \".ts\" --source-maps inline",
     "build:types": "tsc && dts-bundle --configJson dts-bundle.json",
-    "build:docs": "typedoc --entryPointStrategy expand ./src/index.ts"
+    "build:docs": "typedoc --options typedoc.json"
   },
   "keywords": [],
   "author": "",
@@ -31,6 +31,7 @@
     "jest": "^27.5.1",
     "ts-jest": "^27.1.3",
     "typedoc": "^0.22.12",
+    "typedoc-plugin-markdown": "^3.11.14",
     "typescript": "^4.5.5"
   },
   "dependencies": {
