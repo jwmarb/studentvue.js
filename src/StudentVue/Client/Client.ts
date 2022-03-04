@@ -19,13 +19,34 @@ import { ScheduleXMLObject } from './Interfaces/xml/Schedule';
 import { Schedule } from './Client.interfaces';
 import { SchoolInfoXMLObject } from './Interfaces/xml/SchoolInfo';
 import { ReportCardsXMLObject } from '../ReportCard/ReportCard.xml';
+import { DocumentXMLObject } from '../Document/Document.xml';
 import ReportCard from '../ReportCard/ReportCard';
+import Document from '../Document/Document';
 
 export default class Client extends soap.Client {
   private hostUrl: string;
   constructor(credentials: LoginCredentials, hostUrl: string) {
     super(credentials);
     this.hostUrl = hostUrl;
+  }
+
+  public documents(): Promise<Document[]> {
+    return new Promise(async (res, rej) => {
+      try {
+        const xmlObject: DocumentXMLObject = await super.processRequest({
+          methodName: 'GetStudentDocumentInitialData',
+          paramStr: { childIntId: 0 },
+        });
+
+        res(
+          xmlObject['StudentDocuments'][0].StudentDocumentDatas[0].StudentDocumentData.map(
+            (xml) => new Document(xml, super.credentials)
+          )
+        );
+      } catch (e) {
+        rej(e);
+      }
+    });
   }
 
   /**
