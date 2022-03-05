@@ -1,4 +1,5 @@
-export * as StudentVue from './StudentVue/StudentVue';
+import * as StudentVue from './StudentVue/StudentVue';
+export default StudentVue;
 export { default as ResourceType } from './Constants/ResourceType';
 export { default as EventType } from './Constants/EventType';
 export { default as RequestException } from './StudentVue/RequestException/RequestException';
