@@ -84,7 +84,7 @@
             
             <nav>
                 
-                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Modules</h3><ul><li><a href="module-StudentVue.html">StudentVue</a></li></ul><h3>Classes</h3><ul><li><a href="Attachment.html">Attachment</a></li><li><a href="Client.html">Client</a></li><li><a href="File.html">File</a></li><li><a href="Icon.html">Icon</a></li><li><a href="Message.html">Message</a></li><li><a href="ReportCard.html">ReportCard</a></li><li><a href="RequestException.html">RequestException</a></li></ul><h3>Interfaces</h3><ul><li><a href="Absence.html">Absence</a></li><li><a href="AbsentPeriod.html">AbsentPeriod</a></li><li><a href="AdditionalInfoItem.html">AdditionalInfoItem</a></li><li><a href="Assignment.html">Assignment</a></li><li><a href="AssignmentEvent.html">AssignmentEvent</a></li><li><a href="Attendance.html">Attendance</a></li><li><a href="Calendar.html">Calendar</a></li><li><a href="CalendarOptions.html">CalendarOptions</a></li><li><a href="ClassInfo.html">ClassInfo</a></li><li><a href="ClassScheduleInfo.html">ClassScheduleInfo</a></li><li><a href="Course.html">Course</a></li><li><a href="EmergencyContact.html">EmergencyContact</a></li><li><a href="Event.html">Event</a></li><li><a href="FileResource.html">FileResource</a></li><li><a href="Gradebook.html">Gradebook</a></li><li><a href="HolidayEvent.html">HolidayEvent</a></li><li><a href="Mark.html">Mark</a></li><li><a href="PeriodInfo.html">PeriodInfo</a></li><li><a href="RegularEvent.html">RegularEvent</a></li><li><a href="ReportingPeriod.html">ReportingPeriod</a></li><li><a href="Resource.html">Resource</a></li><li><a href="SchoolDistrict.html">SchoolDistrict</a></li><li><a href="SchoolInfo.html">SchoolInfo</a></li><li><a href="SchoolScheduleInfo.html">SchoolScheduleInfo</a></li><li><a href="Staff.html">Staff</a></li><li><a href="TermInfo.html">TermInfo</a></li><li><a href="URLResource.html">URLResource</a></li><li><a href="UserCredentials.html">UserCredentials</a></li><li><a href="WeightedCategory.html">WeightedCategory</a></li></ul><h3>Global</h3><ul><li><a href="global.html#StudentVue">StudentVue</a></li></ul></div>
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Modules</h3><ul><li><a href="module-StudentVue.html">StudentVue</a></li></ul><h3>Classes</h3><ul><li><a href="Attachment.html">Attachment</a></li><li><a href="Client.html">Client</a></li><li><a href="File.html">File</a></li><li><a href="Icon.html">Icon</a></li><li><a href="Message.html">Message</a></li><li><a href="ReportCard.html">ReportCard</a></li><li><a href="RequestException.html">RequestException</a></li></ul><h3>Interfaces</h3><ul><li><a href="Absence.html">Absence</a></li><li><a href="AbsentPeriod.html">AbsentPeriod</a></li><li><a href="AdditionalInfoItem.html">AdditionalInfoItem</a></li><li><a href="Assignment.html">Assignment</a></li><li><a href="AssignmentEvent.html">AssignmentEvent</a></li><li><a href="Attendance.html">Attendance</a></li><li><a href="Calendar.html">Calendar</a></li><li><a href="CalendarOptions.html">CalendarOptions</a></li><li><a href="ClassInfo.html">ClassInfo</a></li><li><a href="ClassScheduleInfo.html">ClassScheduleInfo</a></li><li><a href="Course.html">Course</a></li><li><a href="EmergencyContact.html">EmergencyContact</a></li><li><a href="Event.html">Event</a></li><li><a href="FileResource.html">FileResource</a></li><li><a href="Gradebook.html">Gradebook</a></li><li><a href="Mark.html">Mark</a></li><li><a href="PeriodInfo.html">PeriodInfo</a></li><li><a href="RegularEvent.html">RegularEvent</a></li><li><a href="ReportingPeriod.html">ReportingPeriod</a></li><li><a href="Resource.html">Resource</a></li><li><a href="SchoolDistrict.html">SchoolDistrict</a></li><li><a href="SchoolInfo.html">SchoolInfo</a></li><li><a href="SchoolScheduleInfo.html">SchoolScheduleInfo</a></li><li><a href="Staff.html">Staff</a></li><li><a href="TermInfo.html">TermInfo</a></li><li><a href="URLResource.html">URLResource</a></li><li><a href="UserCredentials.html">UserCredentials</a></li><li><a href="WeightedCategory.html">WeightedCategory</a></li></ul><h3>Global</h3><ul><li><a href="global.html#StudentVue">StudentVue</a></li></ul></div>
                 
             </nav>
         </div>
@@ -107,7 +107,6 @@ import soap from '../utils/soap/soap';
 import { DistrictListXMLObject } from './StudentVue.xml';
 import RequestException from './RequestException/RequestException';
 import url from 'url';
-import { StudentInfo } from './Client/Client.interfaces';
 
 /** @module StudentVue */
 
@@ -115,24 +114,29 @@ import { StudentInfo } from './Client/Client.interfaces';
  * Login to the StudentVUE API
  * @param {string} districtUrl The URL of the district which can be found using `findDistricts()` method
  * @param {UserCredentials} credentials User credentials of the student
- * @returns {Promise&lt;[Client, StudentInfo]>} Returns the client and the information of the student upon successful login
+ * @returns {Promise&lt;Client>} Returns the client and the information of the student upon successful login
  */
-export function login(districtUrl: string, credentials: UserCredentials): Promise&lt;[Client, StudentInfo]> {
-  return new Promise(async (res, rej) => {
+export function login(districtUrl: string, credentials: UserCredentials): Promise&lt;Client> {
+  return new Promise((res, rej) => {
     if (districtUrl.length === 0)
       return rej(new RequestException({ message: 'District URL cannot be an empty string' }));
-    try {
-      const host = url.parse(districtUrl).host;
-      const endpoint: string = `https://${host}/Service/PXPCommunication.asmx`;
-      const client = new Client(
-        { username: credentials.username, password: credentials.password, districtUrl: endpoint },
-        `https://${host}/`
-      );
-      const studentInfo = await client.studentInfo();
-      res([client, studentInfo]);
-    } catch (e) {
-      rej(e);
-    }
+    const host = url.parse(districtUrl).host;
+    const endpoint = `https://${host}/Service/PXPCommunication.asmx`;
+    const client = new Client(
+      {
+        username: credentials.username,
+        password: credentials.password,
+        districtUrl: endpoint,
+        isParent: credentials.isParent,
+      },
+      `https://${host}/`
+    );
+    client
+      .validateCredentials()
+      .then(() => {
+        res(client);
+      })
+      .catch(rej);
   });
 }
 
@@ -142,30 +146,28 @@ export function login(districtUrl: string, credentials: UserCredentials): Promis
  * @returns {Promise&lt;SchoolDistrict[]>} Returns a list of school districts which can be used to login to the API
  */
 export function findDistricts(zipCode: string): Promise&lt;SchoolDistrict[]> {
-  return new Promise(async (res, reject) => {
-    try {
-      const xmlObject: DistrictListXMLObject | undefined = await soap.Client.processAnonymousRequest(
-        'https://support.edupoint.com/Service/HDInfoCommunication.asmx',
-        {
-          paramStr: {
-            Key: '5E4B7859-B805-474B-A833-FDB15D205D40',
-            MatchToDistrictZipCode: zipCode,
-          },
-        }
-      );
-
-      if (!xmlObject || !xmlObject.DistrictLists.DistrictInfos.DistrictInfo) return res([]);
-      res(
-        xmlObject.DistrictLists.DistrictInfos.DistrictInfo.map((district) => ({
-          parentVueUrl: district['@_PvueURL'],
-          address: district['@_Address'],
-          id: district['@_DistrictID'],
-          name: district['@_Name'],
-        }))
-      );
-    } catch (e) {
-      reject(e);
-    }
+  return new Promise((res, reject) => {
+    soap.Client.processAnonymousRequest&lt;DistrictListXMLObject | undefined>(
+      'https://support.edupoint.com/Service/HDInfoCommunication.asmx',
+      {
+        paramStr: {
+          Key: '5E4B7859-B805-474B-A833-FDB15D205D40',
+          MatchToDistrictZipCode: zipCode,
+        },
+      }
+    )
+      .then((xmlObject) => {
+        if (!xmlObject || !xmlObject.DistrictLists.DistrictInfos.DistrictInfo) return res([]);
+        res(
+          xmlObject.DistrictLists.DistrictInfos.DistrictInfo.map((district) => ({
+            parentVueUrl: district['@_PvueURL'],
+            address: district['@_Address'],
+            id: district['@_DistrictID'],
+            name: district['@_Name'],
+          }))
+        );
+      })
+      .catch(reject);
   });
 }
 </code></pre>
