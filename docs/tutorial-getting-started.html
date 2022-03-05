@@ -107,7 +107,7 @@ const schools = await StudentVue.findDistricts('zipcode');
 const mySchoolDistrict = schools.find((school) => school.name.includes('my school name'));
 </code></pre>
 <p>Great! We got our school district. But, how do we login? We can do that right here:</p>
-<pre class="prettyprint source lang-js"><code>const [client, studentInfo] = await StudentVue.login(mySchoolDistrict.name, {
+<pre class="prettyprint source lang-js"><code>const client = await StudentVue.login(mySchoolDistrict.name, {
   username: 'USERNAME',
   password: 'PASSWORD',
 });
