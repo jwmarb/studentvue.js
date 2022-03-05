@@ -27,7 +27,6 @@
     "@types/tiny-async-pool": "^1.0.0",
     "better-docs": "^2.7.2",
     "cross-env": "^7.0.3",
-    "documentation": "^13.2.5",
     "dts-bundle": "^0.7.3",
     "expect-type": "^0.13.0",
     "jest": "^27.5.1",
