@@ -44,7 +44,7 @@ export default class Client extends soap.Client {
       super
         .processRequest<ParsedRequestError>({ methodName: 'login test', validateErrors: false })
         .then((response) => {
-          if (response.RT_ERROR[0]['@_ERROR_MESSAGE'][0] === 'login test is not a valid method') res();
+          if (response.RT_ERROR[0]['@_ERROR_MESSAGE'][0] === 'login test is not a valid method.') res();
           else rej(new RequestException(response));
         })
         .catch(rej);
