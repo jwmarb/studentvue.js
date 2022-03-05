@@ -11,69 +11,22 @@ import Icon from '../Icon/Icon';
  * @extends {soap.Client}
  */
 export default class Message extends soap.Client {
-  /**
-   * The URL to create POST fetch requests to synergy servers
-   * @private
-   * @readonly
-   */
   private readonly hostUrl: string;
 
-  /**
-   * The message icon
-   * @public
-   * @readonly
-   */
   public readonly icon: Icon;
 
-  /**
-   * The ID of the message
-   * @public
-   * @readonly
-   */
   public readonly id: string;
 
-  /**
-   * The date when the message was first posted
-   * @public
-   * @readonly
-   */
   public readonly beginDate;
 
-  /**
-   * The type of the message
-   * @public
-   * @readonly
-   */
   public readonly type: string;
 
-  /**
-   * The HTML content of the message
-   * @public
-   * @readonly
-   */
   public readonly htmlContent: string;
 
-  /**
-   * Whether the message has been read or not
-   * @private
-   */
   private read: boolean;
 
-  /**
-   * Whether the message is deletable or not
-   * @private
-   */
   private deletable: boolean;
 
-  /**
-   * The sender of the message
-   * @public
-   * @readonly
-   * @property {string} name - The name of the sender
-   * @property {string} staffGu - the staffGu of the sender
-   * @property {string} email - The email of the sender
-   * @property {string} smMsgPersonGu - The smMsgPersonGu of the sender. Don't know if this property has a real usage or not
-   */
   public readonly from: {
     name: string;
     staffGu: string;
@@ -81,30 +34,13 @@ export default class Message extends soap.Client {
     smMsgPersonGu: string;
   };
 
-  /**
-   * The module of the sender
-   * @public
-   * @readonly
-   */
   public readonly module: string;
 
-  /**
-   * The subject of the message
-   * @public
-   * @readonly
-   * @property {string} html - The subject of the message with HTML
-   * @property {string} raw - The subject of the message without HTML and formatting
-   */
   public readonly subject: {
     html: string;
     raw: string;
   };
 
-  /**
-   * The attachments included in the message, if there are any.
-   * @public
-   * @readonly
-   */
   public readonly attachments: Attachment[];
 
   constructor(
@@ -113,25 +49,89 @@ export default class Message extends soap.Client {
     hostUrl: string
   ) {
     super(credentials);
+    /**
+     * The URL to create POST fetch requests to synergy servers
+     * @private
+     * @readonly
+     */
     this.hostUrl = hostUrl;
+    /**
+     * The message icon
+     * @public
+     * @readonly
+     */
     this.icon = new Icon(xmlObject['@_IconURL'][0], this.hostUrl);
+    /**
+     * The ID of the message
+     * @public
+     * @readonly
+     */
     this.id = xmlObject['@_ID'][0];
+    /**
+     * The type of the message
+     * @public
+     * @readonly
+     */
     this.type = xmlObject['@_Type'][0];
+    /**
+     * The date when the message was first posted
+     * @public
+     * @readonly
+     */
     this.beginDate = xmlObject['@_BeginDate'][0];
+    /**
+     * The HTML content of the message
+     * @public
+     * @readonly
+     */
     this.htmlContent = atob(xmlObject['@_Content'][0]);
+    /**
+     * Whether the message has been read or not
+     * @private
+     */
     this.read = JSON.parse(xmlObject['@_Read'][0]);
+    /**
+     * Whether the message is deletable or not
+     * @private
+     */
     this.deletable = JSON.parse(xmlObject['@_Deletable'][0]);
+    /**
+     * The sender of the message
+     * @public
+     * @readonly
+     * @property {string} name - The name of the sender
+     * @property {string} staffGu - the staffGu of the sender
+     * @property {string} email - The email of the sender
+     * @property {string} smMsgPersonGu - The smMsgPersonGu of the sender. Don't know if this property has a real usage or not
+     */
     this.from = {
       name: xmlObject['@_From'][0],
       staffGu: xmlObject['@_StaffGU'][0],
       smMsgPersonGu: xmlObject['@_SMMsgPersonGU'][0],
       email: xmlObject['@_Email'][0],
     };
+    /**
+     * The module of the sender
+     * @public
+     * @readonly
+     */
     this.module = xmlObject['@_Module'][0];
+    /**
+     * The subject of the message
+     * @public
+     * @readonly
+     * @property {string} html - The subject of the message with HTML
+     * @property {string} raw - The subject of the message without HTML and formatting
+     */
     this.subject = {
       html: xmlObject['@_Subject'][0],
       raw: xmlObject['@_SubjectNoHTML'][0],
     };
+    /**
+     * The attachments included in the message, if there are any.
+     * @public
+     * @readonly
+     */
     this.attachments =
       typeof xmlObject.AttachmentDatas[0] !== 'string'
         ? xmlObject.AttachmentDatas[0].AttachmentData.map(

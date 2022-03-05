@@ -10,89 +10,25 @@ import Icon from '../Icon/Icon';
  * @extends {soap.Client}
  */
 export default class Message extends soap.Client {
-    /**
-     * The URL to create POST fetch requests to synergy servers
-     * @private
-     * @readonly
-     */
     private readonly hostUrl;
-    /**
-     * The message icon
-     * @public
-     * @readonly
-     */
     readonly icon: Icon;
-    /**
-     * The ID of the message
-     * @public
-     * @readonly
-     */
     readonly id: string;
-    /**
-     * The date when the message was first posted
-     * @public
-     * @readonly
-     */
     readonly beginDate: string;
-    /**
-     * The type of the message
-     * @public
-     * @readonly
-     */
     readonly type: string;
-    /**
-     * The HTML content of the message
-     * @public
-     * @readonly
-     */
     readonly htmlContent: string;
-    /**
-     * Whether the message has been read or not
-     * @private
-     */
     private read;
-    /**
-     * Whether the message is deletable or not
-     * @private
-     */
     private deletable;
-    /**
-     * The sender of the message
-     * @public
-     * @readonly
-     * @property {string} name - The name of the sender
-     * @property {string} staffGu - the staffGu of the sender
-     * @property {string} email - The email of the sender
-     * @property {string} smMsgPersonGu - The smMsgPersonGu of the sender. Don't know if this property has a real usage or not
-     */
     readonly from: {
         name: string;
         staffGu: string;
         email: string;
         smMsgPersonGu: string;
     };
-    /**
-     * The module of the sender
-     * @public
-     * @readonly
-     */
     readonly module: string;
-    /**
-     * The subject of the message
-     * @public
-     * @readonly
-     * @property {string} html - The subject of the message with HTML
-     * @property {string} raw - The subject of the message without HTML and formatting
-     */
     readonly subject: {
         html: string;
         raw: string;
     };
-    /**
-     * The attachments included in the message, if there are any.
-     * @public
-     * @readonly
-     */
     readonly attachments: Attachment[];
     constructor(xmlObject: MessageXMLObject['PXPMessagesData'][0]['MessageListings'][0]['MessageListing'][0], credentials: LoginCredentials, hostUrl: string);
     /**

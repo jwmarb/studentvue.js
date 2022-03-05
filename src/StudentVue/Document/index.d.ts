@@ -1,2 +1,2 @@
-export * from './Document.interface';
+export * from './Document.interfaces';
 export { default as Document } from './Document';

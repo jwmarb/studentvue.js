@@ -4,17 +4,7 @@ import { ParsedAnonymousRequestError, ParsedRequestError } from '../../utils/soa
  * @constructor
  */
 export default class RequestException {
-    /**
-     * The message of the exception
-     * @public
-     * @readonly
-     */
     readonly message: string;
-    /**
-     * The stack trace of the exception. (java)
-     * @public
-     * @readonly
-     */
     readonly stack: string | undefined;
     constructor(obj: ParsedRequestError | {
         message: string;

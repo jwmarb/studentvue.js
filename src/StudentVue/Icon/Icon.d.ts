@@ -1,9 +1,4 @@
 export default class Icon {
-    /**
-     * The URI of the icon
-     * @public
-     * @readonly
-     */
     readonly uri: string;
     /**
      *

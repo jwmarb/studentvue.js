@@ -44,7 +44,7 @@ export default class Client {
    * Create a POST request to synergy servers to fetch data
    * @param options Options to provide when making a XML request to the servers
    * @returns Returns an XML object that must be defined in a type declaration file.
-   * @link See https://github.com/StudentVue/docs
+   * @see https://github.com/StudentVue/docs
    * @description
    * ```js
    * super.processRequest({ methodName: 'Refer to StudentVue/docs', paramStr: { AnythingThatCanBePassed: true, AsLongAsItMatchesTheDocumentation: true }});

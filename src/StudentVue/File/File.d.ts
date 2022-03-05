@@ -7,25 +7,7 @@ import soap from '../../utils/soap/soap';
  * @constructor
  */
 export default abstract class File<T> extends soap.Client {
-    /**
-     * The DocumentGU of the file so that it can be fetched from synergy servers
-     * This value is important for `File.get()` method. You cannot fetch the file without it
-     * @public
-     * @readonly
-     */
     readonly documentGu: string;
-    /**
-     * Synergy servers have different methods for retrieving files. For example,
-     *
-     * To retrieve a document, there is a specific method for it: `GetContentOfAttachedDoc`
-     *
-     * To retrieve a report card, there is a specific method for it: `GetReportCardDocumentData`
-     *
-     * Therefore, methodName must be defined to get retrieve the file data. See how methodName is implemented
-     * in `Document.ts` and `ReportCard.ts`
-     * @private
-     * @readonly
-     */
     private readonly methodName;
     constructor(credentials: LoginCredentials, documentGu: string, methodName: string);
     /**

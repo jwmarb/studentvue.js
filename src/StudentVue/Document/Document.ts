@@ -1,25 +1,15 @@
 import { LoginCredentials } from '../../utils/soap/Client/Client.interfaces';
 import File from '../File/File';
-import { DocumentFile } from './Document.interface';
+import { DocumentFile } from './Document.interfaces';
 import { DocumentFileXMLObject, DocumentXMLObject } from './Document.xml';
 
 export default class Document extends File<DocumentFile[]> {
-  /**
-   * The properties of the file
-   * @public
-   * @readonly
-   */
   public readonly file: {
     name: string;
     date: Date;
     type: string;
   };
 
-  /**
-   * The comment included in the document
-   * @public
-   * @readonly
-   */
   public readonly comment: string;
   protected parseXMLObject(xmlObject: DocumentFileXMLObject) {
     return xmlObject.StudentAttachedDocumentData[0].DocumentDatas[0].DocumentData.map((document) => ({
@@ -38,11 +28,23 @@ export default class Document extends File<DocumentFile[]> {
     credentials: LoginCredentials
   ) {
     super(credentials, xmlObj['@_DocumentGU'][0], 'GetContentOfAttachedDoc');
+
+    /**
+     * The properties of the file
+     * @public
+     * @readonly
+     */
     this.file = {
       name: xmlObj['@_DocumentFileName'][0],
       type: xmlObj['@_DocumentType'][0],
       date: new Date(xmlObj['@_DocumentDate'][0]),
     };
+
+    /**
+     * The comment included in the document
+     * @public
+     * @readonly
+     */
     this.comment = xmlObj['@_DocumentComment'][0];
   }
 }

@@ -8,26 +8,8 @@ import soap from '../../utils/soap/soap';
  * @extends {soap.Client}
  */
 export default class Attachment extends soap.Client {
-    /**
-     * The name of the attachment.
-     * @type {string}
-     * @public
-     * @readonly
-     */
     readonly name: string;
-    /**
-     * the GU of the attachment.
-     * @type {string}
-     * @public
-     * @readonly
-     */
     readonly attachmentGu: string;
-    /**
-     * The file extension of the attachment extracted using regex
-     * @type {string | null}
-     * @public
-     * @readonly
-     */
     readonly fileExtension: string | null;
     constructor(name: string, attachmentGu: string, session: LoginCredentials);
     /**
