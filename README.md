@@ -31,7 +31,7 @@ const PASSWORD = '...';
 const client = await StudentVue.login(DISTRICT_URL, { username: USERNAME, password: PASSWORD });
 ```
 
-Once we are logged in, we can access any method within the API. See [Client](https://eggaming.github.io/studentvue.js/Client.html)
+Once we are logged in, we can access any method within the API. Refer to [Client](https://eggaming.github.io/studentvue.js/Client.html) documentation to see valid methods
 
 --
 
