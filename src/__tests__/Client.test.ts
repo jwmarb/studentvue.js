@@ -35,7 +35,7 @@ jest.spyOn(StudentVue, 'login').mockImplementation((districtUrl, credentials) =>
     { username: credentials.username, password: credentials.password, districtUrl: endpoint },
     `https://${host}/`
   );
-  return Promise.resolve([client, null as any]);
+  return Promise.resolve(client);
 });
 
 let client: Client;
@@ -52,7 +52,7 @@ beforeAll(() => {
     username: credentials.username,
     password: credentials.password,
   })
-    .then(([session]) => {
+    .then((session) => {
       return Promise.all([
         session,
         session.messages(),

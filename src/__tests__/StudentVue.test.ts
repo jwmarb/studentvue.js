@@ -82,11 +82,10 @@ describe('StudentVue', () => {
 
   it('Returns Client class object upon successful login', async () => {
     try {
-      const [client, studentInfo] = await StudentVue.login(credentials.district, {
+      const client = await StudentVue.login(credentials.district, {
         username: credentials.username,
         password: credentials.password,
       });
-      expect(studentInfo).toBeDefined();
       expect(client).toBeDefined();
     } catch (e) {}
   });
