@@ -13,7 +13,7 @@ export default class Message extends soap.Client {
     private readonly hostUrl;
     readonly icon: Icon;
     readonly id: string;
-    readonly beginDate: string;
+    readonly beginDate: Date;
     readonly type: string;
     readonly htmlContent: string;
     private read;
@@ -45,7 +45,7 @@ export default class Message extends soap.Client {
     private setDeletable;
     /**
      * Marks the message as read
-     * @returns Returns true to show that it has been marked as read
+     * @returns {true} Returns true to show that it has been marked as read
      * @description
      * ```js
      * const messages = await client.messages();
