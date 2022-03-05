@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,7 +5,7 @@
   
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title> src/StudentVue/Client/Interfaces/Calendar.d.ts</title>
+  <title> File</title>
 
   <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -75,193 +73,382 @@
         <div class="core" id="main-content-wrapper">
             <div class="content">
                 <header class="page-title">
-                    <p>Source</p>
-                    <h1>src/StudentVue/Client/Interfaces/Calendar.d.ts</h1>
+                    <p>Class</p>
+                    <h1>File</h1>
                 </header>
                 
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>import EventType from '../../../Constants/EventType';
-import Icon from '../../Icon/Icon';
+        <h2><span class="attribs"><span class="type-signature">(abstract) </span></span>File<span class="signature">()</span><span class="type-signature"></span></h2>
+        
+            <div class="class-description"><p>File class</p></div>
+        
+    
+</header>
 
-/**
- * Options to provide in `Client.calendar()` method
- */
-export declare interface CalendarOptions {
-  /**
-   * The interval between two dates in the calendar
-   */
-  interval: {
-    /**
-     * The start interval
-     */
-    start: Date | number;
+<article>
+    <div class="container-overview">
+    
+        
+            <div class='vertical-section'>
+                <div class="members">
+                    <div class="member">
+                        <div class=name>
+                            <span class="tag">Constructor</span>
+                        </div>
+                        
 
-    /**
-     * The end interval
-     */
-    end: Date | number;
-  };
 
-  /**
-   * The number of fetches that should occur per asynchronous task. StudentVUE does not send ALL events within a school year, but rather it sends all events within a month.
-   * @description
-   * ```js
-   * // { concurrency: 1 }
-   * ```
-   * Fetch events of one month at a time
-   *
-   * ```js
-   * // { concurrency: 7 } -> this is the default
-   * ```
-   * Fetch events of 7 months at a time
-   *
-   * If you set concurrency to `8` or more, it will throw an error because it will time out
-   */
-  concurrency?: number | null;
-}
+    
+    <h4 class="name" id="File">
+        <a class="href-link" href="#File">#</a>
+        
+            
+                <span class='tag'>abstract</span>
+            
+        
+        <span class="code-name">
+            
+                new File<span class="signature">()</span><span class="type-signature"></span>
+            
+        </span>
+    </h4>
+    
 
-/**
- * Calendar of the school
- */
-export declare interface Calendar {
-  /**
-   * The date of the school
-   */
-  schoolDate: {
-    /**
-     * The date that indicates the start of school
-     */
-    start: Date | number;
+    
+    
 
-    /**
-     * The date that indicates the last day of school
-     */
-    end: Date | number;
-  };
 
-  /**
-   * The date range of the events
-   */
-  outputRange: {
-    /**
-     * The beginning date of events range
-     */
-    start: Date | number;
 
-    /**
-     * The end date of events range
-     */
-    end: Date | number;
-  };
 
-  /**
-   * The list of school events
-   */
-  events: (AssignmentEvent | HolidayEvent | RegularEvent)[];
-}
 
-/**
- * A school event
- */
-export declare interface Event {
-  /**
-   * The date of the event
-   */
-  date: Date;
 
-  /**
-   * The title of the event
-   */
-  title: string;
 
-  /**
-   * The type of the event
-   */
-  type: EventType;
 
-  /**
-   * The time the event take places
-   */
-  startTime: string;
-}
 
-/**
- * An event that contains an assignment
- */
-export declare interface AssignmentEvent extends Event {
-  /**
-   * The AGU of the event
-   */
-  agu?: string;
 
-  /**
-   * The link of the event
-   */
-  link?: string;
 
-  /**
-   * The DGU of the event
-   */
-  dgu?: string;
 
-  /**
-   * The view type of the event
-   */
-  viewType?: string;
 
-  /**
-   * The Add Link Data of the event
-   */
-  addLinkData?: string;
-}
+<dl class="details">
 
-/**
- * An event that is held in a holiday. Students may not have school in this event
- */
-export declare interface HolidayEvent extends Event {}
+    
 
-/**
- * An event that is not anything special, hence Regular. Synergy Server Maintenance event type uses this event
- */
-export declare interface RegularEvent extends Event {
-  /**
-   * The AGU of the event
-   */
-  agu?: string;
+    
 
-  /**
-   * The DGU of the event
-   */
-  dgu?: string;
+    
 
-  /**
-   * The link of the event
-   */
-  link?: string;
+    
 
-  /**
-   * The type of view in the event
-   */
-  viewType?: string;
+    
 
-  /**
-   * The Add Link Data of the event
-   */
-  addLinkData?: string;
+    
 
-  /**
-   * The description of the event
-   */
-  description?: string;
-}
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="lib_StudentVue_File_File.js.html" class="button">View Source</a>
+            <span>
+                <a href="lib_StudentVue_File_File.js.html">lib/StudentVue/File/File.js</a>, <a href="lib_StudentVue_File_File.js.html#line30">line 30</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    </div>
+                </div>
+            </div>
+        
+    
+    </div>
+    
+    
+        <h3 class="subsection-title">Extends</h3>
+
+        
+
+
+    <ul>
+        <li>soap.Client</li>
+    </ul>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <div class='vertical-section'>
+            <h1>Members</h1>
+            <div class="members">
+            
+                <div class="member">
+
+<h4 class="name" id="documentGu">
+    <a class="href-link" href="#documentGu">#</a>
+    
+        
+            <span class='tag'>readonly</span>
+        
+    
+    <span class="code-name">
+        documentGu
+    </span>
+    
+</h4>
+
+
+
+
+<div class="description">
+    <p>The DocumentGU of the file so that it can be fetched from synergy servers
+This value is important for <code>File.get()</code> method. You cannot fetch the file without it</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="lib_StudentVue_File_File.js.html" class="button">View Source</a>
+            <span>
+                <a href="lib_StudentVue_File_File.js.html">lib/StudentVue/File/File.js</a>, <a href="lib_StudentVue_File_File.js.html#line40">line 40</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+</div>
+            
+            </div>
+        </div>
+    
+
+    
+        <div class='vertical-section'>
+            <h1>Methods</h1>
+            <div class="members">
+            
+                <div class="member">
+
+
+    
+    <h4 class="name" id="get">
+        <a class="href-link" href="#get">#</a>
+        
+        <span class="code-name">
+            
+                get<span class="signature">()</span><span class="type-signature"> &rarr; {Promise.&lt;T>}</span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <pre class="prettyprint source lang-js"><code>const base64 = await document.get(); // { attribute: { nested: {...} }, base64: &quot;base64 code&quot; }
 </code></pre>
-        </article>
-    </section>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="lib_StudentVue_File_File.js.html" class="button">View Source</a>
+            <span>
+                <a href="lib_StudentVue_File_File.js.html">lib/StudentVue/File/File.js</a>, <a href="lib_StudentVue_File_File.js.html#line79">line 79</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class='columns method-parameter'>
+        <div class="column is-2"><label>Returns:</label></div>
+        <div class="column is-10">
+            
+                    
+
+<div class="columns">
+    
+    <div class='param-desc column is-7'><p>Returns a base64 object</p></div>
+    
+    
+    <div class='column is-5 has-text-left'>
+        <label>Type: </label>
+        
+<code class="param-type">Promise.&lt;T></code>
+
+
+    </div>
+    
+</div>
+
+                
+        </div>
+    </div>
+
+
+
+
+</div>
+            
+            </div>
+        </div>
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

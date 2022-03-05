@@ -7,7 +7,7 @@
   
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title> src/StudentVue/Client/Interfaces/Calendar.d.ts</title>
+  <title> src/StudentVue/StudentVue.ts</title>
 
   <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -76,7 +76,7 @@
             <div class="content">
                 <header class="page-title">
                     <p>Source</p>
-                    <h1>src/StudentVue/Client/Interfaces/Calendar.d.ts</h1>
+                    <h1>src/StudentVue/StudentVue.ts</h1>
                 </header>
                 
 
@@ -85,179 +85,72 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import EventType from '../../../Constants/EventType';
-import Icon from '../../Icon/Icon';
+            <pre class="prettyprint source linenums"><code>import { SchoolDistrict, UserCredentials } from './StudentVue.interfaces';
+import Client from './Client/Client';
+import soap from '../utils/soap/soap';
+import { DistrictListXMLObject } from './StudentVue.xml';
+import RequestException from './RequestException/RequestException';
+import url from 'url';
+import { StudentInfo } from './Client/Client.interfaces';
+
+/** @module StudentVue */
 
 /**
- * Options to provide in `Client.calendar()` method
+ * Login to the StudentVUE API
+ * @param {string} districtUrl The URL of the district which can be found using `findDistricts()` method
+ * @param {UserCredentials} credentials User credentials of the student
+ * @returns {Promise&lt;[Client, StudentInfo]>} Returns the client and the information of the student upon successful login
  */
-export declare interface CalendarOptions {
-  /**
-   * The interval between two dates in the calendar
-   */
-  interval: {
-    /**
-     * The start interval
-     */
-    start: Date | number;
-
-    /**
-     * The end interval
-     */
-    end: Date | number;
-  };
-
-  /**
-   * The number of fetches that should occur per asynchronous task. StudentVUE does not send ALL events within a school year, but rather it sends all events within a month.
-   * @description
-   * ```js
-   * // { concurrency: 1 }
-   * ```
-   * Fetch events of one month at a time
-   *
-   * ```js
-   * // { concurrency: 7 } -> this is the default
-   * ```
-   * Fetch events of 7 months at a time
-   *
-   * If you set concurrency to `8` or more, it will throw an error because it will time out
-   */
-  concurrency?: number | null;
+export function login(districtUrl: string, credentials: UserCredentials): Promise&lt;[Client, StudentInfo]> {
+  return new Promise(async (res, rej) => {
+    if (districtUrl.length === 0)
+      return rej(new RequestException({ message: 'District URL cannot be an empty string' }));
+    try {
+      const host = url.parse(districtUrl).host;
+      const endpoint: string = `https://${host}/Service/PXPCommunication.asmx`;
+      const client = new Client(
+        { username: credentials.username, password: credentials.password, districtUrl: endpoint },
+        `https://${host}/`
+      );
+      const studentInfo = await client.studentInfo();
+      res([client, studentInfo]);
+    } catch (e) {
+      rej(e);
+    }
+  });
 }
 
 /**
- * Calendar of the school
+ * Find school districts using a zipcode
+ * @param {string} zipCode The zipcode to get a list of schools from
+ * @returns {Promise&lt;SchoolDistrict[]>} Returns a list of school districts which can be used to login to the API
  */
-export declare interface Calendar {
-  /**
-   * The date of the school
-   */
-  schoolDate: {
-    /**
-     * The date that indicates the start of school
-     */
-    start: Date | number;
+export function findDistricts(zipCode: string): Promise&lt;SchoolDistrict[]> {
+  return new Promise(async (res, reject) => {
+    try {
+      const xmlObject: DistrictListXMLObject | undefined = await soap.Client.processAnonymousRequest(
+        'https://support.edupoint.com/Service/HDInfoCommunication.asmx',
+        {
+          paramStr: {
+            Key: '5E4B7859-B805-474B-A833-FDB15D205D40',
+            MatchToDistrictZipCode: zipCode,
+          },
+        }
+      );
 
-    /**
-     * The date that indicates the last day of school
-     */
-    end: Date | number;
-  };
-
-  /**
-   * The date range of the events
-   */
-  outputRange: {
-    /**
-     * The beginning date of events range
-     */
-    start: Date | number;
-
-    /**
-     * The end date of events range
-     */
-    end: Date | number;
-  };
-
-  /**
-   * The list of school events
-   */
-  events: (AssignmentEvent | HolidayEvent | RegularEvent)[];
-}
-
-/**
- * A school event
- */
-export declare interface Event {
-  /**
-   * The date of the event
-   */
-  date: Date;
-
-  /**
-   * The title of the event
-   */
-  title: string;
-
-  /**
-   * The type of the event
-   */
-  type: EventType;
-
-  /**
-   * The time the event take places
-   */
-  startTime: string;
-}
-
-/**
- * An event that contains an assignment
- */
-export declare interface AssignmentEvent extends Event {
-  /**
-   * The AGU of the event
-   */
-  agu?: string;
-
-  /**
-   * The link of the event
-   */
-  link?: string;
-
-  /**
-   * The DGU of the event
-   */
-  dgu?: string;
-
-  /**
-   * The view type of the event
-   */
-  viewType?: string;
-
-  /**
-   * The Add Link Data of the event
-   */
-  addLinkData?: string;
-}
-
-/**
- * An event that is held in a holiday. Students may not have school in this event
- */
-export declare interface HolidayEvent extends Event {}
-
-/**
- * An event that is not anything special, hence Regular. Synergy Server Maintenance event type uses this event
- */
-export declare interface RegularEvent extends Event {
-  /**
-   * The AGU of the event
-   */
-  agu?: string;
-
-  /**
-   * The DGU of the event
-   */
-  dgu?: string;
-
-  /**
-   * The link of the event
-   */
-  link?: string;
-
-  /**
-   * The type of view in the event
-   */
-  viewType?: string;
-
-  /**
-   * The Add Link Data of the event
-   */
-  addLinkData?: string;
-
-  /**
-   * The description of the event
-   */
-  description?: string;
+      if (!xmlObject || !xmlObject.DistrictLists.DistrictInfos.DistrictInfo) return res([]);
+      res(
+        xmlObject.DistrictLists.DistrictInfos.DistrictInfo.map((district) => ({
+          parentVueUrl: district['@_PvueURL'],
+          address: district['@_Address'],
+          id: district['@_DistrictID'],
+          name: district['@_Name'],
+        }))
+      );
+    } catch (e) {
+      reject(e);
+    }
+  });
 }
 </code></pre>
         </article>
