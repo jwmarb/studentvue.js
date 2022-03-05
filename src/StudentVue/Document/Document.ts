@@ -33,6 +33,9 @@ export default class Document extends File<DocumentFile[]> {
      * The properties of the file
      * @public
      * @readonly
+     * @property {string} name The name of the file
+     * @property {string} type The file type
+     * @property {Date} date The date the file was created
      */
     this.file = {
       name: xmlObj['@_DocumentFileName'][0],
@@ -44,6 +47,7 @@ export default class Document extends File<DocumentFile[]> {
      * The comment included in the document
      * @public
      * @readonly
+     * @type {string}
      */
     this.comment = xmlObj['@_DocumentComment'][0];
   }

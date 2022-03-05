@@ -20,6 +20,7 @@ export default abstract class File<T> extends soap.Client {
      * This value is important for `File.get()` method. You cannot fetch the file without it
      * @public
      * @readonly
+     * @type {string}
      */
     this.documentGu = documentGu;
 
@@ -34,6 +35,7 @@ export default abstract class File<T> extends soap.Client {
      * in `Document.ts` and `ReportCard.ts`
      * @private
      * @readonly
+     * @type {string}
      */
     this.methodName = methodName;
   }

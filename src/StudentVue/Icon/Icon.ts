@@ -11,6 +11,7 @@ export default class Icon {
      * The URI of the icon
      * @public
      * @readonly
+     * @type {string}
      */
     this.uri = hostUrl + path;
   }

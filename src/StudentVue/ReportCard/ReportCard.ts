@@ -32,12 +32,14 @@ export default class ReportCard extends File<ReportCardFile> {
      * The date of the report card
      * @public
      * @readonly
+     * @type {Date}
      */
     this.date = new Date(xmlObj['@_EndDate'][0]);
     /**
      * The time period of the report card
      * @public
      * @readonly
+     * @type {string}
      */
     this.periodName = xmlObj['@_ReportingPeriodName'][0];
   }

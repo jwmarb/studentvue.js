@@ -17,7 +17,7 @@ export default class Message extends soap.Client {
 
   public readonly id: string;
 
-  public readonly beginDate;
+  public readonly beginDate: Date;
 
   public readonly type: string;
 
@@ -51,47 +51,55 @@ export default class Message extends soap.Client {
     super(credentials);
     /**
      * The URL to create POST fetch requests to synergy servers
+     * @type {string}
      * @private
      * @readonly
      */
     this.hostUrl = hostUrl;
     /**
      * The message icon
+     * @type {Icon}
      * @public
      * @readonly
      */
     this.icon = new Icon(xmlObject['@_IconURL'][0], this.hostUrl);
     /**
      * The ID of the message
+     * @type {string}
      * @public
      * @readonly
      */
     this.id = xmlObject['@_ID'][0];
     /**
      * The type of the message
+     * @type {string}
      * @public
      * @readonly
      */
     this.type = xmlObject['@_Type'][0];
     /**
      * The date when the message was first posted
+     * @type {Date}
      * @public
      * @readonly
      */
-    this.beginDate = xmlObject['@_BeginDate'][0];
+    this.beginDate = new Date(xmlObject['@_BeginDate'][0]);
     /**
      * The HTML content of the message
+     * @type {string}
      * @public
      * @readonly
      */
     this.htmlContent = atob(xmlObject['@_Content'][0]);
     /**
      * Whether the message has been read or not
+     * @type {boolean}
      * @private
      */
     this.read = JSON.parse(xmlObject['@_Read'][0]);
     /**
      * Whether the message is deletable or not
+     * @type {boolean}
      * @private
      */
     this.deletable = JSON.parse(xmlObject['@_Deletable'][0]);
@@ -99,6 +107,7 @@ export default class Message extends soap.Client {
      * The sender of the message
      * @public
      * @readonly
+     * @type {object}
      * @property {string} name - The name of the sender
      * @property {string} staffGu - the staffGu of the sender
      * @property {string} email - The email of the sender
@@ -112,6 +121,7 @@ export default class Message extends soap.Client {
     };
     /**
      * The module of the sender
+     * @type {string}
      * @public
      * @readonly
      */
@@ -120,6 +130,7 @@ export default class Message extends soap.Client {
      * The subject of the message
      * @public
      * @readonly
+     * @type {object}
      * @property {string} html - The subject of the message with HTML
      * @property {string} raw - The subject of the message without HTML and formatting
      */
@@ -129,6 +140,7 @@ export default class Message extends soap.Client {
     };
     /**
      * The attachments included in the message, if there are any.
+     * @type {Attachment[]}
      * @public
      * @readonly
      */
@@ -166,7 +178,7 @@ export default class Message extends soap.Client {
 
   /**
    * Marks the message as read
-   * @returns Returns true to show that it has been marked as read
+   * @returns {true} Returns true to show that it has been marked as read
    * @description
    * ```js
    * const messages = await client.messages();
