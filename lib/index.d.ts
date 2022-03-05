@@ -646,6 +646,7 @@ declare module 'studentvue/StudentVue/Client/Interfaces/Calendar' {
     
         /**
             * The list of school events
+            * @type {(AssignmentEvent | HolidayEvent | RegularEvent)[]}
             */
         events: (AssignmentEvent | HolidayEvent | RegularEvent)[];
     }
@@ -666,6 +667,7 @@ declare module 'studentvue/StudentVue/Client/Interfaces/Calendar' {
     
         /**
             * The type of the event
+            * @type {EventType}
             */
         type: EventType;
     
@@ -770,16 +772,19 @@ declare module 'studentvue/StudentVue/Client/Interfaces/Gradebook' {
         reportingPeriod: {
             /**
                 * The current time period that is reported
+                * @type {ReportingPeriod}
                 */
             current: ReportingPeriod;
     
             /**
                 * Other available time periods the student can view
+                * @type {ReportingPeriod[]}
                 */
             available: ReportingPeriod[];
         };
         /**
             * The courses within this time period in the student gradebook
+            * @type {Course[]}
             */
         courses: Course[];
     }
@@ -835,11 +840,13 @@ declare module 'studentvue/StudentVue/Client/Interfaces/Gradebook' {
     
         /**
             * The staff in charge of the class
+            * @type {Staff}
             */
         staff: Staff;
     
         /**
             * The grade marks of the class
+            * @type {Mark[]}
             */
         marks: Mark[];
     }
@@ -870,11 +877,13 @@ declare module 'studentvue/StudentVue/Client/Interfaces/Gradebook' {
     
         /**
             * The weighing scale of the course
+            * @type {WeightedCategory[]}
             */
         weightedCategories: WeightedCategory[];
     
         /**
             * The assignments of the course
+            * @type {Assignment[]}
             */
         assignments: Assignment[];
     }
@@ -1019,6 +1028,7 @@ declare module 'studentvue/StudentVue/Client/Interfaces/Gradebook' {
     
         /**
             * The resources provided in the assignment
+            * @type {(FileResource | URLResource)[]}
             */
         resources: (FileResource | URLResource)[];
     }
@@ -1069,6 +1079,7 @@ declare module 'studentvue/StudentVue/Client/Interfaces/Gradebook' {
     
         /**
             * The resource type
+            * @type {ResourceType}
             */
         type: ResourceType.FILE;
     }
@@ -1084,6 +1095,7 @@ declare module 'studentvue/StudentVue/Client/Interfaces/Gradebook' {
     
         /**
             * The resource type
+            * @type {ResourceType}
             */
         type: ResourceType.URL;
     
@@ -1183,11 +1195,13 @@ declare module 'studentvue/StudentVue/Client/Interfaces/Attendance' {
     
         /**
             * List of absences
+            * @type {Absence[]}
             */
         absences: Absence[];
     
         /**
             * List of information about a period
+            * @type {PeriodInfo[]}
             */
         periodInfos: PeriodInfo[];
     }
@@ -1218,6 +1232,7 @@ declare module 'studentvue/StudentVue/Client/Interfaces/Attendance' {
     
         /**
             * The periods in which the student was absent in
+            * @type {AbsentPeriod[]}
             */
         periods: AbsentPeriod[];
     }
@@ -1248,6 +1263,7 @@ declare module 'studentvue/StudentVue/Client/Interfaces/Attendance' {
     
         /**
             * The staff member supervising the class
+            * @type {Staff}
             */
         staff: Staff;
     
@@ -1532,6 +1548,7 @@ declare module 'studentvue/StudentVue/Client/Interfaces/StudentInfo' {
     
         /**
             * The student's homeroom teacher
+            * @type {Staff}
             */
         homeRoomTeacher: Staff;
     
@@ -1547,6 +1564,7 @@ declare module 'studentvue/StudentVue/Client/Interfaces/StudentInfo' {
     
         /**
             * The student's counselor
+            * @type {Staff}
             */
         counselor: Staff;
     
@@ -1557,6 +1575,7 @@ declare module 'studentvue/StudentVue/Client/Interfaces/StudentInfo' {
     
         /**
             * A list of contacts in case of emergency
+            * @type {EmergencyContact[]}
             */
         emergencyContacts: EmergencyContact[];
     
@@ -1587,6 +1606,7 @@ declare module 'studentvue/StudentVue/Client/Interfaces/StudentInfo' {
     
         /**
             * Additional information about the student such as transportation information
+            * @type {AdditionalInfo[]}
             */
         additionalInfo: AdditionalInfo[];
     }
@@ -1609,6 +1629,7 @@ declare module 'studentvue/StudentVue/Client/Interfaces/StudentInfo' {
     
         /**
             * Fields within the information. For example, if the type was `Transportation Information`, this will contain items about it such as `AM Route`, `Pickup Bus Stop`, etc.
+            * @type {AdditionalInfoItem[]}
             */
         items: AdditionalInfoItem[];
     }
@@ -1714,16 +1735,19 @@ declare module 'studentvue/StudentVue/Client/Interfaces/Schedule' {
     
         /**
             * The course schedules of all schools
+            * @type {SchoolScheduleInfo[]}
             */
         today: SchoolScheduleInfo[];
     
         /**
             * The classes' information in regards to the schedule
+            * @type {ClassInfo[]}
             */
         classes: ClassInfo[];
     
         /**
             * All the available terms that can retrieve a schedule
+            * @type {TermInfo[]}
             */
         terms: TermInfo[];
     }
@@ -1744,6 +1768,7 @@ declare module 'studentvue/StudentVue/Client/Interfaces/Schedule' {
     
         /**
             * The student's classes of this school
+            * @type {ClassScheduleInfo[]}
             */
         classes: ClassScheduleInfo[];
     }
@@ -1804,6 +1829,7 @@ declare module 'studentvue/StudentVue/Client/Interfaces/Schedule' {
     
         /**
             * The teacher of the class
+            * @type {Staff}
             */
         teacher: Staff;
     
@@ -1922,12 +1948,14 @@ declare module 'studentvue/StudentVue/Client/Interfaces/SchoolInfo' {
     
             /**
                 * The principal of the school
+                * @type {Staff}
                 */
             principal: Staff;
         };
     
         /**
             * A list of staff members in the school
+            * @type {StaffInfo[]}
             */
         staff: StaffInfo[];
     }
