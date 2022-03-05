@@ -10,6 +10,7 @@ declare module 'studentvue' {
     export { default as Client } from 'studentvue/StudentVue/Client/Client';
     export { default as Attachment } from 'studentvue/StudentVue/Attachment/Attachment';
     export { default as File } from 'studentvue/StudentVue/File/File';
+    export { default as soap } from 'studentvue/utils/soap/soap';
     export * from 'studentvue/StudentVue/ReportCard';
     export * from 'studentvue/StudentVue/Document';
     export * from 'studentvue/StudentVue/Client/Client.interfaces';
@@ -29,6 +30,7 @@ declare module 'studentvue/StudentVue/StudentVue' {
 declare module 'studentvue/Constants/ResourceType' {
     /**
       * The type the resource uses
+      * @enum
       */
     enum ResourceType {
         FILE = "File",
@@ -38,6 +40,10 @@ declare module 'studentvue/Constants/ResourceType' {
 }
 
 declare module 'studentvue/Constants/EventType' {
+    /**
+      * The event type of a calendar day.
+      * @enum
+      */
     enum EventType {
         ASSIGNMENT = "Assignment",
         REGULAR = "Regular",
@@ -48,13 +54,27 @@ declare module 'studentvue/Constants/EventType' {
 
 declare module 'studentvue/StudentVue/RequestException/RequestException' {
     import { ParsedAnonymousRequestError, ParsedRequestError } from 'studentvue/utils/soap/Client/Client.interfaces';
+    /**
+        * RequestException is a class used to parse errors from Synergy servers
+        * @constructor
+        */
     export default class RequestException {
-        get message(): string;
-        get stack(): string | undefined;
-        constructor(obj: ParsedRequestError | {
-            message: string;
-            stack?: string;
-        } | ParsedAnonymousRequestError);
+            /**
+                * The message of the exception
+                * @public
+                * @readonly
+                */
+            readonly message: string;
+            /**
+                * The stack trace of the exception. (java)
+                * @public
+                * @readonly
+                */
+            readonly stack: string | undefined;
+            constructor(obj: ParsedRequestError | {
+                    message: string;
+                    stack?: string;
+            } | ParsedAnonymousRequestError);
     }
 }
 
@@ -64,39 +84,96 @@ declare module 'studentvue/StudentVue/Message/Message' {
     import Attachment from 'studentvue/StudentVue/Attachment/Attachment';
     import { MessageXMLObject } from 'studentvue/StudentVue/Message/Message.xml';
     import Icon from 'studentvue/StudentVue/Icon/Icon';
+    /**
+        * Message class
+        * This is only returned as an array in `Client.messages()` method
+        * @constructor
+        * @extends {soap.Client}
+        */
     export default class Message extends soap.Client {
+            /**
+                * The message icon
+                * @public
+                * @readonly
+                */
             readonly icon: Icon;
+            /**
+                * The ID of the message
+                * @public
+                * @readonly
+                */
             readonly id: string;
+            /**
+                * The date when the message was first posted
+                * @public
+                * @readonly
+                */
             readonly beginDate: string;
+            /**
+                * The type of the message
+                * @public
+                * @readonly
+                */
             readonly type: string;
+            /**
+                * The HTML content of the message
+                * @public
+                * @readonly
+                */
             readonly htmlContent: string;
+            /**
+                * The sender of the message
+                * @public
+                * @readonly
+                * @property {string} name - The name of the sender
+                * @property {string} staffGu - the staffGu of the sender
+                * @property {string} email - The email of the sender
+                * @property {string} smMsgPersonGu - The smMsgPersonGu of the sender. Don't know if this property has a real usage or not
+                */
             readonly from: {
                     name: string;
                     staffGu: string;
                     email: string;
                     smMsgPersonGu: string;
             };
+            /**
+                * The module of the sender
+                * @public
+                * @readonly
+                */
             readonly module: string;
+            /**
+                * The subject of the message
+                * @public
+                * @readonly
+                * @property {string} html - The subject of the message with HTML
+                * @property {string} raw - The subject of the message without HTML and formatting
+                */
             readonly subject: {
                     html: string;
                     raw: string;
             };
+            /**
+                * The attachments included in the message, if there are any.
+                * @public
+                * @readonly
+                */
             readonly attachments: Attachment[];
             constructor(xmlObject: MessageXMLObject['PXPMessagesData'][0]['MessageListings'][0]['MessageListing'][0], credentials: LoginCredentials, hostUrl: string);
             /**
                 * Check if a message has been read
-                * @returns Returns a boolean declaring whether or not the message has been previously read
+                * @returns {boolean} Returns a boolean declaring whether or not the message has been previously read
                 */
             isRead(): boolean;
             /**
                 * Check if a message is deletable
-                * @returns Returns a boolean declaring whether or not the message is deletable
+                * @returns {boolean} Returns a boolean declaring whether or not the message is deletable
                 */
             isDeletable(): boolean;
             /**
                 * Marks the message as read
                 * @returns Returns true to show that it has been marked as read
-                * @example
+                * @description
                 * ```js
                 * const messages = await client.messages();
                 * messages.every((msg) => msg.isRead()) // -> false
@@ -105,7 +182,7 @@ declare module 'studentvue/StudentVue/Message/Message' {
                 * const refetchedMessages = await client.messages(); // See if it updated on the server
                 * messages.every((msg) => msg.isRead()) // -> true
                 * ```
-                * @example
+                * @description
                 * ```tsx
                 * // In a React project...
                 * import React from 'react';
@@ -133,8 +210,18 @@ declare module 'studentvue/StudentVue/Message/Message' {
 
 declare module 'studentvue/StudentVue/Icon/Icon' {
     export default class Icon {
-        readonly uri: string;
-        constructor(path: string, hostUrl: string);
+            /**
+                * The URI of the icon
+                * @public
+                * @readonly
+                */
+            readonly uri: string;
+            /**
+                *
+                * @param path The URL path to the icon (e.g. /path/to/icon.png)
+                * @param hostUrl The host url (e.g. https://schooldistrict.org/)
+                */
+            constructor(path: string, hostUrl: string);
     }
 }
 
@@ -149,12 +236,17 @@ declare module 'studentvue/StudentVue/Client/Client' {
     import { Schedule } from 'studentvue/StudentVue/Client/Client.interfaces';
     import ReportCard from 'studentvue/StudentVue/ReportCard/ReportCard';
     import Document from 'studentvue/StudentVue/Document/Document';
+    /**
+        * The StudentVUE Client to access the API
+        * @constructor
+        * @extends {soap.Client}
+        */
     export default class Client extends soap.Client {
             constructor(credentials: LoginCredentials, hostUrl: string);
             /**
                 * Gets the student's documents from synergy servers
-                * @returns {Promise<Document[]}> Returns a list of student documents
-                * @example
+                * @returns {Promise<Document[]>}> Returns a list of student documents
+                * @description
                 * ```js
                 * const documents = await client.documents();
                 * const document = documents[0];
@@ -166,7 +258,7 @@ declare module 'studentvue/StudentVue/Client/Client' {
             /**
                 * Gets a list of report cards
                 * @returns {Promise<ReportCard[]>} Returns a list of report cards that can fetch a file
-                * @example
+                * @description
                 * ```js
                 * const reportCards = await client.reportCards();
                 * const files = await Promise.all(reportCards.map((card) => card.get()));
@@ -177,7 +269,7 @@ declare module 'studentvue/StudentVue/Client/Client' {
             /**
                 * Gets the student's school's information
                 * @returns {Promise<SchoolInfo>} Returns the information of the student's school
-                * @example
+                * @description
                 * ```js
                 * await client.schoolInfo();
                 *
@@ -191,7 +283,7 @@ declare module 'studentvue/StudentVue/Client/Client' {
                 * Gets the schedule of the student
                 * @param {number} termIndex The index of the term.
                 * @returns {Promise<Schedule>} Returns the schedule of the student
-                * @example
+                * @description
                 * ```js
                 * await schedule(0) // -> { term: { index: 0, name: '1st Qtr Progress' }, ... }
                 * ```
@@ -200,7 +292,7 @@ declare module 'studentvue/StudentVue/Client/Client' {
             /**
                 * Returns the attendance of the student
                 * @returns {Promise<Attendance>} Returns an Attendance object
-                * @example
+                * @description
                 * ```js
                 * client.attendance()
                 *  .then(console.log); // -> { type: 'Period', period: {...}, schoolName: 'University High School', absences: [...], periodInfos: [...] }
@@ -211,7 +303,7 @@ declare module 'studentvue/StudentVue/Client/Client' {
                 * Returns the gradebook of the student
                 * @param {number} reportingPeriodIndex The timeframe that the gradebook should return
                 * @returns {Promise<Gradebook>} Returns a Gradebook object
-                * @example
+                * @description
                 * ```js
                 * const gradebook = await client.gradebook();
                 * console.log(gradebook); // { error: '', type: 'Traditional', reportingPeriod: {...}, courses: [...] };
@@ -224,7 +316,7 @@ declare module 'studentvue/StudentVue/Client/Client' {
             /**
                 * Get a list of messages of the student
                 * @returns {Promise<Message[]>} Returns an array of messages of the student
-                * @example
+                * @description
                 * ```js
                 * await client.messages(); // -> [{ id: 'E972F1BC-99A0-4CD0-8D15-B18968B43E08', type: 'StudentActivity', ... }, { id: '86FDA11D-42C7-4249-B003-94B15EB2C8D4', type: 'StudentActivity', ... }]
                 * ```
@@ -233,7 +325,7 @@ declare module 'studentvue/StudentVue/Client/Client' {
             /**
                 * Gets the info of a student
                 * @returns {Promise<StudentInfo>} StudentInfo object
-                * @example
+                * @description
                 * ```js
                 * studentInfo().then(console.log) // -> { student: { name: 'Evan Davis', nickname: '', lastName: 'Davis' }, ...}
                 * ```
@@ -243,7 +335,7 @@ declare module 'studentvue/StudentVue/Client/Client' {
                 *
                 * @param {CalendarOptions} options Options to provide for calendar method. An interval is required.
                 * @returns {Promise<Calendar>} Returns a Calendar object
-                * @example
+                * @description
                 * ```js
                 * client.calendar({ interval: { start: new Date('5/1/2022'), end: new Date('8/1/2021') }, concurrency: null }); // -> Limitless concurrency (not recommended)
                 *
@@ -259,30 +351,66 @@ declare module 'studentvue/StudentVue/Attachment/Attachment' {
     import { Base64String } from 'studentvue/utils/types';
     import { LoginCredentials } from 'studentvue/utils/soap/Client/Client.interfaces';
     import soap from 'studentvue/utils/soap/soap';
+    /**
+        * Attachment class
+        * This is a class used to define message attachments
+        * @constructor
+        * @extends {soap.Client}
+        */
     export default class Attachment extends soap.Client {
-        readonly name: string;
-        readonly attachmentGu: string;
-        readonly fileExtension: string | null;
-        constructor(name: string, attachmentGu: string, session: LoginCredentials);
-        /**
-          * Fetches the attachment from synergy servers.
-          * Unfortunately, the api does not offer a URL path to the file
-          * @returns {string} base64 string
-          *
-          * @example
-          * ```js
-          * const base64 = await someAttachment.get();
-          * console.log(base64) // -> UEsDBBQABgAIAAAAIQCj77s...
-          * ```
-          */
-        get(): Promise<Base64String>;
+            /**
+                * The name of the attachment.
+                * @type {string}
+                * @public
+                * @readonly
+                */
+            readonly name: string;
+            /**
+                * the GU of the attachment.
+                * @type {string}
+                * @public
+                * @readonly
+                */
+            readonly attachmentGu: string;
+            /**
+                * The file extension of the attachment extracted using regex
+                * @type {string | null}
+                * @public
+                * @readonly
+                */
+            readonly fileExtension: string | null;
+            constructor(name: string, attachmentGu: string, session: LoginCredentials);
+            /**
+                * Fetches the attachment from synergy servers.
+                * Unfortunately, the api does not offer a URL path to the file
+                * @returns {string} base64 string
+                *
+                * @description
+                * ```js
+                * const base64 = await someAttachment.get();
+                * console.log(base64) // -> UEsDBBQABgAIAAAAIQCj77s...
+                * ```
+                */
+            get(): Promise<Base64String>;
     }
 }
 
 declare module 'studentvue/StudentVue/File/File' {
     import { LoginCredentials } from 'studentvue/utils/soap/Client/Client.interfaces';
     import soap from 'studentvue/utils/soap/soap';
+    /**
+        * File class
+        * @abstract
+        * @extends {soap.Client}
+        * @constructor
+        */
     export default abstract class File<T> extends soap.Client {
+            /**
+                * The DocumentGU of the file so that it can be fetched from synergy servers
+                * This value is important for `File.get()` method. You cannot fetch the file without it
+                * @public
+                * @readonly
+                */
             readonly documentGu: string;
             constructor(credentials: LoginCredentials, documentGu: string, methodName: string);
             /**
@@ -290,7 +418,7 @@ declare module 'studentvue/StudentVue/File/File' {
                 * @param {unknown} xmlObject The XML Object passed after parsing
                 * @protected
                 * @returns {T} Returns a reformatted XML object to make it easier for code
-                * @example
+                * @description
                 * ```js
                 * const xmlObject = await super.processRequest({...}); // { "@_Attribute": [{ "@_Nested": [{...}, {...}]}]}
                 * parseXMLObject(xmlObject); // { attribute: { nested: [{...}, {...}] } }
@@ -302,13 +430,21 @@ declare module 'studentvue/StudentVue/File/File' {
                 * Retrieve the file from synergy servers. After retrieving the xmlObject, this method calls parseXMLObject which must be defined to parse the xmlObject into a readable, typesafe object.
                 * @public
                 * @returns {Promise<T>} Returns a base64 object
-                * @example
+                * @description
                 * ```js
                 * const base64 = await document.get(); // { attribute: { nested: {...} }, base64: "base64 code" }
                 * ```
                 */
             get(): Promise<T>;
     }
+}
+
+declare module 'studentvue/utils/soap/soap' {
+    import Client from 'studentvue/utils/soap/Client/Client';
+    const _default: {
+        Client: typeof Client;
+    };
+    export default _default;
 }
 
 declare module 'studentvue/StudentVue/ReportCard' {
@@ -328,40 +464,123 @@ declare module 'studentvue/StudentVue/Client/Client.interfaces' {
     export * from 'studentvue/StudentVue/Client/Interfaces/Attendance';
     export * from 'studentvue/StudentVue/Client/Interfaces/Schedule';
     export * from 'studentvue/StudentVue/Client/Interfaces/SchoolInfo';
-    export * from 'studentvue/StudentVue/Client/Client';
+    
+    /**
+        * Information about the staff member working in the school facility
+        */
     export interface Staff {
+        /**
+            * The name of the staff
+            */
         name: string;
+    
+        /**
+            * The staff's email
+            */
         email: string;
+    
+        /**
+            * The staffGu of the staff member
+            */
         staffGu: string;
     }
 }
 
 declare module 'studentvue/StudentVue/StudentVue.interfaces' {
+    /**
+        * SchoolDistrict
+        */
     export interface SchoolDistrict {
+        /**
+            * The address of the school district
+            */
         address: string;
+    
+        /**
+            * The ID of the school district
+            */
         id: string;
+    
+        /**
+            * The name of the school district
+            */
         name: string;
+    
+        /**
+            * The ParentVUE URL of the school district
+            */
         parentVueUrl: string;
     }
     
+    /**
+        * The login information of the student
+        */
     export interface UserCredentials {
+        /**
+            * The student's username
+            */
         username: string;
+    
+        /**
+            * The student's password
+            */
         password: string;
     }
 }
 
 declare module 'studentvue/utils/soap/Client/Client.interfaces' {
+    /**
+        * Options to provide when processing a fetch POST request to synergy servers
+        */
     export interface RequestOptions {
+        /**
+            * Skip the login process. If set to 1, this will save a server-sided HTTPOnly cookie, but it is recommended to set it to 0 since there is no way to log out using this API yet.
+            * @see https://github.com/StudentVue/docs
+            */
         skipLoginLog?: number;
+    
+        /**
+            * Whether the user is a parent or not. Set to 1 if the user is a parent
+            * @see https://github.com/StudentVue/docs
+            */
         parent?: number;
+    
+        /**
+            * The service handle name sent to synergy servers to process the request. For handling requests for the student, it will be `PXPWebServices`
+            * @see https://github.com/StudentVue/docs
+            */
         webServiceHandleName?: string;
+    
+        /**
+            * The method name to provide to synergy when processing the request.
+            * @see https://github.com/StudentVue/docs
+            */
         methodName: string;
+    
+        /**
+            * The parameters to provide in the method
+            * @see https://github.com/StudentVue/docs
+            */
         paramStr?: Record<string, unknown>;
     }
     
+    /**
+        * The login information of the student that includes the district url
+        */
     export interface LoginCredentials {
+        /**
+            * The student's username
+            */
         username: string;
+    
+        /**
+            * The student's password
+            */
         password: string;
+    
+        /**
+            * The student's district URL
+            */
         districtUrl: string;
     }
     
@@ -391,14 +610,6 @@ declare module 'studentvue/utils/soap/Client/Client.interfaces' {
             STACK_TRACE: string;
         };
     }
-}
-
-declare module 'studentvue/utils/soap/soap' {
-    import Client from 'studentvue/utils/soap/Client/Client';
-    const _default: {
-        Client: typeof Client;
-    };
-    export default _default;
 }
 
 declare module 'studentvue/StudentVue/Message/Message.xml' {
@@ -444,49 +655,175 @@ declare module 'studentvue/StudentVue/Client/Interfaces/Calendar' {
     import EventType from 'studentvue/Constants/EventType';
     import Icon from 'studentvue/StudentVue/Icon/Icon';
     
+    /**
+        * Options to provide in `Client.calendar()` method
+        */
     export interface CalendarOptions {
+        /**
+            * The interval between two dates in the calendar
+            */
         interval: {
+            /**
+                * The start interval
+                */
             start: Date | number;
+    
+            /**
+                * The end interval
+                */
             end: Date | number;
         };
+    
+        /**
+            * The number of fetches that should occur per asynchronous task. StudentVUE does not send ALL events within a school year, but rather it sends all events within a month.
+            * @description
+            * ```js
+            * // { concurrency: 1 }
+            * ```
+            * Fetch events of one month at a time
+            *
+            * ```js
+            * // { concurrency: 7 } -> this is the default
+            * ```
+            * Fetch events of 7 months at a time
+            *
+            * If you set concurrency to `8` or more, it will throw an error because it will time out
+            */
         concurrency?: number | null;
     }
     
+    /**
+        * Calendar of the school
+        */
     export interface Calendar {
+        /**
+            * The date of the school
+            */
         schoolDate: {
+            /**
+                * The date that indicates the start of school
+                */
             start: Date | number;
+    
+            /**
+                * The date that indicates the last day of school
+                */
             end: Date | number;
         };
+    
+        /**
+            * The date range of the events
+            */
         outputRange: {
+            /**
+                * The beginning date of events range
+                */
             start: Date | number;
+    
+            /**
+                * The end date of events range
+                */
             end: Date | number;
         };
+    
+        /**
+            * The list of school events
+            */
         events: (AssignmentEvent | HolidayEvent | RegularEvent)[];
     }
     
+    /**
+        * A school event
+        */
     export interface Event {
+        /**
+            * The date of the event
+            */
         date: Date;
+    
+        /**
+            * The title of the event
+            */
         title: string;
+    
+        /**
+            * The type of the event
+            */
         type: EventType;
+    
+        /**
+            * The time the event take places
+            */
         startTime: string;
     }
     
+    /**
+        * An event that contains an assignment
+        */
     export interface AssignmentEvent extends Event {
-        agu: string;
-        link: string;
-        dgu: string;
-        viewType: string;
-        addLinkData: string;
+        /**
+            * The AGU of the event
+            */
+        agu?: string;
+    
+        /**
+            * The link of the event
+            */
+        link?: string;
+    
+        /**
+            * The DGU of the event
+            */
+        dgu?: string;
+    
+        /**
+            * The view type of the event
+            */
+        viewType?: string;
+    
+        /**
+            * The Add Link Data of the event
+            */
+        addLinkData?: string;
     }
     
+    /**
+        * An event that is held in a holiday. Students may not have school in this event
+        */
     export interface HolidayEvent extends Event {}
     
+    /**
+        * An event that is not anything special, hence Regular. Synergy Server Maintenance event type uses this event
+        */
     export interface RegularEvent extends Event {
+        /**
+            * The AGU of the event
+            */
         agu?: string;
+    
+        /**
+            * The DGU of the event
+            */
         dgu?: string;
+    
+        /**
+            * The link of the event
+            */
         link?: string;
+    
+        /**
+            * The type of view in the event
+            */
         viewType?: string;
+    
+        /**
+            * The Add Link Data of the event
+            */
         addLinkData?: string;
+    
+        /**
+            * The description of the event
+            */
         description?: string;
     }
 }
@@ -495,113 +832,396 @@ declare module 'studentvue/StudentVue/Client/Interfaces/Gradebook' {
     import ResourceType from 'studentvue/Constants/ResourceType';
     import { Staff } from 'studentvue/StudentVue/Client/Client.interfaces';
     
+    /**
+        * The student gradebook
+        */
     export interface Gradebook {
+        /**
+            * Error message, if there is any
+            */
         error: string;
+    
+        /**
+            * The type of gradebook. It's usually `Traditional` if the student's class uses a letter-grade scale
+            */
         type: string;
+    
+        /**
+            * The reporting time period of the gradebook
+            */
         reportingPeriod: {
+            /**
+                * The current time period that is reported
+                */
             current: ReportingPeriod;
+    
+            /**
+                * Other available time periods the student can view
+                */
             available: ReportingPeriod[];
         };
+        /**
+            * The courses within this time period in the student gradebook
+            */
         courses: Course[];
     }
     
+    /**
+        * The time period of a gradebook
+        */
     export interface ReportingPeriod {
+        /**
+            * The index of the period. This is usually passed in `Client.gradebook()`
+            */
         index: number;
+    
+        /**
+            * The name of the period
+            */
         name: string;
+    
+        /**
+            * The date of the period
+            */
         date: {
+            /**
+                * The start date of the period
+                */
             start: Date;
+    
+            /**
+                * The end date of the period
+                */
             end: Date;
         };
     }
     
+    /**
+        * The course the student is taking
+        */
     export interface Course {
+        /**
+            * The period number of the course
+            */
         period: number;
+    
+        /**
+            * The title of the course
+            */
         title: string;
+    
+        /**
+            * The room name or location of the class
+            */
         room: string;
+    
+        /**
+            * The staff in charge of the class
+            */
         staff: Staff;
+    
+        /**
+            * The grade marks of the class
+            */
         marks: Mark[];
     }
     
+    /**
+        * The grade mark of a course
+        */
     export interface Mark {
+        /**
+            * The name of the mark
+            */
         name: string;
+    
+        /**
+            * The calculated score of the mark
+            */
         calculatedScore: {
+            /**
+                * The score formatted according to the gradebook type. If the gradebook type is `Traditional`, it will show A's, B's, C's, D's, and F's
+                */
             string: string;
+    
+            /**
+                * The score formatted in a number from 0-100. This is the student's percentage score, but without the % sign.
+                */
             raw: number;
         };
+    
+        /**
+            * The weighing scale of the course
+            */
         weightedCategories: WeightedCategory[];
+    
+        /**
+            * The assignments of the course
+            */
         assignments: Assignment[];
     }
     
+    /**
+        * The weighting scale category
+        */
     export interface WeightedCategory {
+        /**
+            * The score formatted according to the grade type. It is based on the student's score on the weighted category
+            */
         calculatedMark: string;
+    
+        /**
+            * The weighted category type. Examples are `Tests/Quizzes`, `Homework`, and `Finals`
+            */
         type: string;
+    
+        /**
+            * The weight of the category
+            */
         weight: {
+            /**
+                * The student's percentage score in the weighted category
+                */
             evaluated: string;
+    
+            /**
+                * The percentage that makes up the total grade in the class
+                */
             standard: string;
         };
+    
+        /**
+            * The points in the weighted category
+            */
         points: {
+            /**
+                * The current points the student achieved in the weighted category
+                */
             current: number;
+    
+            /**
+                * The points possible to achieve in the class
+                */
             possible: number;
         };
     }
     
+    /**
+        * The Assignment of a course
+        */
     export interface Assignment {
+        /**
+            * The ID of the assignment
+            */
         gradebookId: string;
+    
+        /**
+            * The name of the assignment
+            */
         name: string;
+    
+        /**
+            * The type of the assignment that falls under the weighted categories
+            */
         type: string;
+    
+        /**
+            * The date of the assignment
+            */
         date: {
+            /**
+                * The start date of the assignment
+                */
             start: Date;
+    
+            /**
+                * The due date of the assignment
+                */
             due: Date;
         };
+    
+        /**
+            * The student's score in the assignment
+            */
         score: {
+            /**
+                * The type of the score. It is usually `Raw Score`
+                */
             type: string;
+    
+            /**
+                * The student's score in the assignment. It is usually formatted as `x out of x`
+                */
             value: string;
         };
+        /**
+            * The points the student achieved in the assignment. It is usually formatted as `x / x`
+            */
         points: string;
+    
+        /**
+            * The notes the teacher provided in the assignment
+            */
         notes: string;
+    
+        /**
+            * The ID of the teacher
+            */
         teacherId: string;
+    
+        /**
+            * The description of teh assignment
+            */
         description: string;
+    
+        /**
+            * Whether the assignment has a dropbox or not
+            */
         hasDropbox: boolean;
+    
+        /**
+            * The ID of the student
+            */
         studentId: string;
+    
+        /**
+            * The date of the dropbox
+            */
         dropboxDate: {
+            /**
+                * The beginning date of the dropbox
+                */
             start: Date;
+    
+            /**
+                * The end date of the dropbox before all submissions are closed
+                */
             end: Date;
         };
+    
+        /**
+            * The resources provided in the assignment
+            */
         resources: (FileResource | URLResource)[];
     }
     
+    /**
+        * A resource that contains a file
+        */
     export interface FileResource extends Resource {
+        /**
+            * The properties of the file
+            */
         file: {
+            /**
+                * The type of the file
+                */
             type: string;
+    
+            /**
+                * The name of the file
+                */
             name: string;
+    
+            /**
+                * The URI of the file
+                */
             uri: string;
         };
+    
+        /**
+            * The resource properties of the resource
+            */
         resource: {
+            /**
+                * The upload date of the resource
+                */
             date: Date;
+    
+            /**
+                * The ID of the resource
+                */
             id: string;
+    
+            /**
+                * The name of the resource
+                */
             name: string;
         };
+    
+        /**
+            * The resource type
+            */
         type: ResourceType.FILE;
     }
     
+    /**
+        * A resource that is a URL
+        */
     export interface URLResource extends Resource {
+        /**
+            * The URL of the resource
+            */
         url: string;
+    
+        /**
+            * The resource type
+            */
         type: ResourceType.URL;
+    
+        /**
+            * The resource properties of the resource
+            */
         resource: {
+            /**
+                * The date of the resource
+                */
             date: Date;
+    
+            /**
+                * The ID of the resource
+                */
             id: string;
+    
+            /**
+                * The name of the resource
+                */
             name: string;
+    
+            /**
+                * The description of the resource
+                */
             description: string;
         };
+    
+        /**
+            * The URL path of the resource
+            */
         path: string;
     }
     
+    /**
+        * A resource provided in the assignment
+        */
     export interface Resource {
+        /**
+            * The class ID of the resource
+            */
         classId: string;
     
+        /**
+            * The gradebook ID of the resource
+            */
         gradebookId: string;
     
+        /**
+            * The sequence type of the resource
+            */
         sequence: string;
+    
+        /**
+            * The teacher ID of the resource
+            */
         teacherId: string;
     }
 }
@@ -609,42 +1229,152 @@ declare module 'studentvue/StudentVue/Client/Interfaces/Gradebook' {
 declare module 'studentvue/StudentVue/Client/Interfaces/Attendance' {
     import { Staff } from 'studentvue/StudentVue/Client/Client.interfaces';
     
+    /**
+        * Student Attendance
+        */
     export interface Attendance {
+        /**
+            * The type of attendance
+            */
         type: string;
+    
+        /**
+            * The class periods
+            */
         period: {
+            /**
+                * The total class periods
+                */
             total: number;
+    
+            /**
+                * The first class period
+                */
             start: number;
+    
+            /**
+                * The last class period
+                */
             end: number;
         };
+    
+        /**
+            * The name of the school
+            */
         schoolName: string;
+    
+        /**
+            * List of absences
+            */
         absences: Absence[];
+    
+        /**
+            * List of information about a period
+            */
         periodInfos: PeriodInfo[];
     }
     
+    /**
+        * Information about the student's absence
+        */
     export interface Absence {
+        /**
+            * The date of the absence
+            */
         date: Date;
+    
+        /**
+            * The reason for being absence
+            */
         reason: string;
+    
+        /**
+            * The note about the student's absence
+            */
         note: string;
+    
+        /**
+            * The description about the student's absence
+            */
         description: string;
+    
+        /**
+            * The periods in which the student was absent in
+            */
         periods: AbsentPeriod[];
     }
     
+    /**
+        * The period the student was absent in
+        */
     export interface AbsentPeriod {
+        /**
+            * The period number of the class
+            */
         period: number;
+    
+        /**
+            * The name of the absence type. Example would be `School Business`
+            */
         name: string;
+    
+        /**
+            * The reason for the student's absence in the class
+            */
         reason: string;
+    
+        /**
+            * The name of the student's class
+            */
         course: string;
+    
+        /**
+            * The staff member supervising the class
+            */
         staff: Staff;
+    
+        /**
+            * The organization year GU. It is unknown what this does
+            */
         orgYearGu: string;
     }
     
+    /**
+        * The attendance information about the student's period
+        */
     export interface PeriodInfo {
+        /**
+            * The period number of the class
+            */
         period: number;
+    
+        /**
+            * Properties with total attendance type
+            */
         total: {
+            /**
+                * The total excused absences of the student
+                */
             excused: number;
+    
+            /**
+                * The total late tardies of the student
+                */
             tardies: number;
+    
+            /**
+                * The total unexcused absences of the student
+                */
             unexcused: number;
+    
+            /**
+                * The total student absences due to activities
+                */
             activities: number;
+    
+            /**
+                * The total unexcused late tardies of the student
+                */
             unexcusedTardies: number;
         };
     }
@@ -655,11 +1385,26 @@ declare module 'studentvue/StudentVue/ReportCard/ReportCard' {
     import File from 'studentvue/StudentVue/File/File';
     import { ReportCardFile } from 'studentvue/StudentVue/ReportCard/ReportCard.interfaces';
     import { ReportCardBase64XMLObject, ReportCardsXMLObject } from 'studentvue/StudentVue/ReportCard/ReportCard.xml';
+    /**
+        * ReportCard class
+        * @class
+        * @extends {File<ReportCardFile>}
+        */
     export default class ReportCard extends File<ReportCardFile> {
-        readonly date: Date;
-        readonly periodName: string;
-        protected parseXMLObject(xmlObject: ReportCardBase64XMLObject): ReportCardFile;
-        constructor(xmlObj: ReportCardsXMLObject['RCReportingPeriodData'][0]['RCReportingPeriods'][0]['RCReportingPeriod'][0], credentials: LoginCredentials);
+            /**
+                * The date of the report card
+                * @public
+                * @readonly
+                */
+            readonly date: Date;
+            /**
+                * The time period of the report card
+                * @public
+                * @readonly
+                */
+            readonly periodName: string;
+            protected parseXMLObject(xmlObject: ReportCardBase64XMLObject): ReportCardFile;
+            constructor(xmlObj: ReportCardsXMLObject['RCReportingPeriodData'][0]['RCReportingPeriods'][0]['RCReportingPeriod'][0], credentials: LoginCredentials);
     }
 }
 
@@ -669,204 +1414,38 @@ declare module 'studentvue/StudentVue/Document/Document' {
     import { DocumentFile } from 'studentvue/StudentVue/Document/Document.interface';
     import { DocumentFileXMLObject, DocumentXMLObject } from 'studentvue/StudentVue/Document/Document.xml';
     export default class Document extends File<DocumentFile[]> {
-        readonly file: {
-            name: string;
-            date: Date;
-            type: string;
-        };
-        readonly comment: string;
-        protected parseXMLObject(xmlObject: DocumentFileXMLObject): {
-            file: {
-                name: string;
-                type: string;
-                date: Date;
+            /**
+                * The properties of the file
+                * @public
+                * @readonly
+                */
+            readonly file: {
+                    name: string;
+                    date: Date;
+                    type: string;
             };
-            category: string;
-            notes: string;
-            base64: string;
-        }[];
-        constructor(xmlObj: DocumentXMLObject['StudentDocuments'][0]['StudentDocumentDatas'][0]['StudentDocumentData'][0], credentials: LoginCredentials);
+            /**
+                * The comment included in the document
+                * @public
+                * @readonly
+                */
+            readonly comment: string;
+            protected parseXMLObject(xmlObject: DocumentFileXMLObject): {
+                    file: {
+                            name: string;
+                            type: string;
+                            date: Date;
+                    };
+                    category: string;
+                    notes: string;
+                    base64: string;
+            }[];
+            constructor(xmlObj: DocumentXMLObject['StudentDocuments'][0]['StudentDocumentDatas'][0]['StudentDocumentData'][0], credentials: LoginCredentials);
     }
 }
 
 declare module 'studentvue/utils/types' {
     export type Base64String = string;
-}
-
-declare module 'studentvue/StudentVue/ReportCard/ReportCard.interfaces' {
-    export interface ReportCardFile {
-        name: string;
-        document: {
-            type: string;
-            name: string;
-        };
-        base64: string;
-    }
-}
-
-declare module 'studentvue/StudentVue/Document/Document.interface' {
-    export interface DocumentFile {
-        file: {
-            name: string;
-            type: string;
-            date: Date;
-        };
-        category: string;
-        notes: string;
-        base64: string;
-    }
-}
-
-declare module 'studentvue/StudentVue/Client/Interfaces/StudentInfo' {
-    import { Staff } from 'studentvue/StudentVue/Client/Client.interfaces';
-    
-    export interface StudentInfo {
-        student: {
-            name: string;
-            nickname: string;
-            lastName: string;
-        };
-        id: string;
-        address: string;
-        gender: string;
-        grade: string;
-        birthDate: string;
-        email: string;
-        phone: string;
-        homeLanguage: string;
-        currentSchool: string;
-        track: string;
-        homeRoomTeacher: {
-            name: string;
-            email: string;
-            staffGu: string;
-        };
-        orgYearGu: string;
-        homeRoom: string;
-        counselor: Staff;
-        photo: string;
-        emergencyContacts: EmergencyContact[];
-        physician: {
-            name: string;
-            phone: string;
-            extn: string;
-            hospital: string;
-        };
-        dentist: {
-            name: string;
-            phone: string;
-            extn: string;
-            office: string;
-        };
-        lockerInfoRecords: string;
-        additionalInfo: AdditionalInfo[];
-    }
-    
-    export interface AdditionalInfo {
-        type: string;
-        id: string;
-        vcId: string;
-        items: AdditionalInfoItem[];
-    }
-    
-    export interface AdditionalInfoItem {
-        type: string;
-        source: {
-            object: string;
-            element: string;
-        };
-        vcId: string;
-        value: string;
-    }
-    
-    export interface EmergencyContact {
-        name: string;
-        relationship: string;
-        phone: {
-            home: string;
-            work: string;
-            other: string;
-            mobile: string;
-        };
-    }
-}
-
-declare module 'studentvue/StudentVue/Client/Interfaces/Schedule' {
-    import { Staff } from 'studentvue/StudentVue/Client/Client.interfaces';
-    
-    export interface Schedule {
-        term: {
-            index: number;
-            name: string;
-        };
-        error: string;
-        today: SchoolScheduleInfo[];
-        classes: ClassInfo[];
-        terms: TermInfo[];
-    }
-    
-    export interface SchoolScheduleInfo {
-        name: string;
-        bellScheduleName: string;
-        classes: ClassScheduleInfo[];
-    }
-    
-    export interface TermInfo {
-        index: number;
-        name: string;
-        date: {
-            start: Date;
-            end: Date;
-        };
-        schoolYearTermCodeGu: string;
-    }
-    
-    export interface ClassInfo {
-        period: number;
-        name: string;
-        room: string;
-        teacher: Staff;
-        sectionGu: string;
-    }
-    
-    export interface ClassScheduleInfo {
-        period: number;
-        name: string;
-        url: string;
-        time: {
-            start: Date;
-            end: Date;
-        };
-        date: {
-            start: Date;
-            end: Date;
-        };
-        attendanceCode: string;
-        sectionGu: string;
-        teacher: Staff & { url: string; emailSubject: string };
-    }
-}
-
-declare module 'studentvue/StudentVue/Client/Interfaces/SchoolInfo' {
-    import { Staff } from 'studentvue/StudentVue/Client/Client.interfaces';
-    export interface SchoolInfo {
-        school: {
-            address: string;
-            addressAlt: string;
-            city: string;
-            zipCode: string;
-            phone: string;
-            altPhone: string;
-            principal: Staff;
-        };
-        staff: StaffInfo[];
-    }
-    
-    export interface StaffInfo extends Staff {
-        jobTitle: string;
-        extn: string;
-        phone: string;
-    }
 }
 
 declare module 'studentvue/utils/soap/Client/Client' {
@@ -879,7 +1458,7 @@ declare module 'studentvue/utils/soap/Client/Client' {
           * @param options Options to provide when making a XML request to the servers
           * @returns Returns an XML object that must be defined in a type declaration file.
           * @link See https://github.com/StudentVue/docs
-          * @example
+          * @description
           * ```js
           * super.processRequest({ methodName: 'Refer to StudentVue/docs', paramStr: { AnythingThatCanBePassed: true, AsLongAsItMatchesTheDocumentation: true }});
           * // This will make the XML request below:
@@ -906,6 +1485,570 @@ declare module 'studentvue/utils/soap/Client/Client' {
           */
         protected processRequest<T>(options: RequestOptions): Promise<T>;
         static processAnonymousRequest<T>(url: string, options?: Partial<RequestOptions>): Promise<T>;
+    }
+}
+
+declare module 'studentvue/StudentVue/ReportCard/ReportCard.interfaces' {
+    /**
+        * The file of a report card
+        */
+    export interface ReportCardFile {
+        /**
+            * The name of the file
+            */
+        name: string;
+        /**
+            * The document properties
+            */
+        document: {
+            /**
+                * The type of the document
+                */
+            type: string;
+            /**
+                * The name of the document
+                */
+            name: string;
+        };
+        /**
+            * The base64 data of the file
+            */
+        base64: string;
+    }
+}
+
+declare module 'studentvue/StudentVue/Document/Document.interface' {
+    /**
+        * The file of a document
+        */
+    export interface DocumentFile {
+        /**
+            * The file properties of the document
+            */
+        file: {
+            /**
+                * The name of the file
+                */
+            name: string;
+    
+            /**
+                * The type of file
+                */
+            type: string;
+    
+            /**
+                * The date the file was uploaded
+                */
+            date: Date;
+        };
+    
+        /**
+            * The category of the file
+            */
+        category: string;
+    
+        /**
+            * The notes provided in the file
+            */
+        notes: string;
+    
+        /**
+            * The base64 data of the file
+            */
+        base64: string;
+    }
+}
+
+declare module 'studentvue/StudentVue/Client/Interfaces/StudentInfo' {
+    import { Staff } from 'studentvue/StudentVue/Client/Client.interfaces';
+    
+    export interface StudentInfo {
+        /**
+            * Basic info about the student
+            */
+        student: {
+            /**
+                * The name of the student
+                */
+            name: string;
+    
+            /**
+                * The nickname of the student
+                */
+            nickname: string;
+    
+            /**
+                * The last name of the student
+                */
+            lastName: string;
+        };
+        /**
+            * The student's ID. Can be their metric number
+            */
+        id: string;
+    
+        /**
+            * The student's address
+            */
+        address: string;
+    
+        /**
+            * The student's gender
+            */
+        gender: string;
+    
+        /**
+            * The grade level of the student
+            */
+        grade: string;
+    
+        /**
+            * The birth date of the student
+            */
+        birthDate: string;
+    
+        /**
+            * The email of the student
+            */
+        email: string;
+    
+        /**
+            * The student's parent phone number
+            */
+        phone: string;
+    
+        /**
+            * The student's primary language
+            */
+        homeLanguage: string;
+    
+        /**
+            * The school the student goes to
+            */
+        currentSchool: string;
+    
+        /**
+            * The track the student is in
+            */
+        track: string;
+    
+        /**
+            * The student's homeroom teacher
+            */
+        homeRoomTeacher: Staff;
+    
+        /**
+            * The organization year Gu. it is unknown what this does
+            */
+        orgYearGu: string;
+    
+        /**
+            * The student's homeroom location/name
+            */
+        homeRoom: string;
+    
+        /**
+            * The student's counselor
+            */
+        counselor: Staff;
+    
+        /**
+            * The student's photo. It is a base64 string
+            */
+        photo: string;
+    
+        /**
+            * A list of contacts in case of emergency
+            */
+        emergencyContacts: EmergencyContact[];
+    
+        /**
+            * The student's physician
+            */
+        physician: {
+            name: string;
+            phone: string;
+            extn: string;
+            hospital: string;
+        };
+    
+        /**
+            * The student's dentist
+            */
+        dentist: {
+            name: string;
+            phone: string;
+            extn: string;
+            office: string;
+        };
+    
+        /**
+            * The info about the student's lockers
+            */
+        lockerInfoRecords: string;
+    
+        /**
+            * Additional information about the student such as transportation information
+            */
+        additionalInfo: AdditionalInfo[];
+    }
+    
+    export interface AdditionalInfo {
+        /**
+            * The type of the information
+            */
+        type: string;
+    
+        /**
+            * The ID of the information
+            */
+        id: string;
+    
+        /**
+            * The vcID of the information
+            */
+        vcId: string;
+    
+        /**
+            * Fields within the information. For example, if the type was `Transportation Information`, this will contain items about it such as `AM Route`, `Pickup Bus Stop`, etc.
+            */
+        items: AdditionalInfoItem[];
+    }
+    
+    /**
+        * A field contained in the student's additional information
+        */
+    export interface AdditionalInfoItem {
+        /**
+            * The type of field. For example, this can be `AM Route` if this was under `Transportation Information`
+            */
+        type: string;
+    
+        /**
+            * The source of the field within synergy database
+            */
+        source: {
+            /**
+                * The object ID of the field
+                */
+            object: string;
+    
+            /**
+                * The element name of the field in the database
+                */
+            element: string;
+        };
+    
+        /**
+            * The vcId of the field
+            */
+        vcId: string;
+    
+        /**
+            * The value of the field according to what the student has set
+            */
+        value: string;
+    }
+    
+    /**
+        * The person to contact in case of emergency
+        */
+    export interface EmergencyContact {
+        /**
+            * The name of the contacter
+            */
+        name: string;
+    
+        /**
+            * The contacter's relationship with the student
+            */
+        relationship: string;
+    
+        /**
+            * The contacter's phone
+            */
+        phone: {
+            /**
+                * The home phone number of the contacter
+                */
+            home: string;
+    
+            /**
+                * The work phone number of the contacter
+                */
+            work: string;
+    
+            /**
+                * A phone number of the contacter
+                */
+            other: string;
+    
+            /**
+                * The contacter's mobile phone number
+                */
+            mobile: string;
+        };
+    }
+}
+
+declare module 'studentvue/StudentVue/Client/Interfaces/Schedule' {
+    import { Staff } from 'studentvue/StudentVue/Client/Client.interfaces';
+    
+    export interface Schedule {
+        /**
+            * The current school term
+            */
+        term: {
+            /**
+                * The index of the school term
+                */
+            index: number;
+    
+            /**
+                * The name of the school term
+                */
+            name: string;
+        };
+        /**
+            * The error of the schedule, if there are any
+            */
+        error: string;
+    
+        /**
+            * The course schedules of all schools
+            */
+        today: SchoolScheduleInfo[];
+    
+        /**
+            * The classes' information in regards to the schedule
+            */
+        classes: ClassInfo[];
+    
+        /**
+            * All the available terms that can retrieve a schedule
+            */
+        terms: TermInfo[];
+    }
+    
+    /**
+        * Information about the school's schedule
+        */
+    export interface SchoolScheduleInfo {
+        /**
+            * The name of the school
+            */
+        name: string;
+    
+        /**
+            * The name of the bell schedule
+            */
+        bellScheduleName: string;
+    
+        /**
+            * The student's classes of this school
+            */
+        classes: ClassScheduleInfo[];
+    }
+    
+    /**
+        * Information about the school term
+        */
+    export interface TermInfo {
+        /**
+            * The index of the term
+            */
+        index: number;
+    
+        /**
+            * The name of the term
+            */
+        name: string;
+    
+        /**
+            * The date of the term
+            */
+        date: {
+            /**
+                * The beginning date of the term
+                */
+            start: Date;
+    
+            /**
+                * The last date of the term
+                */
+            end: Date;
+        };
+    
+        /**
+            * The GU of the school year term. It is unknown what this does.
+            */
+        schoolYearTermCodeGu: string;
+    }
+    
+    /**
+        * The information of a class
+        */
+    export interface ClassInfo {
+        /**
+            * The period number of the class
+            */
+        period: number;
+    
+        /**
+            * The name of the class
+            */
+        name: string;
+    
+        /**
+            * The room name or location of the class
+            */
+        room: string;
+    
+        /**
+            * The teacher of the class
+            */
+        teacher: Staff;
+    
+        /**
+            * The sectionGu of the class. It is unknown what this does
+            */
+        sectionGu: string;
+    }
+    
+    /**
+        * Information about the class's schedule
+        */
+    export interface ClassScheduleInfo {
+        /**
+            * The period number of the class
+            */
+        period: number;
+    
+        /**
+            * The name of the class
+            */
+        name: string;
+    
+        /**
+            * The class's website, if it has one.
+            */
+        url: string;
+    
+        /**
+            * The time of the class
+            */
+        time: {
+            /**
+                * The start time of the class
+                */
+            start: Date;
+    
+            /**
+                * The end time of the class
+                */
+            end: Date;
+        };
+    
+        /**
+            * The date of the class
+            */
+        date: {
+            /**
+                * The start date of the class
+                */
+            start: Date;
+    
+            /**
+                * The end date of the class
+                */
+            end: Date;
+        };
+    
+        /**
+            * The attendance code of the class
+            */
+        attendanceCode: string;
+    
+        /**
+            * The sectionGu of the class. It is unknown what this does
+            */
+        sectionGu: string;
+    
+        /**
+            * The teacher of the class
+            */
+        teacher: Staff & { url: string; emailSubject: string };
+    }
+}
+
+declare module 'studentvue/StudentVue/Client/Interfaces/SchoolInfo' {
+    import { Staff } from 'studentvue/StudentVue/Client/Client.interfaces';
+    
+    /**
+        * The information of the school
+        */
+    export interface SchoolInfo {
+        /**
+            * Information about the school
+            */
+        school: {
+            /**
+                * The address of the school
+                */
+            address: string;
+    
+            /**
+                * The alt address of the school
+                */
+            addressAlt: string;
+    
+            /**
+                * The city the school is located in
+                */
+            city: string;
+    
+            /**
+                * The zipcode of the school
+                */
+            zipCode: string;
+    
+            /**
+                * The phone number of the school
+                */
+            phone: string;
+    
+            /**
+                * The alt phone number of the school
+                */
+            altPhone: string;
+    
+            /**
+                * The principal of the school
+                */
+            principal: Staff;
+        };
+    
+        /**
+            * A list of staff members in the school
+            */
+        staff: StaffInfo[];
+    }
+    
+    export interface StaffInfo extends Staff {
+        /**
+            * The name of the position the staff member holds
+            */
+        jobTitle: string;
+    
+        /**
+            * The extn of the staff member
+            */
+        extn: string;
+    
+        /**
+            * The phone number of the staff member
+            */
+        phone: string;
     }
 }
 
