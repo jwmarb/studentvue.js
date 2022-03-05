@@ -1,7 +1,3 @@
-/**
- * Icon
- * @constructor
- */
 export default class Icon {
   /**
    * The URI of the icon

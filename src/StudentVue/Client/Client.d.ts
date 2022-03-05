@@ -8,13 +8,18 @@ import { Attendance } from './Interfaces/Attendance';
 import { Schedule } from './Client.interfaces';
 import ReportCard from '../ReportCard/ReportCard';
 import Document from '../Document/Document';
+/**
+ * The StudentVUE Client to access the API
+ * @constructor
+ * @extends {soap.Client}
+ */
 export default class Client extends soap.Client {
     private hostUrl;
     constructor(credentials: LoginCredentials, hostUrl: string);
     /**
      * Gets the student's documents from synergy servers
-     * @returns {Promise<Document[]}> Returns a list of student documents
-     * @example
+     * @returns {Promise<Document[]>}> Returns a list of student documents
+     * @description
      * ```js
      * const documents = await client.documents();
      * const document = documents[0];
@@ -26,7 +31,7 @@ export default class Client extends soap.Client {
     /**
      * Gets a list of report cards
      * @returns {Promise<ReportCard[]>} Returns a list of report cards that can fetch a file
-     * @example
+     * @description
      * ```js
      * const reportCards = await client.reportCards();
      * const files = await Promise.all(reportCards.map((card) => card.get()));
@@ -37,7 +42,7 @@ export default class Client extends soap.Client {
     /**
      * Gets the student's school's information
      * @returns {Promise<SchoolInfo>} Returns the information of the student's school
-     * @example
+     * @description
      * ```js
      * await client.schoolInfo();
      *
@@ -51,7 +56,7 @@ export default class Client extends soap.Client {
      * Gets the schedule of the student
      * @param {number} termIndex The index of the term.
      * @returns {Promise<Schedule>} Returns the schedule of the student
-     * @example
+     * @description
      * ```js
      * await schedule(0) // -> { term: { index: 0, name: '1st Qtr Progress' }, ... }
      * ```
@@ -60,7 +65,7 @@ export default class Client extends soap.Client {
     /**
      * Returns the attendance of the student
      * @returns {Promise<Attendance>} Returns an Attendance object
-     * @example
+     * @description
      * ```js
      * client.attendance()
      *  .then(console.log); // -> { type: 'Period', period: {...}, schoolName: 'University High School', absences: [...], periodInfos: [...] }
@@ -71,7 +76,7 @@ export default class Client extends soap.Client {
      * Returns the gradebook of the student
      * @param {number} reportingPeriodIndex The timeframe that the gradebook should return
      * @returns {Promise<Gradebook>} Returns a Gradebook object
-     * @example
+     * @description
      * ```js
      * const gradebook = await client.gradebook();
      * console.log(gradebook); // { error: '', type: 'Traditional', reportingPeriod: {...}, courses: [...] };
@@ -84,7 +89,7 @@ export default class Client extends soap.Client {
     /**
      * Get a list of messages of the student
      * @returns {Promise<Message[]>} Returns an array of messages of the student
-     * @example
+     * @description
      * ```js
      * await client.messages(); // -> [{ id: 'E972F1BC-99A0-4CD0-8D15-B18968B43E08', type: 'StudentActivity', ... }, { id: '86FDA11D-42C7-4249-B003-94B15EB2C8D4', type: 'StudentActivity', ... }]
      * ```
@@ -93,7 +98,7 @@ export default class Client extends soap.Client {
     /**
      * Gets the info of a student
      * @returns {Promise<StudentInfo>} StudentInfo object
-     * @example
+     * @description
      * ```js
      * studentInfo().then(console.log) // -> { student: { name: 'Evan Davis', nickname: '', lastName: 'Davis' }, ...}
      * ```
@@ -104,7 +109,7 @@ export default class Client extends soap.Client {
      *
      * @param {CalendarOptions} options Options to provide for calendar method. An interval is required.
      * @returns {Promise<Calendar>} Returns a Calendar object
-     * @example
+     * @description
      * ```js
      * client.calendar({ interval: { start: new Date('5/1/2022'), end: new Date('8/1/2021') }, concurrency: null }); // -> Limitless concurrency (not recommended)
      *

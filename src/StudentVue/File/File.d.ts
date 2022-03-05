@@ -1,7 +1,31 @@
 import { LoginCredentials } from '../../utils/soap/Client/Client.interfaces';
 import soap from '../../utils/soap/soap';
+/**
+ * File class
+ * @abstract
+ * @extends {soap.Client}
+ * @constructor
+ */
 export default abstract class File<T> extends soap.Client {
+    /**
+     * The DocumentGU of the file so that it can be fetched from synergy servers
+     * This value is important for `File.get()` method. You cannot fetch the file without it
+     * @public
+     * @readonly
+     */
     readonly documentGu: string;
+    /**
+     * Synergy servers have different methods for retrieving files. For example,
+     *
+     * To retrieve a document, there is a specific method for it: `GetContentOfAttachedDoc`
+     *
+     * To retrieve a report card, there is a specific method for it: `GetReportCardDocumentData`
+     *
+     * Therefore, methodName must be defined to get retrieve the file data. See how methodName is implemented
+     * in `Document.ts` and `ReportCard.ts`
+     * @private
+     * @readonly
+     */
     private readonly methodName;
     constructor(credentials: LoginCredentials, documentGu: string, methodName: string);
     /**
@@ -9,7 +33,7 @@ export default abstract class File<T> extends soap.Client {
      * @param {unknown} xmlObject The XML Object passed after parsing
      * @protected
      * @returns {T} Returns a reformatted XML object to make it easier for code
-     * @example
+     * @description
      * ```js
      * const xmlObject = await super.processRequest({...}); // { "@_Attribute": [{ "@_Nested": [{...}, {...}]}]}
      * parseXMLObject(xmlObject); // { attribute: { nested: [{...}, {...}] } }
@@ -21,7 +45,7 @@ export default abstract class File<T> extends soap.Client {
      * Retrieve the file from synergy servers. After retrieving the xmlObject, this method calls parseXMLObject which must be defined to parse the xmlObject into a readable, typesafe object.
      * @public
      * @returns {Promise<T>} Returns a base64 object
-     * @example
+     * @description
      * ```js
      * const base64 = await document.get(); // { attribute: { nested: {...} }, base64: "base64 code" }
      * ```

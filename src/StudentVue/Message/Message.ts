@@ -167,7 +167,7 @@ export default class Message extends soap.Client {
   /**
    * Marks the message as read
    * @returns Returns true to show that it has been marked as read
-   * @example
+   * @description
    * ```js
    * const messages = await client.messages();
    * messages.every((msg) => msg.isRead()) // -> false
@@ -176,7 +176,7 @@ export default class Message extends soap.Client {
    * const refetchedMessages = await client.messages(); // See if it updated on the server
    * messages.every((msg) => msg.isRead()) // -> true
    * ```
-   * @example
+   * @description
    * ```tsx
    * // In a React project...
    * import React from 'react';

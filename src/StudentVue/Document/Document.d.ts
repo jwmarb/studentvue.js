@@ -3,11 +3,21 @@ import File from '../File/File';
 import { DocumentFile } from './Document.interface';
 import { DocumentFileXMLObject, DocumentXMLObject } from './Document.xml';
 export default class Document extends File<DocumentFile[]> {
+    /**
+     * The properties of the file
+     * @public
+     * @readonly
+     */
     readonly file: {
         name: string;
         date: Date;
         type: string;
     };
+    /**
+     * The comment included in the document
+     * @public
+     * @readonly
+     */
     readonly comment: string;
     protected parseXMLObject(xmlObject: DocumentFileXMLObject): {
         file: {

@@ -22,7 +22,7 @@ export declare interface CalendarOptions {
 
   /**
    * The number of fetches that should occur per asynchronous task. StudentVUE does not send ALL events within a school year, but rather it sends all events within a month.
-   * @example
+   * @description
    * ```js
    * // { concurrency: 1 }
    * ```

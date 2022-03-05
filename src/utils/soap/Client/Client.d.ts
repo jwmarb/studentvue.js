@@ -13,7 +13,7 @@ export default class Client {
      * @param options Options to provide when making a XML request to the servers
      * @returns Returns an XML object that must be defined in a type declaration file.
      * @link See https://github.com/StudentVue/docs
-     * @example
+     * @description
      * ```js
      * super.processRequest({ methodName: 'Refer to StudentVue/docs', paramStr: { AnythingThatCanBePassed: true, AsLongAsItMatchesTheDocumentation: true }});
      * // This will make the XML request below:

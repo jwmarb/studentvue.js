@@ -46,7 +46,7 @@ export default class Attachment extends soap.Client {
    * Unfortunately, the api does not offer a URL path to the file
    * @returns {string} base64 string
    *
-   * @example
+   * @description
    * ```js
    * const base64 = await someAttachment.get();
    * console.log(base64) // -> UEsDBBQABgAIAAAAIQCj77s...

@@ -7,6 +7,7 @@ export { default as Icon } from './StudentVue/Icon/Icon';
 export { default as Client } from './StudentVue/Client/Client';
 export { default as Attachment } from './StudentVue/Attachment/Attachment';
 export { default as File } from './StudentVue/File/File';
+export { default as soap } from './utils/soap/soap';
 export * from './StudentVue/ReportCard';
 export * from './StudentVue/Document';
 export * from './StudentVue/Client/Client.interfaces';
