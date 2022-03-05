@@ -45,6 +45,7 @@ let gradebook: Gradebook;
 let attendance: Attendance;
 let reportCards: ReportCard[];
 let documents: Document[];
+let schoolInfo: SchoolInfo;
 let resources: (URLResource | FileResource)[];
 
 beforeAll(() => {
@@ -61,9 +62,10 @@ beforeAll(() => {
         session.attendance(),
         session.reportCards(),
         session.documents(),
+        session.schoolInfo(),
       ]);
     })
-    .then(([session, _messages, _calendar, _gradebook, _attendance, _reportCards, _documents]) => {
+    .then(([session, _messages, _calendar, _gradebook, _attendance, _reportCards, _documents, _schoolInfo]) => {
       calendar = _calendar;
       client = session;
       gradebook = _gradebook;
@@ -71,6 +73,7 @@ beforeAll(() => {
       attendance = _attendance;
       reportCards = _reportCards;
       documents = _documents;
+      schoolInfo = _schoolInfo;
       resources = gradebook.courses
         .map((course) => course.marks.map((mark) => mark.assignments.map((assignment) => assignment.resources)))
         .flat(4);
@@ -231,5 +234,11 @@ describe('Documents', () => {
     const document = await documents[0].get();
 
     expect(document[0].base64).toMatch(/^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/);
+  });
+});
+
+describe('School info', () => {
+  it('matches type', () => {
+    expectTypeOf(schoolInfo).toMatchTypeOf<SchoolInfo>();
   });
 });
