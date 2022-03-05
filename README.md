@@ -23,7 +23,7 @@ npm install studentvue
 To get started, we must first log in to start using the API.
 
 ```js
-import { StudentVue } from 'studentvue';
+import StudentVue from 'studentvue';
 
 const DISTRICT_URL = 'https://...';
 const USERNAME = '...';

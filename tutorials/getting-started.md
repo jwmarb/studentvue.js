@@ -11,7 +11,7 @@ This package comes with its own defined types, so there is no need to install a 
 In order to access the API, we must first login to StudentVue. First, we need to find a school district to do that, so:
 
 ```js
-import { StudentVue } from 'studentvue';
+import StudentVue from 'studentvue';
 
 const schools = await StudentVue.findDistricts('zipcode');
 const mySchoolDistrict = schools.find((school) => school.name.includes('my school name'));
