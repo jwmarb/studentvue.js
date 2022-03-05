@@ -2,9 +2,21 @@ import { ParsedAnonymousRequestError, ParsedRequestError } from '../../utils/soa
 
 /**
  * RequestException is a class used to parse errors from Synergy servers
+ * @constructor
  */
 export default class RequestException {
+  /**
+   * The message of the exception
+   * @public
+   * @readonly
+   */
   public readonly message: string;
+
+  /**
+   * The stack trace of the exception. (java)
+   * @public
+   * @readonly
+   */
   public readonly stack: string | undefined;
 
   public constructor(obj: ParsedRequestError | { message: string; stack?: string } | ParsedAnonymousRequestError) {
