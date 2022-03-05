@@ -4,7 +4,6 @@ import soap from '../utils/soap/soap';
 import { DistrictListXMLObject } from './StudentVue.xml';
 import RequestException from './RequestException/RequestException';
 import url from 'url';
-import { StudentInfo } from './Client/Client.interfaces';
 
 /** @module StudentVue */
 
@@ -12,9 +11,9 @@ import { StudentInfo } from './Client/Client.interfaces';
  * Login to the StudentVUE API
  * @param {string} districtUrl The URL of the district which can be found using `findDistricts()` method
  * @param {UserCredentials} credentials User credentials of the student
- * @returns {Promise<[Client, StudentInfo]>} Returns the client and the information of the student upon successful login
+ * @returns {Promise<Client>} Returns the client and the information of the student upon successful login
  */
-export function login(districtUrl: string, credentials: UserCredentials): Promise<[Client, StudentInfo]> {
+export function login(districtUrl: string, credentials: UserCredentials): Promise<Client> {
   return new Promise((res, rej) => {
     if (districtUrl.length === 0)
       return rej(new RequestException({ message: 'District URL cannot be an empty string' }));
@@ -25,9 +24,9 @@ export function login(districtUrl: string, credentials: UserCredentials): Promis
       `https://${host}/`
     );
     client
-      .studentInfo()
-      .then((studentInfo) => {
-        res([client, studentInfo]);
+      .validateCredentials()
+      .then(() => {
+        res(client);
       })
       .catch(rej);
   });

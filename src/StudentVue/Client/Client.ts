@@ -1,4 +1,4 @@
-import { LoginCredentials } from '../../utils/soap/Client/Client.interfaces';
+import { LoginCredentials, ParsedRequestError } from '../../utils/soap/Client/Client.interfaces';
 import soap from '../../utils/soap/soap';
 import { AdditionalInfo, AdditionalInfoItem, ClassScheduleInfo, SchoolInfo, StudentInfo } from './Client.interfaces';
 import { StudentInfoXMLObject } from './Interfaces/xml/StudentInfo';
@@ -22,6 +22,7 @@ import { ReportCardsXMLObject } from '../ReportCard/ReportCard.xml';
 import { DocumentXMLObject } from '../Document/Document.xml';
 import ReportCard from '../ReportCard/ReportCard';
 import Document from '../Document/Document';
+import RequestException from '../RequestException/RequestException';
 
 /**
  * The StudentVUE Client to access the API
@@ -33,6 +34,21 @@ export default class Client extends soap.Client {
   constructor(credentials: LoginCredentials, hostUrl: string) {
     super(credentials);
     this.hostUrl = hostUrl;
+  }
+
+  /**
+   * Validate's the user's credentials. It will throw an error if credentials are incorrect
+   */
+  public validateCredentials(): Promise<void> {
+    return new Promise((res, rej) => {
+      super
+        .processRequest<ParsedRequestError>({ methodName: 'login test', validateErrors: false })
+        .then((response) => {
+          if (response.RT_ERROR[0]['@_ERROR_MESSAGE'][0] === 'login test is not a valid method') res();
+          else rej(new RequestException(response));
+        })
+        .catch(rej);
+    });
   }
 
   /**
