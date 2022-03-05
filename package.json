@@ -6,7 +6,7 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules npx jest",
-    "build": "node src/tools/cleanup.js lib && npm run build:compile && npm run build:types",
+    "build": "node src/tools/cleanup.js lib && npm run build:compile && npm run build:types && npm run build:docs",
     "build:compile": "babel src --out-dir lib --extensions \".ts\" --source-maps inline",
     "build:types": "tsc && dts-bundle --configJson dts-bundle.json",
     "build:docs": "jsdoc -c jsdoc.json"
@@ -27,6 +27,7 @@
     "@types/tiny-async-pool": "^1.0.0",
     "better-docs": "^2.7.2",
     "cross-env": "^7.0.3",
+    "documentation": "^13.2.5",
     "dts-bundle": "^0.7.3",
     "expect-type": "^0.13.0",
     "jest": "^27.5.1",

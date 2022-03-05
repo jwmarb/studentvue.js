@@ -3,7 +3,7 @@
     "allowUnknownTags": ["category", "optional"]
   },
 
-  "plugins": ["node_modules/better-docs/typescript", "node_modules/better-docs/category"],
+  "plugins": ["plugins/markdown", "node_modules/better-docs/typescript", "node_modules/better-docs/category"],
   "opts": {
     "template": "node_modules/better-docs/",
     "destination": "docs/",
@@ -12,21 +12,10 @@
     "encoding": "utf8"
   },
   "source": {
-    "includePattern": "\\.(ts)$",
-    "excludePattern": ".*\\.(xml).d.ts",
-    "exclude": ["./src/__tests__", "./src/tools"],
-    "include": [
-      "./src/StudentVue",
-      "./src/Constants",
-      "./src/StudentVue/RequestException",
-      "./src/StudentVue/Message",
-      "./src/StudentVue/Icon",
-      "./src/StudentVue/Client",
-      "./src/StudentVue/Attachment",
-      "./src/StudentVue/File",
-      "./src/StudentVue/ReportCard",
-      "./src/StudentVue/Document",
-      "./src/utils/soap/Client/Client.interfaces.d.ts"
-    ]
-  }
+    "includePattern": "\\.(js|ts)$",
+    "excludePattern": "\\.(xml.d.ts)$",
+    "exclude": ["./src/StudentVue/Client/Interfaces/xml"],
+    "include": ["./lib", "./src/StudentVue/Client/Interfaces", "./src/StudentVue/Client/Client.interfaces.d.ts"]
+  },
+  "recurseDepth": 20
 }
