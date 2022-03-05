@@ -242,3 +242,29 @@ describe('School info', () => {
     expectTypeOf(schoolInfo).toMatchTypeOf<SchoolInfo>();
   });
 });
+
+describe('credential validations', () => {
+  it('works', async () => {
+    const client = await StudentVue.login(credentials.district, {
+      username: credentials.username,
+      password: credentials.password,
+    });
+    try {
+      await client.validateCredentials();
+    } catch (e) {
+      console.error(e);
+    }
+  });
+
+  it('throws on invalid user credentials', async () => {
+    const client = await StudentVue.login(credentials.district, {
+      username: credentials.username,
+      password: '491293389',
+    });
+    try {
+      await client.validateCredentials();
+    } catch (e) {
+      expect(e).toBeInstanceOf(RequestException);
+    }
+  });
+});
