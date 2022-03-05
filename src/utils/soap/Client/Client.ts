@@ -13,6 +13,7 @@ export default class Client {
   private __username__: string;
   private __password__: string;
   private __district__: string;
+  private readonly isParent: number;
 
   private get district(): string {
     return this.__district__;
@@ -38,6 +39,7 @@ export default class Client {
     this.__username__ = credentials.username;
     this.__password__ = credentials.password;
     this.__district__ = credentials.districtUrl;
+    this.isParent = credentials.isParent ? 1 : 0;
   }
 
   /**
@@ -72,8 +74,9 @@ export default class Client {
    */
   protected processRequest<T>(options: RequestOptions): Promise<T> {
     const defaultOptions: RequestOptions = {
-      skipLoginLog: 1,
-      parent: 0,
+      validateErrors: true,
+      skipLoginLog: 0,
+      parent: this.isParent,
       webServiceHandleName: 'PXPWebServices',
       paramStr: {},
       ...options,
@@ -123,9 +126,9 @@ export default class Client {
             )
           );
 
-          if ('RT_ERROR' in obj) return reject(new RequestException(obj));
+          if (defaultOptions.validateErrors && 'RT_ERROR' in obj) return reject(new RequestException(obj));
 
-          res(obj);
+          res(obj as T);
         })
         .catch(reject);
     });
@@ -144,7 +147,8 @@ export default class Client {
 
   public static processAnonymousRequest<T>(url: string, options: Partial<RequestOptions> = {}): Promise<T> {
     const defaultOptions: RequestOptions = {
-      skipLoginLog: 1,
+      skipLoginLog: 0,
+      validateErrors: true,
       parent: 0,
       webServiceHandleName: 'HDInfoServices',
       methodName: 'GetMatchingDistrictList',
@@ -190,9 +194,9 @@ export default class Client {
             )
           );
 
-          if ('RT_ERROR' in obj) return reject(new RequestException(obj));
+          if (defaultOptions.validateErrors && 'RT_ERROR' in obj) return reject(new RequestException(obj));
 
-          res(obj);
+          res(obj as T);
         })
         .catch(reject);
     });

@@ -20,7 +20,12 @@ export function login(districtUrl: string, credentials: UserCredentials): Promis
     const host = url.parse(districtUrl).host;
     const endpoint = `https://${host}/Service/PXPCommunication.asmx`;
     const client = new Client(
-      { username: credentials.username, password: credentials.password, districtUrl: endpoint },
+      {
+        username: credentials.username,
+        password: credentials.password,
+        districtUrl: endpoint,
+        isParent: credentials.isParent,
+      },
       `https://${host}/`
     );
     client

@@ -1,3 +1,5 @@
+import { LoginOptions } from '../utils/soap/Client/Client.interfaces';
+
 /**
  * SchoolDistrict
  */
@@ -26,7 +28,7 @@ export declare interface SchoolDistrict {
 /**
  * The login information of the student
  */
-export declare interface UserCredentials {
+export declare interface UserCredentials extends LoginOptions {
   /**
    * The student's username
    */
