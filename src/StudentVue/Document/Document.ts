@@ -3,12 +3,29 @@ import File from '../File/File';
 import { DocumentFile } from './Document.interface';
 import { DocumentFileXMLObject, DocumentXMLObject } from './Document.xml';
 
+/**
+ * Document
+ * @class
+ * @constructor
+ * @extends {File<DocumentFile[]>}
+ */
 export default class Document extends File<DocumentFile[]> {
+  /**
+   * The properties of the file
+   * @public
+   * @readonly
+   */
   public readonly file: {
     name: string;
     date: Date;
     type: string;
   };
+
+  /**
+   * The comment included in the document
+   * @public
+   * @readonly
+   */
   public readonly comment: string;
   protected parseXMLObject(xmlObject: DocumentFileXMLObject) {
     return xmlObject.StudentAttachedDocumentData[0].DocumentDatas[0].DocumentData.map((document) => ({
