@@ -1,3 +1,10 @@
+export declare interface LoginOptions {
+  /**
+   * Whether the user signing in is a parent. Defaults to `false`
+   */
+  isParent?: boolean;
+}
+
 /**
  * Options to provide when processing a fetch POST request to synergy servers
  */
@@ -31,12 +38,37 @@ export declare interface RequestOptions {
    * @see https://github.com/StudentVue/docs
    */
   paramStr?: Record<string, unknown>;
+
+  /**
+   * Determine whether or not the function should throw an error when the response is an error.
+   * StudentVUE does not use HTTP errors, so every HTTP response will be 200. An error may be sent like this, for example:
+   * ```py
+   * # HTTP Status Code: 200 OK
+   * # Time: 45 ms
+   * # Size: 2.54 KB
+   * ```
+   * ```xml
+   * <RT_ERROR ERROR_MESSAGE="Attendane is not a valid method.">
+   *  <STACK_TRACE> Revelation.RevException
+   *  Revelation.RevException
+   *  Source: Exception, Msg: Attendane is not a valid method.
+   *  Stack:    at Revelation.Reverror.HandleError(Exception inner)
+   *    at Reve...
+   *
+   *  </STACK_TRACE>
+   * </RT_ERROR>
+   * ```
+   *
+   * If this value is set to `true`, then errors like this will be detected and thrown.
+   * If set to `false`, this error is ignored and not thrown.
+   */
+  validateErrors?: boolean;
 }
 
 /**
  * The login information of the student that includes the district url
  */
-export declare interface LoginCredentials {
+export declare interface LoginCredentials extends LoginOptions {
   /**
    * The student's username
    */
