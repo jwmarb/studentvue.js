@@ -3,35 +3,41 @@ import { LoginCredentials } from '../../utils/soap/Client/Client.interfaces';
 import soap from '../../utils/soap/soap';
 import { AttachmentXMLObject } from './Attachment.xml';
 
+/**
+ * Attachment class
+ * This is a class used to define message attachments
+ * @constructor
+ * @extends {soap.Client}
+ */
 export default class Attachment extends soap.Client {
+  /**
+   * The name of the attachment.
+   * @type {string}
+   * @public
+   * @readonly
+   */
   public readonly name: string;
+
+  /**
+   * the GU of the attachment.
+   * @type {string}
+   * @public
+   * @readonly
+   */
   public readonly attachmentGu: string;
+
+  /**
+   * The file extension of the attachment extracted using regex
+   * @type {string | null}
+   * @public
+   * @readonly
+   */
   public readonly fileExtension: string | null;
 
   public constructor(name: string, attachmentGu: string, session: LoginCredentials) {
     super(session);
-    /**
-     * The name of the attachment.
-     * @type {string}
-     * @public
-     * @readonly
-     */
     this.name = name;
-
-    /**
-     * the GU of the attachment.
-     * @type {string}
-     * @public
-     * @readonly
-     */
     this.attachmentGu = attachmentGu;
-
-    /**
-     * The file extension of the attachment extracted using regex
-     * @type {string | null}
-     * @public
-     * @readonly
-     */
     this.fileExtension = (name.match(/(\.[^.]+)$/) ?? [null])[0];
   }
 
