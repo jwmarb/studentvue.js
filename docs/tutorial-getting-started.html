@@ -96,12 +96,12 @@
 
 <article>
     <p>To get started, start by installing StudentVue package</p>
-<pre class="prettyprint source lang-sh"><code>npm install @specify_/studentvue
+<pre class="prettyprint source lang-sh"><code>npm install studentvue
 </code></pre>
 <p>This package comes with its own defined types, so there is no need to install a type definition package.</p>
 <h3>How to use</h3>
 <p>In order to access the API, we must first login to StudentVue. First, we need to find a school district to do that, so:</p>
-<pre class="prettyprint source lang-js"><code>import { StudentVue } from '@specify_/studentvue';
+<pre class="prettyprint source lang-js"><code>import { StudentVue } from 'studentvue';
 
 const schools = await StudentVue.findDistricts('zipcode');
 const mySchoolDistrict = schools.find((school) => school.name.includes('my school name'));
