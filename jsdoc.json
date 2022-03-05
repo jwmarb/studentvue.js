@@ -9,7 +9,8 @@
     "destination": "docs/",
     "recurse": true,
     "verbose": true,
-    "encoding": "utf8"
+    "encoding": "utf8",
+    "tutorials": "tutorials"
   },
   "source": {
     "includePattern": "\\.(js|ts)$",
@@ -20,7 +21,8 @@
       "./src/StudentVue/Client/Interfaces",
       "./src/StudentVue/Client/Client.interfaces.d.ts",
       "./src/StudentVue/StudentVue.ts",
-      "./src/StudentVue/StudentVue.interfaces.d.ts"
+      "./src/StudentVue/StudentVue.interfaces.d.ts",
+      "./README.md"
     ]
   },
   "recurseDepth": 20
