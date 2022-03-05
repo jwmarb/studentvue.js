@@ -40,12 +40,14 @@ export declare interface SchoolInfo {
 
     /**
      * The principal of the school
+     * @type {Staff}
      */
     principal: Staff;
   };
 
   /**
    * A list of staff members in the school
+   * @type {StaffInfo[]}
    */
   staff: StaffInfo[];
 }

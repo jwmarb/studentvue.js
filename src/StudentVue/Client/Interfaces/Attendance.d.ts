@@ -36,11 +36,13 @@ export declare interface Attendance {
 
   /**
    * List of absences
+   * @type {Absence[]}
    */
   absences: Absence[];
 
   /**
    * List of information about a period
+   * @type {PeriodInfo[]}
    */
   periodInfos: PeriodInfo[];
 }
@@ -71,6 +73,7 @@ export declare interface Absence {
 
   /**
    * The periods in which the student was absent in
+   * @type {AbsentPeriod[]}
    */
   periods: AbsentPeriod[];
 }
@@ -101,6 +104,7 @@ export declare interface AbsentPeriod {
 
   /**
    * The staff member supervising the class
+   * @type {Staff}
    */
   staff: Staff;
 

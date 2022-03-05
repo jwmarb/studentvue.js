@@ -74,6 +74,7 @@ export declare interface Calendar {
 
   /**
    * The list of school events
+   * @type {(AssignmentEvent | HolidayEvent | RegularEvent)[]}
    */
   events: (AssignmentEvent | HolidayEvent | RegularEvent)[];
 }
@@ -94,6 +95,7 @@ export declare interface Event {
 
   /**
    * The type of the event
+   * @type {EventType}
    */
   type: EventType;
 

@@ -72,6 +72,7 @@ export declare interface StudentInfo {
 
   /**
    * The student's homeroom teacher
+   * @type {Staff}
    */
   homeRoomTeacher: Staff;
 
@@ -87,6 +88,7 @@ export declare interface StudentInfo {
 
   /**
    * The student's counselor
+   * @type {Staff}
    */
   counselor: Staff;
 
@@ -97,6 +99,7 @@ export declare interface StudentInfo {
 
   /**
    * A list of contacts in case of emergency
+   * @type {EmergencyContact[]}
    */
   emergencyContacts: EmergencyContact[];
 
@@ -127,6 +130,7 @@ export declare interface StudentInfo {
 
   /**
    * Additional information about the student such as transportation information
+   * @type {AdditionalInfo[]}
    */
   additionalInfo: AdditionalInfo[];
 }
@@ -149,6 +153,7 @@ export declare interface AdditionalInfo {
 
   /**
    * Fields within the information. For example, if the type was `Transportation Information`, this will contain items about it such as `AM Route`, `Pickup Bus Stop`, etc.
+   * @type {AdditionalInfoItem[]}
    */
   items: AdditionalInfoItem[];
 }

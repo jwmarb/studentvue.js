@@ -22,16 +22,19 @@ export declare interface Schedule {
 
   /**
    * The course schedules of all schools
+   * @type {SchoolScheduleInfo[]}
    */
   today: SchoolScheduleInfo[];
 
   /**
    * The classes' information in regards to the schedule
+   * @type {ClassInfo[]}
    */
   classes: ClassInfo[];
 
   /**
    * All the available terms that can retrieve a schedule
+   * @type {TermInfo[]}
    */
   terms: TermInfo[];
 }
@@ -52,6 +55,7 @@ export declare interface SchoolScheduleInfo {
 
   /**
    * The student's classes of this school
+   * @type {ClassScheduleInfo[]}
    */
   classes: ClassScheduleInfo[];
 }
@@ -112,6 +116,7 @@ export declare interface ClassInfo {
 
   /**
    * The teacher of the class
+   * @type {Staff}
    */
   teacher: Staff;
 

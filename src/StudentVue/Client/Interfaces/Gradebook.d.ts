@@ -21,16 +21,19 @@ export declare interface Gradebook {
   reportingPeriod: {
     /**
      * The current time period that is reported
+     * @type {ReportingPeriod}
      */
     current: ReportingPeriod;
 
     /**
      * Other available time periods the student can view
+     * @type {ReportingPeriod[]}
      */
     available: ReportingPeriod[];
   };
   /**
    * The courses within this time period in the student gradebook
+   * @type {Course[]}
    */
   courses: Course[];
 }
@@ -86,11 +89,13 @@ export declare interface Course {
 
   /**
    * The staff in charge of the class
+   * @type {Staff}
    */
   staff: Staff;
 
   /**
    * The grade marks of the class
+   * @type {Mark[]}
    */
   marks: Mark[];
 }
@@ -121,11 +126,13 @@ export declare interface Mark {
 
   /**
    * The weighing scale of the course
+   * @type {WeightedCategory[]}
    */
   weightedCategories: WeightedCategory[];
 
   /**
    * The assignments of the course
+   * @type {Assignment[]}
    */
   assignments: Assignment[];
 }
@@ -270,6 +277,7 @@ export declare interface Assignment {
 
   /**
    * The resources provided in the assignment
+   * @type {(FileResource | URLResource)[]}
    */
   resources: (FileResource | URLResource)[];
 }
@@ -320,6 +328,7 @@ export declare interface FileResource extends Resource {
 
   /**
    * The resource type
+   * @type {ResourceType}
    */
   type: ResourceType.FILE;
 }
@@ -335,6 +344,7 @@ export declare interface URLResource extends Resource {
 
   /**
    * The resource type
+   * @type {ResourceType}
    */
   type: ResourceType.URL;
 
