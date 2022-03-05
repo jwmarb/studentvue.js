@@ -20,7 +20,7 @@ const mySchoolDistrict = schools.find((school) => school.name.includes('my schoo
 Great! We got our school district. But, how do we login? We can do that right here:
 
 ```js
-const [client, studentInfo] = await StudentVue.login(mySchoolDistrict.name, {
+const client = await StudentVue.login(mySchoolDistrict.name, {
   username: 'USERNAME',
   password: 'PASSWORD',
 });
