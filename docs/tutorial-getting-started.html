@@ -5,7 +5,7 @@
   
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title> Home</title>
+  <title> Getting Started</title>
 
   <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -76,71 +76,46 @@
 </div>
     <div id="main">
         <div
-            class="sidebar "
+            class="sidebar tutorials"
             id="sidebarNav"
         >
             
             <nav>
                 
-                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Modules</h3><ul><li><a href="module-StudentVue.html">StudentVue</a></li></ul><h3>Classes</h3><ul><li><a href="Attachment.html">Attachment</a></li><li><a href="Client.html">Client</a></li><li><a href="File.html">File</a></li><li><a href="Icon.html">Icon</a></li><li><a href="Message.html">Message</a></li><li><a href="ReportCard.html">ReportCard</a></li><li><a href="RequestException.html">RequestException</a></li></ul><h3>Interfaces</h3><ul><li><a href="Absence.html">Absence</a></li><li><a href="AbsentPeriod.html">AbsentPeriod</a></li><li><a href="AdditionalInfoItem.html">AdditionalInfoItem</a></li><li><a href="Assignment.html">Assignment</a></li><li><a href="AssignmentEvent.html">AssignmentEvent</a></li><li><a href="Attendance.html">Attendance</a></li><li><a href="Calendar.html">Calendar</a></li><li><a href="CalendarOptions.html">CalendarOptions</a></li><li><a href="ClassInfo.html">ClassInfo</a></li><li><a href="ClassScheduleInfo.html">ClassScheduleInfo</a></li><li><a href="Course.html">Course</a></li><li><a href="EmergencyContact.html">EmergencyContact</a></li><li><a href="Event.html">Event</a></li><li><a href="FileResource.html">FileResource</a></li><li><a href="Gradebook.html">Gradebook</a></li><li><a href="HolidayEvent.html">HolidayEvent</a></li><li><a href="Mark.html">Mark</a></li><li><a href="PeriodInfo.html">PeriodInfo</a></li><li><a href="RegularEvent.html">RegularEvent</a></li><li><a href="ReportingPeriod.html">ReportingPeriod</a></li><li><a href="Resource.html">Resource</a></li><li><a href="SchoolDistrict.html">SchoolDistrict</a></li><li><a href="SchoolInfo.html">SchoolInfo</a></li><li><a href="SchoolScheduleInfo.html">SchoolScheduleInfo</a></li><li><a href="Staff.html">Staff</a></li><li><a href="TermInfo.html">TermInfo</a></li><li><a href="URLResource.html">URLResource</a></li><li><a href="UserCredentials.html">UserCredentials</a></li><li><a href="WeightedCategory.html">WeightedCategory</a></li></ul><h3>Global</h3><ul><li><a href="global.html#StudentVue">StudentVue</a></li></ul></div>
+                    <div class="category"><h3>Tutorials</h3><ul><li><a href="tutorial-getting-started.html">Getting Started</a></li></ul></div>
                 
             </nav>
         </div>
         <div class="core" id="main-content-wrapper">
             <div class="content">
                 <header class="page-title">
-                    <p></p>
-                    <h1>Home</h1>
+                    <p>Tutorial</p>
+                    <h1>Getting Started</h1>
                 </header>
-                
+                <section>
 
-
-
-    
-
-
-    <h3> </h3>
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-    <section>
-        <article><h1>StudentVUE</h1>
-<p>StudentVUE is a tool for students to access classroom information from their institution or district. It uses a <a href="https://en.wikipedia.org/wiki/SOAP">SOAP</a> API, sending data in the form of XML. But, to access XML as usable data, it must be parsed which can be a tedious process. Thus, this library was created to let you use StudentVUE's API without needing to worry about parsing XML.</p>
-<hr>
-<h2>Installation</h2>
-<h3>npm</h3>
+<article>
+    <p>To get started, start by installing StudentVue package</p>
 <pre class="prettyprint source lang-sh"><code>npm install @specify_/studentvue
 </code></pre>
-<hr>
-<h2>Usage</h2>
-<p>To get started, we must first log in to start using the API.</p>
+<p>This package comes with its own defined types, so there is no need to install a type definition package.</p>
+<h3>How to use</h3>
+<p>In order to access the API, we must first login to StudentVue. First, we need to find a school district to do that, so:</p>
 <pre class="prettyprint source lang-js"><code>import { StudentVue } from '@specify_/studentvue';
 
-const DISTRICT_URL = 'https://...';
-const USERNAME = '...';
-const PASSWORD = '...';
-const [client] = await StudentVue.login(DISTRICT_URL, { username: USERNAME, password: PASSWORD });
+const schools = await StudentVue.findDistricts('zipcode');
+const mySchoolDistrict = schools.find((school) => school.name.includes('my school name'));
 </code></pre>
-<p>Once we are logged in, we can access any method within the API. See <a href="./Client.html">Client</a></p>
-<p>--</p></article>
-    </section>
+<p>Great! We got our school district. But, how do we login? We can do that right here:</p>
+<pre class="prettyprint source lang-js"><code>const [client, studentInfo] = await StudentVue.login(mySchoolDistrict.name, {
+  username: 'USERNAME',
+  password: 'PASSWORD',
+});
+</code></pre>
+<p>If no error is thrown, congrats, we have logged in and now have access to the methods of the API. Happy coding!</p>
+</article>
 
-
-
-
-
+</section>
 
             </div>
             
