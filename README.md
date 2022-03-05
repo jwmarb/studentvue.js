@@ -1,6 +1,6 @@
 # StudentVUE
 
-[![license](https://img.shields.io/github/license/EGGaming/studentvue.js)](https://github.com/EGGaming/studentvue.js/blob/main/LICENSE)
+[![license](https://img.shields.io/github/license/EGGaming/studentvue.js)](https://github.com/EGGaming/studentvue.js/blob/main/LICENSE) [![npm package](https://img.shields.io/npm/v/studentvue)](https://www.npmjs.com/package/studentvue)
 
 [Documentation](https://eggaming.github.io/studentvue.js/)
 
