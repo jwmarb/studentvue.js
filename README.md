@@ -13,7 +13,7 @@ StudentVUE is a tool for students to access classroom information from their ins
 ### npm
 
 ```sh
-npm install @specify_/studentvue
+npm install studentvue
 ```
 
 ---
