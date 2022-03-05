@@ -3,6 +3,7 @@ export default class Client {
     private __username__;
     private __password__;
     private __district__;
+    private readonly isParent;
     private get district();
     private get username();
     private get password();

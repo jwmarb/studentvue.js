@@ -19,14 +19,13 @@ declare module 'studentvue' {
 declare module 'studentvue/StudentVue/StudentVue' {
     import { SchoolDistrict, UserCredentials } from 'studentvue/StudentVue/StudentVue.interfaces';
     import Client from 'studentvue/StudentVue/Client/Client';
-    import { StudentInfo } from 'studentvue/StudentVue/Client/Client.interfaces';
     /**
         * Login to the StudentVUE API
         * @param {string} districtUrl The URL of the district which can be found using `findDistricts()` method
         * @param {UserCredentials} credentials User credentials of the student
-        * @returns {Promise<[Client, StudentInfo]>} Returns the client and the information of the student upon successful login
+        * @returns {Promise<Client>} Returns the client and the information of the student upon successful login
         */
-    export function login(districtUrl: string, credentials: UserCredentials): Promise<[Client, StudentInfo]>;
+    export function login(districtUrl: string, credentials: UserCredentials): Promise<Client>;
     /**
         * Find school districts using a zipcode
         * @param {string} zipCode The zipcode to get a list of schools from
@@ -185,6 +184,10 @@ declare module 'studentvue/StudentVue/Client/Client' {
         */
     export default class Client extends soap.Client {
             constructor(credentials: LoginCredentials, hostUrl: string);
+            /**
+                * Validate's the user's credentials. It will throw an error if credentials are incorrect
+                */
+            validateCredentials(): Promise<void>;
             /**
                 * Gets the student's documents from synergy servers
                 * @returns {Promise<Document[]>}> Returns a list of student documents
@@ -405,6 +408,8 @@ declare module 'studentvue/StudentVue/Client/Client.interfaces' {
 }
 
 declare module 'studentvue/StudentVue/StudentVue.interfaces' {
+    import { LoginOptions } from 'studentvue/utils/soap/Client/Client.interfaces';
+    
     /**
         * SchoolDistrict
         */
@@ -433,7 +438,7 @@ declare module 'studentvue/StudentVue/StudentVue.interfaces' {
     /**
         * The login information of the student
         */
-    export interface UserCredentials {
+    export interface UserCredentials extends LoginOptions {
         /**
             * The student's username
             */
@@ -447,6 +452,13 @@ declare module 'studentvue/StudentVue/StudentVue.interfaces' {
 }
 
 declare module 'studentvue/utils/soap/Client/Client.interfaces' {
+    export interface LoginOptions {
+        /**
+            * Whether the user signing in is a parent. Defaults to `false`
+            */
+        isParent?: boolean;
+    }
+    
     /**
         * Options to provide when processing a fetch POST request to synergy servers
         */
@@ -480,12 +492,37 @@ declare module 'studentvue/utils/soap/Client/Client.interfaces' {
             * @see https://github.com/StudentVue/docs
             */
         paramStr?: Record<string, unknown>;
+    
+        /**
+            * Determine whether or not the function should throw an error when the response is an error.
+            * StudentVUE does not use HTTP errors, so every HTTP response will be 200. An error may be sent like this, for example:
+            * ```py
+            * # HTTP Status Code: 200 OK
+            * # Time: 45 ms
+            * # Size: 2.54 KB
+            * ```
+            * ```xml
+            * <RT_ERROR ERROR_MESSAGE="Attendane is not a valid method.">
+            *  <STACK_TRACE> Revelation.RevException
+            *  Revelation.RevException
+            *  Source: Exception, Msg: Attendane is not a valid method.
+            *  Stack:    at Revelation.Reverror.HandleError(Exception inner)
+            *    at Reve...
+            *
+            *  </STACK_TRACE>
+            * </RT_ERROR>
+            * ```
+            *
+            * If this value is set to `true`, then errors like this will be detected and thrown.
+            * If set to `false`, this error is ignored and not thrown.
+            */
+        validateErrors?: boolean;
     }
     
     /**
         * The login information of the student that includes the district url
         */
-    export interface LoginCredentials {
+    export interface LoginCredentials extends LoginOptions {
         /**
             * The student's username
             */
@@ -571,7 +608,6 @@ declare module 'studentvue/StudentVue/Message/Message.xml' {
 
 declare module 'studentvue/StudentVue/Client/Interfaces/Calendar' {
     import EventType from 'studentvue/Constants/EventType';
-    import Icon from 'studentvue/StudentVue/Icon/Icon';
     
     /**
         * Options to provide in `Client.calendar()` method
@@ -646,7 +682,7 @@ declare module 'studentvue/StudentVue/Client/Interfaces/Calendar' {
     
         /**
             * The list of school events
-            * @type {(AssignmentEvent | HolidayEvent | RegularEvent)[]}
+            * @type {Event[]}
             */
         events: (AssignmentEvent | HolidayEvent | RegularEvent)[];
     }
@@ -710,7 +746,7 @@ declare module 'studentvue/StudentVue/Client/Interfaces/Calendar' {
     /**
         * An event that is held in a holiday. Students may not have school in this event
         */
-    export interface HolidayEvent extends Event {}
+    export type HolidayEvent = Event;
     
     /**
         * An event that is not anything special, hence Regular. Synergy Server Maintenance event type uses this event
@@ -1028,7 +1064,7 @@ declare module 'studentvue/StudentVue/Client/Interfaces/Gradebook' {
     
         /**
             * The resources provided in the assignment
-            * @type {(FileResource | URLResource)[]}
+            * @type {Resource[]}
             */
         resources: (FileResource | URLResource)[];
     }

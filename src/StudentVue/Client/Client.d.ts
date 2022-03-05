@@ -17,6 +17,10 @@ export default class Client extends soap.Client {
     private hostUrl;
     constructor(credentials: LoginCredentials, hostUrl: string);
     /**
+     * Validate's the user's credentials. It will throw an error if credentials are incorrect
+     */
+    validateCredentials(): Promise<void>;
+    /**
      * Gets the student's documents from synergy servers
      * @returns {Promise<Document[]>}> Returns a list of student documents
      * @description
