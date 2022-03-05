@@ -23,6 +23,11 @@ import { DocumentXMLObject } from '../Document/Document.xml';
 import ReportCard from '../ReportCard/ReportCard';
 import Document from '../Document/Document';
 
+/**
+ * Client
+ * @constructor
+ * @category Client
+ */
 export default class Client extends soap.Client {
   private hostUrl: string;
   constructor(credentials: LoginCredentials, hostUrl: string) {
@@ -32,7 +37,7 @@ export default class Client extends soap.Client {
 
   /**
    * Gets the student's documents from synergy servers
-   * @returns {Promise<Document[]}> Returns a list of student documents
+   * @returns {Promise<Document[]>}> Returns a list of student documents
    * @example
    * ```js
    * const documents = await client.documents();
