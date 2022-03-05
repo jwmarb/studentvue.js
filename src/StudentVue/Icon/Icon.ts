@@ -1,12 +1,21 @@
+/**
+ * Icon
+ * @constructor
+ */
 export default class Icon {
+  /**
+   * The URI of the icon
+   * @public
+   * @readonly
+   */
   public readonly uri: string;
+
+  /**
+   *
+   * @param path The URL path to the icon (e.g. /path/to/icon.png)
+   * @param hostUrl The host url (e.g. https://schooldistrict.org/)
+   */
   public constructor(path: string, hostUrl: string) {
-    /**
-     * The URI of the icon
-     * @public
-     * @readonly
-     * @type {string}
-     */
     this.uri = hostUrl + path;
   }
 }
