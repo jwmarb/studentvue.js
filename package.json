@@ -9,7 +9,7 @@
     "build": "node src/tools/cleanup.js lib && npm run build:compile && npm run build:types && npm run build:docs",
     "build:compile": "babel src --out-dir lib --extensions \".ts\" --source-maps inline",
     "build:types": "tsc && dts-bundle --configJson dts-bundle.json",
-    "build:docs": "jsdoc -c jsdoc.json"
+    "build:docs": "node src/tools/cleanup.js docs && jsdoc -c jsdoc.json"
   },
   "keywords": [],
   "author": "",
