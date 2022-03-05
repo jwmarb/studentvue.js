@@ -1,5 +1,4 @@
 import EventType from '../../../Constants/EventType';
-import Icon from '../../Icon/Icon';
 
 /**
  * Options to provide in `Client.calendar()` method
@@ -138,7 +137,7 @@ export declare interface AssignmentEvent extends Event {
 /**
  * An event that is held in a holiday. Students may not have school in this event
  */
-export declare interface HolidayEvent extends Event {}
+export type HolidayEvent = Event
 
 /**
  * An event that is not anything special, hence Regular. Synergy Server Maintenance event type uses this event
