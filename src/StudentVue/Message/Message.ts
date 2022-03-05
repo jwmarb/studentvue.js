@@ -4,28 +4,107 @@ import Attachment from '../Attachment/Attachment';
 import { MessageXMLObject } from './Message.xml';
 import Icon from '../Icon/Icon';
 
+/**
+ * Message class
+ * This is only returned as an array in `Client.messages()` method
+ * @constructor
+ * @extends {soap.Client}
+ */
 export default class Message extends soap.Client {
-  private hostUrl: string;
+  /**
+   * The URL to create POST fetch requests to synergy servers
+   * @private
+   * @readonly
+   */
+  private readonly hostUrl: string;
 
+  /**
+   * The message icon
+   * @public
+   * @readonly
+   */
   public readonly icon: Icon;
+
+  /**
+   * The ID of the message
+   * @public
+   * @readonly
+   */
   public readonly id: string;
+
+  /**
+   * The date when the message was first posted
+   * @public
+   * @readonly
+   */
   public readonly beginDate;
 
+  /**
+   * The type of the message
+   * @public
+   * @readonly
+   */
   public readonly type: string;
+
+  /**
+   * The HTML content of the message
+   * @public
+   * @readonly
+   */
   public readonly htmlContent: string;
+
+  /**
+   * Whether the message has been read or not
+   * @private
+   */
   private read: boolean;
+
+  /**
+   * Whether the message is deletable or not
+   * @private
+   */
   private deletable: boolean;
+
+  /**
+   * The sender of the message
+   * @public
+   * @readonly
+   * @property {string} name - The name of the sender
+   * @property {string} staffGu - the staffGu of the sender
+   * @property {string} email - The email of the sender
+   * @property {string} smMsgPersonGu - The smMsgPersonGu of the sender. Don't know if this property has a real usage or not
+   */
   public readonly from: {
     name: string;
     staffGu: string;
     email: string;
     smMsgPersonGu: string;
   };
+
+  /**
+   * The module of the sender
+   * @public
+   * @readonly
+   */
   public readonly module: string;
+
+  /**
+   * The subject of the message
+   * @public
+   * @readonly
+   * @property {string} html - The subject of the message with HTML
+   * @property {string} raw - The subject of the message without HTML and formatting
+   */
   public readonly subject: {
     html: string;
     raw: string;
   };
+
+  /**
+   * The attachments included in the message, if there are any.
+   * @public
+   * @readonly
+   */
   public readonly attachments: Attachment[];
 
   constructor(
@@ -63,7 +142,7 @@ export default class Message extends soap.Client {
 
   /**
    * Check if a message has been read
-   * @returns Returns a boolean declaring whether or not the message has been previously read
+   * @returns {boolean} Returns a boolean declaring whether or not the message has been previously read
    */
   public isRead(): boolean {
     return this.read;
@@ -71,7 +150,7 @@ export default class Message extends soap.Client {
 
   /**
    * Check if a message is deletable
-   * @returns Returns a boolean declaring whether or not the message is deletable
+   * @returns {boolean} Returns a boolean declaring whether or not the message is deletable
    */
   public isDeletable(): boolean {
     return this.deletable;
