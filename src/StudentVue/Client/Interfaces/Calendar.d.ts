@@ -73,7 +73,7 @@ export declare interface Calendar {
 
   /**
    * The list of school events
-   * @type {(AssignmentEvent | HolidayEvent | RegularEvent)[]}
+   * @type {Event[]}
    */
   events: (AssignmentEvent | HolidayEvent | RegularEvent)[];
 }
@@ -137,7 +137,7 @@ export declare interface AssignmentEvent extends Event {
 /**
  * An event that is held in a holiday. Students may not have school in this event
  */
-export type HolidayEvent = Event
+export type HolidayEvent = Event;
 
 /**
  * An event that is not anything special, hence Regular. Synergy Server Maintenance event type uses this event

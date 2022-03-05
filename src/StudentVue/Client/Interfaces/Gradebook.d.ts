@@ -277,7 +277,7 @@ export declare interface Assignment {
 
   /**
    * The resources provided in the assignment
-   * @type {(FileResource | URLResource)[]}
+   * @type {Resource[]}
    */
   resources: (FileResource | URLResource)[];
 }
