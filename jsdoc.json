@@ -15,7 +15,13 @@
     "includePattern": "\\.(js|ts)$",
     "excludePattern": "\\.(xml.d.ts)$",
     "exclude": ["./src/StudentVue/Client/Interfaces/xml"],
-    "include": ["./lib", "./src/StudentVue/Client/Interfaces", "./src/StudentVue/Client/Client.interfaces.d.ts"]
+    "include": [
+      "./lib",
+      "./src/StudentVue/Client/Interfaces",
+      "./src/StudentVue/Client/Client.interfaces.d.ts",
+      "./src/StudentVue/StudentVue.ts",
+      "./src/StudentVue/StudentVue.interfaces.d.ts"
+    ]
   },
   "recurseDepth": 20
 }
