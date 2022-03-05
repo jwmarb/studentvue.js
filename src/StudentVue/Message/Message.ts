@@ -199,10 +199,10 @@ export default class Message extends soap.Client {
    * ```
    */
   public markAsRead(): Promise<true> {
-    return new Promise<true>(async (res, rej) => {
+    return new Promise<true>((res, rej) => {
       if (this.read) return res(true);
-      try {
-        await super.processRequest({
+      super
+        .processRequest({
           methodName: 'UpdatePXPMessage',
           paramStr: {
             childIntId: 0,
@@ -214,13 +214,12 @@ export default class Message extends soap.Client {
               '@_MarkAsRead': 'true',
             },
           },
-        });
-        this.setRead(true);
-
-        res(true);
-      } catch (e) {
-        rej(e);
-      }
+        })
+        .then(() => {
+          this.setRead(true);
+          res(true);
+        })
+        .catch(rej);
     });
   }
 }

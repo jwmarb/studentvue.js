@@ -1,6 +1,5 @@
 import { LoginCredentials } from '../../utils/soap/Client/Client.interfaces';
 import soap from '../../utils/soap/soap';
-import { Base64String } from '../../utils/types';
 
 /**
  * File class
@@ -63,16 +62,16 @@ export default abstract class File<T> extends soap.Client {
    * ```
    */
   public get(): Promise<T> {
-    return new Promise(async (res, rej) => {
-      try {
-        const base64Data: Record<string, unknown> = await super.processRequest({
+    return new Promise((res, rej) => {
+      super
+        .processRequest<Record<string, unknown>>({
           methodName: this.methodName,
           paramStr: { childIntId: 0, DocumentGU: this.documentGu },
-        });
-        res(this.parseXMLObject(base64Data));
-      } catch (e) {
-        rej(e);
-      }
+        })
+        .then((base64Data) => {
+          res(this.parseXMLObject(base64Data));
+        })
+        .catch(rej);
     });
   }
 }

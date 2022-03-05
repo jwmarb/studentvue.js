@@ -78,7 +78,7 @@ export default class Client {
       paramStr: {},
       ...options,
     };
-    return new Promise(async (res, reject) => {
+    return new Promise((res, reject) => {
       const builder = new XMLBuilder({
         ignoreAttributes: false,
         arrayNodeName: 'soap:Envelope',
@@ -151,7 +151,7 @@ export default class Client {
       paramStr: {},
       ...options,
     };
-    return new Promise<T>(async (res, reject) => {
+    return new Promise<T>((res, reject) => {
       const builder = new XMLBuilder({
         ignoreAttributes: false,
         arrayNodeName: 'soap:Envelope',
@@ -174,26 +174,27 @@ export default class Client {
         },
       });
 
-      try {
-        const { data } = await axios.post<string>(url, xml, { headers: { 'Content-Type': 'text/xml' } });
+      axios
+        .post<string>(url, xml, { headers: { 'Content-Type': 'text/xml' } })
+        .then(({ data }) => {
+          const parser = new XMLParser({});
+          const result: ParsedRequestResult = parser.parse(data);
+          const parserTwo = new XMLParser({ ignoreAttributes: false });
 
-        const parser = new XMLParser({});
-        const result: ParsedRequestResult = parser.parse(data);
-        const parserTwo = new XMLParser({ ignoreAttributes: false });
+          const obj: T | ParsedAnonymousRequestError = parserTwo.parse(
+            result['soap:Envelope'][
+              'soap:Body'
+            ].ProcessWebServiceRequestResponse.ProcessWebServiceRequestResult.replace(/&gt;/g, '>').replace(
+              /&lt;/g,
+              '<'
+            )
+          );
 
-        const obj: T | ParsedAnonymousRequestError = parserTwo.parse(
-          result['soap:Envelope']['soap:Body'].ProcessWebServiceRequestResponse.ProcessWebServiceRequestResult.replace(
-            /&gt;/g,
-            '>'
-          ).replace(/&lt;/g, '<')
-        );
+          if ('RT_ERROR' in obj) return reject(new RequestException(obj));
 
-        if ('RT_ERROR' in obj) return reject(new RequestException(obj));
-
-        res(obj);
-      } catch (e) {
-        reject(e);
-      }
+          res(obj);
+        })
+        .catch(reject);
     });
   }
 }

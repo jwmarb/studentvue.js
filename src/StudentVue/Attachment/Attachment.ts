@@ -56,17 +56,16 @@ export default class Attachment extends soap.Client {
    * ```
    */
   public get(): Promise<Base64String> {
-    return new Promise<Base64String>(async (res, reject) => {
-      try {
-        const xmlObject: AttachmentXMLObject = await super.processRequest({
+    return new Promise<Base64String>((res, reject) => {
+      super
+        .processRequest<AttachmentXMLObject>({
           methodName: 'SynergyMailGetAttachment',
           paramStr: { childIntId: 0, SmAttachmentGu: this.attachmentGu },
-        });
-
-        res(xmlObject.AttachmentXML[0].Base64Code[0]);
-      } catch (e) {
-        reject(e);
-      }
+        })
+        .then((xmlObject) => {
+          res(xmlObject.AttachmentXML[0].Base64Code[0]);
+        })
+        .catch(reject);
     });
   }
 }
