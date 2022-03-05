@@ -1,7 +1,7 @@
 {
   "name": "studentvue",
   "version": "1.0.0",
-  "description": "",
+  "description": "An API based around the official StudentVUE's SOAP API. Automatically makes requests in the form of XML and automatically parses XML response into javascript objects.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
@@ -10,14 +10,24 @@
     "build:compile": "babel src --out-dir lib --extensions \".ts\" --source-maps inline",
     "build:types": "tsc && dts-bundle --configJson dts-bundle.json",
     "build:docs": "node src/tools/cleanup.js docs && jsdoc -c jsdoc.json",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint . --ext .ts",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run lint && npm run test",
+    "preversion": "npm run lint"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "studentvue",
+    "synergy",
+    "typescript",
+    "nodejs",
+    "javascript",
+    "api"
+  ],
+  "author": "Joseph Marbella",
   "files": [
     "lib"
   ],
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@babel/cli": "^7.17.6",
     "@babel/core": "^7.17.5",
