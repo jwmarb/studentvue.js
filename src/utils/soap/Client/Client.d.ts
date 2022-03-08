@@ -12,6 +12,7 @@ export default class Client {
     /**
      * Create a POST request to synergy servers to fetch data
      * @param options Options to provide when making a XML request to the servers
+     * @param preparse Runs before parsing the xml string into an object. Useful for mutating xml that could be parsed incorrectly by `fast-xml-parser`
      * @returns Returns an XML object that must be defined in a type declaration file.
      * @see https://github.com/StudentVue/docs
      * @description
@@ -39,7 +40,7 @@ export default class Client {
   </soap:Envelope>
      * ```
      */
-    protected processRequest<T>(options: RequestOptions): Promise<T>;
+    protected processRequest<T>(options: RequestOptions, preparse?: (xml: string) => string): Promise<T>;
     private static parseParamStr;
-    static processAnonymousRequest<T>(url: string, options?: Partial<RequestOptions>): Promise<T>;
+    static processAnonymousRequest<T>(url: string, options?: Partial<RequestOptions>, preparse?: (xml: string) => string): Promise<T>;
 }
