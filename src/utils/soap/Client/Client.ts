@@ -45,6 +45,7 @@ export default class Client {
   /**
    * Create a POST request to synergy servers to fetch data
    * @param options Options to provide when making a XML request to the servers
+   * @param preparse Runs before parsing the xml string into an object. Useful for mutating xml that could be parsed incorrectly by `fast-xml-parser`
    * @returns Returns an XML object that must be defined in a type declaration file.
    * @see https://github.com/StudentVue/docs
    * @description
@@ -72,7 +73,7 @@ export default class Client {
 </soap:Envelope>
    * ```
    */
-  protected processRequest<T>(options: RequestOptions): Promise<T> {
+  protected processRequest<T>(options: RequestOptions, preparse: (xml: string) => string = (xml) => xml): Promise<T> {
     const defaultOptions: RequestOptions = {
       validateErrors: true,
       skipLoginLog: 0,
@@ -145,7 +146,11 @@ export default class Client {
     return xml;
   }
 
-  public static processAnonymousRequest<T>(url: string, options: Partial<RequestOptions> = {}): Promise<T> {
+  public static processAnonymousRequest<T>(
+    url: string,
+    options: Partial<RequestOptions> = {},
+    preparse: (xml: string) => string = (d) => d.replace(/&gt;/g, '>').replace(/&lt;/g, '<')
+  ): Promise<T> {
     const defaultOptions: RequestOptions = {
       skipLoginLog: 0,
       validateErrors: true,
@@ -186,11 +191,8 @@ export default class Client {
           const parserTwo = new XMLParser({ ignoreAttributes: false });
 
           const obj: T | ParsedAnonymousRequestError = parserTwo.parse(
-            result['soap:Envelope'][
-              'soap:Body'
-            ].ProcessWebServiceRequestResponse.ProcessWebServiceRequestResult.replace(/&gt;/g, '>').replace(
-              /&lt;/g,
-              '<'
+            preparse(
+              result['soap:Envelope']['soap:Body'].ProcessWebServiceRequestResponse.ProcessWebServiceRequestResult
             )
           );
 
