@@ -459,10 +459,18 @@ export default class Client extends soap.Client {
   public messages(): Promise<Message[]> {
     return new Promise((res, rej) => {
       super
-        .processRequest<MessageXMLObject>({
-          methodName: 'GetPXPMessages',
-          paramStr: { childIntId: 0 },
-        })
+        .processRequest<MessageXMLObject>(
+          {
+            methodName: 'GetPXPMessages',
+            paramStr: { childIntId: 0 },
+          },
+          (xml) => {
+            // xml.replace(/(?<=Content=").*(?="\sRead)/g, btoa)
+            const Content = (xml.match(/Content=".*" Read/g) ?? [''])[0];
+            const base64 = btoa(Content.substring(9, Content.length - 6));
+            return xml.replace(/Content=".*" Read/g, `Content="${base64}" Read`);
+          }
+        )
         .then((xmlObject) => {
           res(
             xmlObject.PXPMessagesData[0].MessageListings[0].MessageListing.map(
