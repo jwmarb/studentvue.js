@@ -1,6 +1,6 @@
 {
   "name": "studentvue",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "An API based around the official StudentVUE's SOAP API. Automatically makes requests in the form of XML and automatically parses XML response into javascript objects.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
