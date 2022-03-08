@@ -119,11 +119,8 @@ export default class Client {
           });
 
           const obj: T | ParsedRequestError = parserTwo.parse(
-            result['soap:Envelope'][
-              'soap:Body'
-            ].ProcessWebServiceRequestResponse.ProcessWebServiceRequestResult.replace(
-              /(?<=Content=").*(?="\sRead)/g,
-              btoa
+            preparse(
+              result['soap:Envelope']['soap:Body'].ProcessWebServiceRequestResponse.ProcessWebServiceRequestResult
             )
           );
 
