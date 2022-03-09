@@ -507,6 +507,7 @@ export default class Client extends soap.Client {
             birthDate: xmlObjectData.StudentInfo[0].Address[0].BirthDate[0],
             track: xmlObjectData.StudentInfo[0].Address[0].Track[0],
             address: xmlObjectData.StudentInfo[0].Address[0].br[0],
+            photo: xmlObjectData.StudentInfo[0].Address[0].Photo[0],
             counselor: {
               name: xmlObjectData.StudentInfo[0].Address[0].CounselorName[0],
               email: xmlObjectData.StudentInfo[0].Address[0].CounselorEmail[0],
