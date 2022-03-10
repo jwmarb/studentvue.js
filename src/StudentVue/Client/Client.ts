@@ -318,7 +318,7 @@ export default class Client extends soap.Client {
       super
         .processRequest<GradebookXMLObject>({
           methodName: 'Gradebook',
-          paramStr: { childIntId: 0, ...(reportingPeriodIndex ? { ReportingPeriod: reportingPeriodIndex } : {}) },
+          paramStr: { childIntId: 0, ...(reportingPeriodIndex ? { ReportPeriod: reportingPeriodIndex } : {}) },
         })
         .then((xmlObject: GradebookXMLObject) => {
           res({
