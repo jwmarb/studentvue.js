@@ -22,7 +22,7 @@ import credentials from './credentials.json';
 import { Calendar } from '../StudentVue/Client/Interfaces/Calendar';
 import { isThisMonth } from 'date-fns';
 import ResourceType from '../Constants/ResourceType';
-import { FileResource, Gradebook, Resource, URLResource } from '../StudentVue/Client/Interfaces/Gradebook';
+import { Assignment, FileResource, Gradebook, Resource, URLResource } from '../StudentVue/Client/Interfaces/Gradebook';
 import { Attendance, PeriodInfo } from '../StudentVue/Client/Interfaces/Attendance';
 import { ReportCard } from '..';
 import { ReportCardFile } from '../StudentVue/ReportCard';
@@ -167,6 +167,11 @@ describe('Gradebook', () => {
     );
   });
 
+  it.only('fetches gradebook with reportPeriod of 0', async () => {
+    const gradebook_0 = await client.gradebook(0);
+    expect(gradebook_0.reportingPeriod.current.name).toBe('1st Qtr Progress');
+  });
+
   it('resources have a valid URI', () => {
     expect(resources).toStrictEqual(
       expect.arrayContaining([expect.objectContaining({ file: expect.objectContaining({ uri: expect.any(String) }) })])
@@ -178,6 +183,19 @@ describe('Gradebook', () => {
       return console.warn('No URL resources found. Skipping...');
     expect(resources).toStrictEqual(
       expect.arrayContaining([expect.objectContaining<Partial<URLResource>>({ url: expect.any(String) })])
+    );
+  });
+
+  it('encoded properly', () => {
+    expect(gradebook.courses.flatMap((csrc) => csrc.marks.flatMap((mark) => mark.assignments))).toStrictEqual(
+      expect.arrayContaining([
+        expect.objectContaining<Partial<Assignment>>({
+          type: expect.any(String),
+          description: expect.any(String),
+          name: expect.any(String),
+          hasDropbox: expect.any(Boolean),
+        }),
+      ])
     );
   });
 });
