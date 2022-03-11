@@ -1,6 +1,16 @@
 import { XMLParser } from 'fast-xml-parser';
 import StudentVue, { Client } from '../index';
-import { Schedule, SchoolInfo, StudentInfo } from '../StudentVue/Client/Client.interfaces';
+import {
+  AdditionalInfo,
+  AdditionalInfoItem,
+  ClassInfo,
+  ClassScheduleInfo,
+  Schedule,
+  SchoolInfo,
+  SchoolScheduleInfo,
+  StudentInfo,
+  TermInfo,
+} from '../StudentVue/Client/Client.interfaces';
 import RequestException from '../StudentVue/RequestException/RequestException';
 import { SchoolDistrict } from '../StudentVue/StudentVue.interfaces';
 import url from 'url';
@@ -152,19 +162,76 @@ describe('Calendar events', () => {
 
 describe('Gradebook', () => {
   it('fetches gradebook with matching type', async () => {
-    expect(gradebook).toBeDefined();
-    expect(gradebook.error).toBeFalsy();
-    expect(gradebook.courses.length).toBeGreaterThan(0);
-    expect(gradebook.reportingPeriod.current.index).toEqual(expect.any(Number));
-    expect(gradebook.reportingPeriod.available).toStrictEqual(
-      expect.arrayContaining([expect.objectContaining({ index: expect.any(Number) })])
-    );
-    expect(resources).toStrictEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ type: ResourceType.URL }),
-        expect.objectContaining({ type: ResourceType.FILE }),
-      ])
-    );
+    expect(gradebook).toStrictEqual({
+      student: {
+        name: expect.any(String),
+        lastName: expect.any(String),
+        nickname: expect.any(String),
+      },
+      birthDate: expect.any(String),
+      track: expect.any(String),
+      address: expect.any(String),
+      photo: expect.any(String),
+      counselor: {
+        name: expect.any(String),
+        email: expect.any(String),
+        staffGu: expect.any(String),
+      },
+      currentSchool: expect.any(String),
+      dentist: {
+        name: expect.any(String),
+        phone: expect.any(String),
+        extn: expect.any(String),
+        office: expect.any(String),
+      },
+      physician: {
+        name: expect.any(String),
+        phone: expect.any(String),
+        extn: expect.any(String),
+        hospital: expect.any(String),
+      },
+      email: expect.any(String),
+      emergencyContacts: expect.arrayContaining([
+        {
+          name: expect.any(String),
+          phone: {
+            home: expect.any(String),
+            mobile: expect.any(String),
+            other: expect.any(String),
+            work: expect.any(String),
+          },
+          relationship: expect.any(String),
+        },
+      ]),
+      gender: expect.any(String),
+      grade: expect.any(String),
+      lockerInfoRecords: expect.any(String),
+      homeLanguage: expect.any(String),
+      homeRoom: expect.any(String),
+      homeRoomTeacher: {
+        email: expect.any(String),
+        name: expect.any(String),
+        staffGu: expect.any(String),
+      },
+      additionalInfo: expect.arrayContaining<AdditionalInfo>([
+        {
+          id: expect.any(String),
+          type: expect.any(String),
+          vcId: expect.any(String),
+          items: expect.arrayContaining<AdditionalInfoItem>([
+            {
+              source: {
+                element: expect.any(String),
+                object: expect.any(String),
+              },
+              vcId: expect.any(String),
+              value: expect.any(String),
+              type: expect.any(String),
+            },
+          ]),
+        },
+      ]),
+    } as StudentInfo);
   });
 
   it.only('fetches gradebook with reportPeriod of 0', async () => {
@@ -219,6 +286,55 @@ describe('Schedule', () => {
   it('matches type', async () => {
     const schedule = await client.schedule();
     expectTypeOf(schedule).toMatchTypeOf<Schedule>();
+    expect(schedule).toStrictEqual<Schedule>({
+      error: expect.any(String),
+      term: { index: expect.any(Number), name: expect.any(String) },
+      classes: expect.arrayContaining<ClassInfo>([
+        {
+          name: expect.any(String),
+          period: expect.any(Number),
+          room: expect.any(String),
+          sectionGu: expect.any(String),
+          teacher: {
+            email: expect.any(String),
+            name: expect.any(String),
+            staffGu: expect.any(String),
+          },
+        },
+      ]),
+      terms: expect.arrayContaining<TermInfo>([
+        {
+          date: { start: expect.any(Date), end: expect.any(Date) },
+          index: expect.any(Number),
+          name: expect.any(String),
+          schoolYearTermCodeGu: expect.any(String),
+        },
+      ]),
+      today: expect.arrayContaining<SchoolScheduleInfo>([
+        {
+          name: expect.any(String),
+          classes: expect.arrayContaining<ClassScheduleInfo>([
+            {
+              attendanceCode: expect.any(String),
+              date: { start: expect.any(Date), end: expect.any(Date) },
+              name: expect.any(String),
+              period: expect.any(Number),
+              sectionGu: expect.any(String),
+              teacher: {
+                email: expect.any(String),
+                emailSubject: expect.any(String),
+                name: expect.any(String),
+                staffGu: expect.any(String),
+                url: expect.any(String),
+              },
+              time: { start: expect.any(Date), end: expect.any(Date) },
+              url: expect.any(String),
+            },
+          ]),
+          bellScheduleName: expect.any(String),
+        },
+      ]),
+    });
   });
 });
 
