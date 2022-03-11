@@ -23,6 +23,7 @@ import { DocumentXMLObject } from '../Document/Document.xml';
 import ReportCard from '../ReportCard/ReportCard';
 import Document from '../Document/Document';
 import RequestException from '../RequestException/RequestException';
+import XMLFactory from '../../utils/XMLFactory/XMLFactory';
 
 /**
  * The StudentVUE Client to access the API
@@ -324,18 +325,11 @@ export default class Client extends soap.Client {
               ...(reportingPeriodIndex != null ? { ReportPeriod: reportingPeriodIndex } : {}),
             },
           },
-          (xml) => {
-            const MeasureDescription = (xml.match(/MeasureDescription=".*" HasDropBox/g) ?? [''])[0];
-            const Measure = (xml.match(/Measure=".*" Type/g) ?? [''])[0];
-            const measureDescriptionBase64 = btoa(MeasureDescription.substring(20, MeasureDescription.length - 12));
-            const measureBase64 = btoa(Measure.substring(9, Measure.length - 6));
-            return xml
-              .replace(
-                /MeasureDescription=".*" HasDropBox/g,
-                `MeasureDescription="${measureDescriptionBase64}" HasDropBox`
-              )
-              .replace(/Measure=".*" Type/g, `Measure="${measureBase64}" Type`);
-          }
+          (xml) =>
+            new XMLFactory(xml)
+              .encodeAttribute('MeasureDescription', 'HasDropBox')
+              .encodeAttribute('Measure', 'Type')
+              .toString()
         )
         .then((xmlObject: GradebookXMLObject) => {
           res({
@@ -481,12 +475,7 @@ export default class Client extends soap.Client {
             methodName: 'GetPXPMessages',
             paramStr: { childIntId: 0 },
           },
-          (xml) => {
-            // xml.replace(/(?<=Content=").*(?="\sRead)/g, btoa)
-            const Content = (xml.match(/Content=".*" Read/g) ?? [''])[0];
-            const base64 = btoa(Content.substring(9, Content.length - 6));
-            return xml.replace(/Content=".*" Read/g, `Content="${base64}" Read`);
-          }
+          (xml) => new XMLFactory(xml).encodeAttribute('Content', 'Read').toString()
         )
         .then((xmlObject) => {
           res(
