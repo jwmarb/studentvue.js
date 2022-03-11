@@ -316,10 +316,27 @@ export default class Client extends soap.Client {
   public gradebook(reportingPeriodIndex?: number): Promise<Gradebook> {
     return new Promise((res, rej) => {
       super
-        .processRequest<GradebookXMLObject>({
-          methodName: 'Gradebook',
-          paramStr: { childIntId: 0, ...(reportingPeriodIndex ? { ReportPeriod: reportingPeriodIndex } : {}) },
-        })
+        .processRequest<GradebookXMLObject>(
+          {
+            methodName: 'Gradebook',
+            paramStr: {
+              childIntId: 0,
+              ...(reportingPeriodIndex != null ? { ReportPeriod: reportingPeriodIndex } : {}),
+            },
+          },
+          (xml) => {
+            const MeasureDescription = (xml.match(/MeasureDescription=".*" HasDropBox/g) ?? [''])[0];
+            const Measure = (xml.match(/Measure=".*" Type/g) ?? [''])[0];
+            const measureDescriptionBase64 = btoa(MeasureDescription.substring(20, MeasureDescription.length - 12));
+            const measureBase64 = btoa(Measure.substring(9, Measure.length - 6));
+            return xml
+              .replace(
+                /MeasureDescription=".*" HasDropBox/g,
+                `MeasureDescription="${measureDescriptionBase64}" HasDropBox`
+              )
+              .replace(/Measure=".*" Type/g, `Measure="${measureBase64}" Type`);
+          }
+        )
         .then((xmlObject: GradebookXMLObject) => {
           res({
             error: xmlObject.Gradebook[0]['@_ErrorMessage'][0],
@@ -380,7 +397,7 @@ export default class Client extends soap.Client {
                     : [],
                 assignments: mark.Assignments[0].Assignment.map((assignment) => ({
                   gradebookId: assignment['@_GradebookID'][0],
-                  name: assignment['@_Measure'][0],
+                  name: atob(assignment['@_Measure'][0]),
                   type: assignment['@_Type'][0],
                   date: {
                     start: new Date(assignment['@_Date'][0]),
@@ -393,7 +410,7 @@ export default class Client extends soap.Client {
                   points: assignment['@_Points'][0],
                   notes: assignment['@_Notes'][0],
                   teacherId: assignment['@_TeacherID'][0],
-                  description: assignment['@_MeasureDescription'][0],
+                  description: atob(assignment['@_MeasureDescription'][0]),
                   hasDropbox: JSON.parse(assignment['@_HasDropBox'][0]),
                   studentId: assignment['@_StudentID'][0],
                   dropboxDate: {
