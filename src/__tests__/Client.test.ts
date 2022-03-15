@@ -57,6 +57,7 @@ let reportCards: ReportCard[];
 let documents: Document[];
 let schoolInfo: SchoolInfo;
 let resources: (URLResource | FileResource)[];
+let studentInfo: StudentInfo;
 
 beforeAll(() => {
   return StudentVue.login(credentials.district, {
@@ -73,22 +74,36 @@ beforeAll(() => {
         session.reportCards(),
         session.documents(),
         session.schoolInfo(),
+        session.studentInfo(),
       ]);
     })
-    .then(([session, _messages, _calendar, _gradebook, _attendance, _reportCards, _documents, _schoolInfo]) => {
-      calendar = _calendar;
-      client = session;
-      gradebook = _gradebook;
-      messages = _messages;
-      attendance = _attendance;
-      reportCards = _reportCards;
-      documents = _documents;
-      schoolInfo = _schoolInfo;
-      resources = gradebook.courses
-        .map((course) => course.marks.map((mark) => mark.assignments.map((assignment) => assignment.resources)))
-        .flat(4);
-      client = session;
-    });
+    .then(
+      ([
+        session,
+        _messages,
+        _calendar,
+        _gradebook,
+        _attendance,
+        _reportCards,
+        _documents,
+        _schoolInfo,
+        _studentInfo,
+      ]) => {
+        studentInfo = _studentInfo;
+        calendar = _calendar;
+        client = session;
+        gradebook = _gradebook;
+        messages = _messages;
+        attendance = _attendance;
+        reportCards = _reportCards;
+        documents = _documents;
+        schoolInfo = _schoolInfo;
+        resources = gradebook.courses
+          .map((course) => course.marks.map((mark) => mark.assignments.map((assignment) => assignment.resources)))
+          .flat(4);
+        client = session;
+      }
+    );
 });
 
 describe('User Info', () => {
@@ -160,9 +175,9 @@ describe('Calendar events', () => {
   });
 });
 
-describe('Gradebook', () => {
-  it('fetches gradebook with matching type', async () => {
-    expect(gradebook).toStrictEqual({
+describe('StudentInfo', () => {
+  it('fetches studentInfo with matching type', async () => {
+    expect(studentInfo).toStrictEqual({
       student: {
         name: expect.any(String),
         lastName: expect.any(String),
@@ -232,6 +247,12 @@ describe('Gradebook', () => {
         },
       ]),
     } as StudentInfo);
+  });
+});
+
+describe('Gradebook', () => {
+  it('has matching properties', () => {
+    expectTypeOf(gradebook).toMatchTypeOf<Gradebook>();
   });
 
   it('fetches gradebook with reportPeriod of 0', async () => {
