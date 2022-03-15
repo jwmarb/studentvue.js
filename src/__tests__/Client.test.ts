@@ -167,7 +167,7 @@ describe('Gradebook', () => {
     );
   });
 
-  it.only('fetches gradebook with reportPeriod of 0', async () => {
+  it('fetches gradebook with reportPeriod of 0', async () => {
     const gradebook_0 = await client.gradebook(0);
     expect(gradebook_0.reportingPeriod.current.name).toBe('1st Qtr Progress');
   });
