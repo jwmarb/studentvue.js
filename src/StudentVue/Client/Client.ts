@@ -395,68 +395,73 @@ export default class Client extends soap.Client {
                           } as WeightedCategory)
                       )
                     : [],
-                assignments: mark.Assignments[0].Assignment.map((assignment) => ({
-                  gradebookId: assignment['@_GradebookID'][0],
-                  name: atob(assignment['@_Measure'][0]),
-                  type: assignment['@_Type'][0],
-                  date: {
-                    start: new Date(assignment['@_Date'][0]),
-                    due: new Date(assignment['@_DueDate'][0]),
-                  },
-                  score: {
-                    type: assignment['@_ScoreType'][0],
-                    value: assignment['@_Score'][0],
-                  },
-                  points: assignment['@_Points'][0],
-                  notes: assignment['@_Notes'][0],
-                  teacherId: assignment['@_TeacherID'][0],
-                  description: atob(assignment['@_MeasureDescription'][0]),
-                  hasDropbox: JSON.parse(assignment['@_HasDropBox'][0]),
-                  studentId: assignment['@_StudentID'][0],
-                  dropboxDate: {
-                    start: new Date(assignment['@_DropStartDate'][0]),
-                    end: new Date(assignment['@_DropEndDate'][0]),
-                  },
-                  resources:
-                    typeof assignment.Resources[0] !== 'string'
-                      ? (assignment.Resources[0].Resource.map((rsrc) => {
-                          switch (rsrc['@_Type'][0]) {
-                            case 'File': {
-                              const fileRsrc = rsrc as FileResourceXMLObject;
-                              return {
-                                type: ResourceType.FILE,
-                                file: {
-                                  type: fileRsrc['@_FileType'][0],
-                                  name: fileRsrc['@_FileName'][0],
-                                  uri: this.hostUrl + fileRsrc['@_ServerFileName'][0],
-                                },
-                                resource: {
-                                  date: new Date(fileRsrc['@_ResourceDate'][0]),
-                                  id: fileRsrc['@_ResourceID'][0],
-                                  name: fileRsrc['@_ResourceName'][0],
-                                },
-                              } as FileResource;
-                            }
-                            case 'URL': {
-                              const urlRsrc = rsrc as URLResourceXMLObject;
-                              return {
-                                url: urlRsrc['@_URL'][0],
-                                type: ResourceType.URL,
-                                resource: {
-                                  date: new Date(urlRsrc['@_ResourceDate'][0]),
-                                  id: urlRsrc['@_ResourceID'][0],
-                                  name: urlRsrc['@_ResourceName'][0],
-                                  description: urlRsrc['@_ResourceDescription'][0],
-                                },
-                                path: urlRsrc['@_ServerFileName'][0],
-                              } as URLResource;
-                            }
-                            default:
-                              rej(`Type ${rsrc['@_Type'][0]} does not exist as a type. Add it to type declarations.`);
-                          }
-                        }) as (FileResource | URLResource)[])
-                      : [],
-                })) as Assignment[],
+                assignments:
+                  typeof mark.Assignments[0] !== 'string'
+                    ? (mark.Assignments[0].Assignment.map((assignment) => ({
+                        gradebookId: assignment['@_GradebookID'][0],
+                        name: atob(assignment['@_Measure'][0]),
+                        type: assignment['@_Type'][0],
+                        date: {
+                          start: new Date(assignment['@_Date'][0]),
+                          due: new Date(assignment['@_DueDate'][0]),
+                        },
+                        score: {
+                          type: assignment['@_ScoreType'][0],
+                          value: assignment['@_Score'][0],
+                        },
+                        points: assignment['@_Points'][0],
+                        notes: assignment['@_Notes'][0],
+                        teacherId: assignment['@_TeacherID'][0],
+                        description: atob(assignment['@_MeasureDescription'][0]),
+                        hasDropbox: JSON.parse(assignment['@_HasDropBox'][0]),
+                        studentId: assignment['@_StudentID'][0],
+                        dropboxDate: {
+                          start: new Date(assignment['@_DropStartDate'][0]),
+                          end: new Date(assignment['@_DropEndDate'][0]),
+                        },
+                        resources:
+                          typeof assignment.Resources[0] !== 'string'
+                            ? (assignment.Resources[0].Resource.map((rsrc) => {
+                                switch (rsrc['@_Type'][0]) {
+                                  case 'File': {
+                                    const fileRsrc = rsrc as FileResourceXMLObject;
+                                    return {
+                                      type: ResourceType.FILE,
+                                      file: {
+                                        type: fileRsrc['@_FileType'][0],
+                                        name: fileRsrc['@_FileName'][0],
+                                        uri: this.hostUrl + fileRsrc['@_ServerFileName'][0],
+                                      },
+                                      resource: {
+                                        date: new Date(fileRsrc['@_ResourceDate'][0]),
+                                        id: fileRsrc['@_ResourceID'][0],
+                                        name: fileRsrc['@_ResourceName'][0],
+                                      },
+                                    } as FileResource;
+                                  }
+                                  case 'URL': {
+                                    const urlRsrc = rsrc as URLResourceXMLObject;
+                                    return {
+                                      url: urlRsrc['@_URL'][0],
+                                      type: ResourceType.URL,
+                                      resource: {
+                                        date: new Date(urlRsrc['@_ResourceDate'][0]),
+                                        id: urlRsrc['@_ResourceID'][0],
+                                        name: urlRsrc['@_ResourceName'][0],
+                                        description: urlRsrc['@_ResourceDescription'][0],
+                                      },
+                                      path: urlRsrc['@_ServerFileName'][0],
+                                    } as URLResource;
+                                  }
+                                  default:
+                                    rej(
+                                      `Type ${rsrc['@_Type'][0]} does not exist as a type. Add it to type declarations.`
+                                    );
+                                }
+                              }) as (FileResource | URLResource)[])
+                            : [],
+                      })) as Assignment[])
+                    : [],
               })) as Mark[],
             })),
           } as Gradebook);

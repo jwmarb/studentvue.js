@@ -54,33 +54,35 @@ export declare interface GradebookXMLObject {
                         }
                       ]
                     | [''];
-                  Assignments: [
-                    {
-                      Assignment: {
-                        '@_GradebookID': [string];
-                        '@_Measure': [string];
-                        '@_Type': [string];
-                        '@_Date': [string];
-                        '@_DueDate': [string];
-                        '@_Score': [string];
-                        '@_ScoreType': [string];
-                        '@_Points': [string];
-                        '@_Notes': [string];
-                        '@_TeacherID': [string];
-                        '@_StudentID': [string];
-                        '@_MeasureDescription': [string];
-                        '@_HasDropBox': [string];
-                        '@_DropStartDate': [string];
-                        '@_DropEndDate': [string];
-                        Resources:
-                          | {
-                              Resource: [URLResourceXMLObject] | [FileResourceXMLObject];
-                            }[]
-                          | [''];
-                        Standards: [''];
-                      }[];
-                    }
-                  ];
+                  Assignments:
+                    | ['']
+                    | [
+                        {
+                          Assignment: {
+                            '@_GradebookID': [string];
+                            '@_Measure': [string];
+                            '@_Type': [string];
+                            '@_Date': [string];
+                            '@_DueDate': [string];
+                            '@_Score': [string];
+                            '@_ScoreType': [string];
+                            '@_Points': [string];
+                            '@_Notes': [string];
+                            '@_TeacherID': [string];
+                            '@_StudentID': [string];
+                            '@_MeasureDescription': [string];
+                            '@_HasDropBox': [string];
+                            '@_DropStartDate': [string];
+                            '@_DropEndDate': [string];
+                            Resources:
+                              | {
+                                  Resource: [URLResourceXMLObject] | [FileResourceXMLObject];
+                                }[]
+                              | [''];
+                            Standards: [''];
+                          }[];
+                        }
+                      ];
                 }
               ];
             }[];
