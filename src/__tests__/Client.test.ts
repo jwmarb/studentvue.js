@@ -310,30 +310,7 @@ describe('Schedule', () => {
           schoolYearTermCodeGu: expect.any(String),
         },
       ]),
-      today: expect.arrayContaining<SchoolScheduleInfo>([
-        {
-          name: expect.any(String),
-          classes: expect.arrayContaining<ClassScheduleInfo>([
-            {
-              attendanceCode: expect.any(String),
-              date: { start: expect.any(Date), end: expect.any(Date) },
-              name: expect.any(String),
-              period: expect.any(Number),
-              sectionGu: expect.any(String),
-              teacher: {
-                email: expect.any(String),
-                emailSubject: expect.any(String),
-                name: expect.any(String),
-                staffGu: expect.any(String),
-                url: expect.any(String),
-              },
-              time: { start: expect.any(Date), end: expect.any(Date) },
-              url: expect.any(String),
-            },
-          ]),
-          bellScheduleName: expect.any(String),
-        },
-      ]),
+      today: expect.any(Array),
     });
   });
 });
