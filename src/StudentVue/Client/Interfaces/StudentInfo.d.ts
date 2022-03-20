@@ -43,7 +43,7 @@ export declare interface StudentInfo {
   /**
    * The birth date of the student
    */
-  birthDate: string;
+  birthDate: Date;
 
   /**
    * The email of the student
