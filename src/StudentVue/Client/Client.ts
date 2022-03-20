@@ -537,6 +537,9 @@ export default class Client extends soap.Client {
               extn: xmlObjectData.StudentInfo[0].Address[0].Physician[0]['@_Extn'][0],
               hospital: xmlObjectData.StudentInfo[0].Address[0].Physician[0]['@_Hospital'][0],
             },
+            id: xmlObjectData.StudentInfo[0].PermID[0],
+            orgYearGu: xmlObjectData.StudentInfo[0].Address[0].OrgYearGU[0],
+            phone: xmlObjectData.StudentInfo[0].Address[0].Phone[0],
             email: xmlObjectData.StudentInfo[0].Address[0].EMail[0],
             emergencyContacts: xmlObjectData.StudentInfo[0].Address[0].EmergencyContacts[0].EmergencyContact.map(
               (contact) => ({
