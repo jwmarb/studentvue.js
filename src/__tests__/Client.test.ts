@@ -5,9 +5,11 @@ import {
   AdditionalInfoItem,
   ClassInfo,
   ClassScheduleInfo,
+  EmergencyContact,
   Schedule,
   SchoolInfo,
   SchoolScheduleInfo,
+  StaffInfo,
   StudentInfo,
   TermInfo,
 } from '../StudentVue/Client/Client.interfaces';
@@ -33,7 +35,7 @@ import { Calendar } from '../StudentVue/Client/Interfaces/Calendar';
 import { isThisMonth } from 'date-fns';
 import ResourceType from '../Constants/ResourceType';
 import { Assignment, FileResource, Gradebook, Resource, URLResource } from '../StudentVue/Client/Interfaces/Gradebook';
-import { Attendance, PeriodInfo } from '../StudentVue/Client/Interfaces/Attendance';
+import { Absence, AbsentPeriod, Attendance, PeriodInfo } from '../StudentVue/Client/Interfaces/Attendance';
 import { ReportCard } from '..';
 import { ReportCardFile } from '../StudentVue/ReportCard';
 import Document from '../StudentVue/Document/Document';
@@ -106,11 +108,78 @@ beforeAll(() => {
     );
 });
 
-describe('User Info', () => {
-  let studentInfo: StudentInfo;
-  beforeAll(async () => {
-    studentInfo = await client.studentInfo();
-    return studentInfo;
+describe('StudentInfo', () => {
+  it('properties match type', () => {
+    expect(studentInfo).toStrictEqual<StudentInfo>({
+      additionalInfo: expect.arrayContaining<AdditionalInfo>([
+        {
+          id: expect.any(String),
+          items: expect.arrayContaining<AdditionalInfoItem>([
+            {
+              source: { element: expect.any(String), object: expect.any(String) },
+              type: expect.any(String),
+              value: expect.any(String),
+              vcId: expect.any(String),
+            },
+          ]),
+          type: expect.any(String),
+          vcId: expect.any(String),
+        },
+      ]),
+      address: expect.any(String),
+      birthDate: expect.any(Date),
+      counselor: {
+        email: expect.any(String),
+        name: expect.any(String),
+        staffGu: expect.any(String),
+      },
+      currentSchool: expect.any(String),
+      dentist: {
+        extn: expect.any(String),
+        name: expect.any(String),
+        office: expect.any(String),
+        phone: expect.any(String),
+      },
+      email: expect.any(String),
+      emergencyContacts: expect.arrayContaining<EmergencyContact>([
+        {
+          name: expect.any(String),
+          relationship: expect.any(String),
+          phone: {
+            home: expect.any(String),
+            mobile: expect.any(String),
+            other: expect.any(String),
+            work: expect.any(String),
+          },
+        },
+      ]),
+      gender: expect.any(String),
+      grade: expect.any(String),
+      homeLanguage: expect.any(String),
+      homeRoom: expect.any(String),
+      homeRoomTeacher: {
+        email: expect.any(String),
+        name: expect.any(String),
+        staffGu: expect.any(String),
+      },
+      id: expect.any(String),
+      lockerInfoRecords: expect.any(String),
+      orgYearGu: expect.any(String),
+      phone: expect.any(String),
+      photo: expect.any(String),
+      physician: {
+        name: expect.any(String),
+        hospital: expect.any(String),
+        extn: expect.any(String),
+        phone: expect.any(String),
+      },
+      student: {
+        lastName: expect.any(String),
+        name: expect.any(String),
+        nickname: expect.any(String),
+      },
+      track: expect.any(String),
+    });
   });
   it('Is defined', async () => {
     expect(studentInfo).toBeDefined();
@@ -175,81 +244,6 @@ describe('Calendar events', () => {
   });
 });
 
-describe('StudentInfo', () => {
-  it('fetches studentInfo with matching type', async () => {
-    expect(studentInfo).toStrictEqual({
-      student: {
-        name: expect.any(String),
-        lastName: expect.any(String),
-        nickname: expect.any(String),
-      },
-      birthDate: expect.any(String),
-      track: expect.any(String),
-      address: expect.any(String),
-      photo: expect.any(String),
-      counselor: {
-        name: expect.any(String),
-        email: expect.any(String),
-        staffGu: expect.any(String),
-      },
-      currentSchool: expect.any(String),
-      dentist: {
-        name: expect.any(String),
-        phone: expect.any(String),
-        extn: expect.any(String),
-        office: expect.any(String),
-      },
-      physician: {
-        name: expect.any(String),
-        phone: expect.any(String),
-        extn: expect.any(String),
-        hospital: expect.any(String),
-      },
-      email: expect.any(String),
-      emergencyContacts: expect.arrayContaining([
-        {
-          name: expect.any(String),
-          phone: {
-            home: expect.any(String),
-            mobile: expect.any(String),
-            other: expect.any(String),
-            work: expect.any(String),
-          },
-          relationship: expect.any(String),
-        },
-      ]),
-      gender: expect.any(String),
-      grade: expect.any(String),
-      lockerInfoRecords: expect.any(String),
-      homeLanguage: expect.any(String),
-      homeRoom: expect.any(String),
-      homeRoomTeacher: {
-        email: expect.any(String),
-        name: expect.any(String),
-        staffGu: expect.any(String),
-      },
-      additionalInfo: expect.arrayContaining<AdditionalInfo>([
-        {
-          id: expect.any(String),
-          type: expect.any(String),
-          vcId: expect.any(String),
-          items: expect.arrayContaining<AdditionalInfoItem>([
-            {
-              source: {
-                element: expect.any(String),
-                object: expect.any(String),
-              },
-              vcId: expect.any(String),
-              value: expect.any(String),
-              type: expect.any(String),
-            },
-          ]),
-        },
-      ]),
-    } as StudentInfo);
-  });
-});
-
 describe('Gradebook', () => {
   it('has matching properties', () => {
     expectTypeOf(gradebook).toMatchTypeOf<Gradebook>();
@@ -289,6 +283,47 @@ describe('Gradebook', () => {
 });
 
 describe('Attendance', () => {
+  it('properties match type', () => {
+    expect(attendance).toStrictEqual<Attendance>({
+      absences: expect.arrayContaining<Absence>([
+        {
+          date: expect.any(Date),
+          description: expect.any(String),
+          note: expect.any(String),
+          periods: expect.arrayContaining<AbsentPeriod>([
+            {
+              course: expect.any(String),
+              name: expect.any(String),
+              orgYearGu: expect.any(String),
+              period: expect.any(Number),
+              reason: expect.any(String),
+              staff: { email: expect.any(String), name: expect.any(String), staffGu: expect.any(String) },
+            },
+          ]),
+          reason: expect.any(String),
+        },
+      ]),
+      period: {
+        total: expect.any(Number),
+        start: expect.any(Number),
+        end: expect.any(Number),
+      },
+      periodInfos: expect.arrayContaining<PeriodInfo>([
+        {
+          period: expect.any(Number),
+          total: {
+            activities: expect.any(Number),
+            excused: expect.any(Number),
+            tardies: expect.any(Number),
+            unexcused: expect.any(Number),
+            unexcusedTardies: expect.any(Number),
+          },
+        },
+      ]),
+      schoolName: expect.any(String),
+      type: expect.any(String),
+    });
+  });
   it('is defined', async () => {
     expect(attendance).toBeDefined();
   });
@@ -340,6 +375,33 @@ describe('School Info', () => {
   it('matches type', async () => {
     const schoolInfo = await client.schoolInfo();
     expectTypeOf(schoolInfo).toMatchTypeOf<SchoolInfo>();
+  });
+  it('has properties of type', () => {
+    expect(schoolInfo).toStrictEqual<SchoolInfo>({
+      school: {
+        address: expect.any(String),
+        addressAlt: expect.any(String),
+        altPhone: expect.any(String),
+        city: expect.any(String),
+        phone: expect.any(String),
+        principal: {
+          email: expect.any(String),
+          name: expect.any(String),
+          staffGu: expect.any(String),
+        },
+        zipCode: expect.any(String),
+      },
+      staff: expect.arrayContaining<StaffInfo>([
+        {
+          email: expect.any(String),
+          extn: expect.any(String),
+          jobTitle: expect.any(String),
+          name: expect.any(String),
+          phone: expect.any(String),
+          staffGu: expect.any(String),
+        },
+      ]),
+    });
   });
 });
 
