@@ -1593,7 +1593,7 @@ declare module 'studentvue/StudentVue/Client/Interfaces/StudentInfo' {
         /**
             * The birth date of the student
             */
-        birthDate: string;
+        birthDate: Date;
     
         /**
             * The email of the student
