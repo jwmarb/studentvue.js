@@ -186,26 +186,28 @@ export default class Client extends soap.Client {
                     (school) => ({
                       name: school['@_SchoolName'][0],
                       bellScheduleName: school['@_BellSchedName'][0],
-                      classes: school.Classes[0].ClassInfo.map(
-                        (course) =>
-                          ({
-                            period: Number(course['@_Period'][0]),
-                            attendanceCode: course.AttendanceCode[0],
-                            date: {
-                              start: new Date(course['@_StartDate'][0]),
-                              end: new Date(course['@_EndDate'][0]),
-                            },
-                            name: course['@_ClassName'][0],
-                            sectionGu: course['@_SectionGU'][0],
-                            teacher: {
-                              email: course['@_TeacherEmail'][0],
-                              emailSubject: course['@_EmailSubject'][0],
-                              name: course['@_TeacherName'][0],
-                              staffGu: course['@_StaffGU'][0],
-                              url: course['@_TeacherURL'][0],
-                            },
-                          } as ClassScheduleInfo)
-                      ),
+                      classes: school.Classes[0].ClassInfo.map<ClassScheduleInfo>((course) => ({
+                        period: Number(course['@_Period'][0]),
+                        attendanceCode: course.AttendanceCode[0],
+                        date: {
+                          start: new Date(course['@_StartDate'][0]),
+                          end: new Date(course['@_EndDate'][0]),
+                        },
+                        name: course['@_ClassName'][0],
+                        sectionGu: course['@_SectionGU'][0],
+                        teacher: {
+                          email: course['@_TeacherEmail'][0],
+                          emailSubject: course['@_EmailSubject'][0],
+                          name: course['@_TeacherName'][0],
+                          staffGu: course['@_StaffGU'][0],
+                          url: course['@_TeacherURL'][0],
+                        },
+                        url: course['@_ClassURL'][0],
+                        time: {
+                          start: new Date(course['@_StartTime'][0]),
+                          end: new Date(course['@_EndTime'][0]),
+                        },
+                      })),
                     })
                   )
                 : [],
