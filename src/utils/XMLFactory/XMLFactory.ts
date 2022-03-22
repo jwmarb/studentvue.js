@@ -2,7 +2,7 @@
  * Use this class to mutate and manipulate XML before parsing it into an XML object
  */
 class XMLFactory {
-  private readonly xml: string;
+  private xml: string;
 
   /**
    *
@@ -37,9 +37,19 @@ class XMLFactory {
    */
   public encodeAttribute(attributeName: string, followingAttributeName: string) {
     const regexp = new RegExp(`${attributeName}=".*" ${followingAttributeName}`, 'g');
-    const found = (this.xml.match(regexp) ?? [''])[0];
-    const base64 = btoa(found.substring(attributeName.length + 2, found.length - followingAttributeName.length - 2));
-    return new XMLFactory(this.xml.replace(regexp, `${attributeName}="${base64}" ${followingAttributeName}`));
+
+    this.xml = this.xml.replace(regexp, (found) => {
+      const base64 = btoa(
+        unescape(
+          encodeURIComponent(
+            found.substring(attributeName.length + 2, found.length - followingAttributeName.length - 2)
+          )
+        )
+      );
+      return `${attributeName}="${base64}" ${followingAttributeName}`;
+    });
+
+    return this;
   }
 
   public toString(): string {

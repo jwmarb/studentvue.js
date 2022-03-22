@@ -395,7 +395,7 @@ export default class Client extends soap.Client {
                   typeof mark.Assignments[0] !== 'string'
                     ? (mark.Assignments[0].Assignment.map((assignment) => ({
                         gradebookId: assignment['@_GradebookID'][0],
-                        name: atob(assignment['@_Measure'][0]),
+                        name: decodeURIComponent(escape(atob(assignment['@_Measure'][0]))),
                         type: assignment['@_Type'][0],
                         date: {
                           start: new Date(assignment['@_Date'][0]),
@@ -408,7 +408,7 @@ export default class Client extends soap.Client {
                         points: assignment['@_Points'][0],
                         notes: assignment['@_Notes'][0],
                         teacherId: assignment['@_TeacherID'][0],
-                        description: atob(assignment['@_MeasureDescription'][0]),
+                        description: decodeURIComponent(escape(atob(assignment['@_MeasureDescription'][0]))),
                         hasDropbox: JSON.parse(assignment['@_HasDropBox'][0]),
                         studentId: assignment['@_StudentID'][0],
                         dropboxDate: {
