@@ -391,7 +391,7 @@ declare module 'studentvue/utils/XMLFactory/XMLFactory' {
                 * ```
                 * After encoding it to base64, `fast-xml-parser` will now work. The downside of this method is that `atob` must be called to get the actual value of the attribute.
                 */
-            encodeAttribute(attributeName: string, followingAttributeName: string): XMLFactory;
+            encodeAttribute(attributeName: string, followingAttributeName: string): this;
             toString(): string;
     }
     export default XMLFactory;
