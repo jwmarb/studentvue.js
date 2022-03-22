@@ -2,7 +2,7 @@
  * Use this class to mutate and manipulate XML before parsing it into an XML object
  */
 declare class XMLFactory {
-    private readonly xml;
+    private xml;
     /**
      *
      * @param xml XML in a string
@@ -27,7 +27,7 @@ declare class XMLFactory {
      * ```
      * After encoding it to base64, `fast-xml-parser` will now work. The downside of this method is that `atob` must be called to get the actual value of the attribute.
      */
-    encodeAttribute(attributeName: string, followingAttributeName: string): XMLFactory;
+    encodeAttribute(attributeName: string, followingAttributeName: string): this;
     toString(): string;
 }
 export default XMLFactory;
