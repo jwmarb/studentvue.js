@@ -6,7 +6,7 @@ import Message from '../Message/Message';
 import { MessageXMLObject } from '../Message/Message.xml';
 import { AssignmentEventXMLObject, CalendarXMLObject, RegularEventXMLObject } from './Interfaces/xml/Calendar';
 import { AssignmentEvent, Calendar, CalendarOptions, Event, HolidayEvent, RegularEvent } from './Interfaces/Calendar';
-import { eachMonthOfInterval } from 'date-fns';
+import { eachMonthOfInterval, parse } from 'date-fns';
 import { FileResourceXMLObject, GradebookXMLObject, URLResourceXMLObject } from './Interfaces/xml/Gradebook';
 import { AttendanceXMLObject } from './Interfaces/xml/Attendance';
 import EventType from '../../Constants/EventType';
@@ -204,8 +204,8 @@ export default class Client extends soap.Client {
                         },
                         url: course['@_ClassURL'][0],
                         time: {
-                          start: new Date(course['@_StartTime'][0]),
-                          end: new Date(course['@_EndTime'][0]),
+                          start: parse(course['@_StartTime'][0], 'hh:mm a', Date.now()),
+                          end: parse(course['@_EndTime'][0], 'hh:mm a', Date.now()),
                         },
                       })),
                     })
