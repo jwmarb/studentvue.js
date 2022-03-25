@@ -1,6 +1,6 @@
 import XMLFactory from '../utils/XMLFactory/XMLFactory';
 
-describe.skip('XMLFactory', () => {
+describe('XMLFactory', () => {
   it('Properly converts xml attribute to base64', () => {
     const factory =
       new XMLFactory(`<Assignment GradebookID="" Measure="Lab: x vs. t of a Toy Car" Type="Laboratory" Date="8/9/2021" DueDate="8/11/2021" Score="20 out of 20.0000" ScoreType="Raw Score" Points="20.00 / 
