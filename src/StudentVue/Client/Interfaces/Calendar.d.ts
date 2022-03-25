@@ -7,7 +7,7 @@ export declare interface CalendarOptions {
   /**
    * The interval between two dates in the calendar
    */
-  interval: {
+  interval?: {
     /**
      * The start interval
      */

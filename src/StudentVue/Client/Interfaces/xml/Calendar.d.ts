@@ -9,11 +9,13 @@ export declare interface CalendarXMLObject {
       '@_SchoolEndDate': [string];
       '@_MonthBegDate': [string];
       '@_MonthEndDate': [string];
-      EventLists: [
-        {
-          EventList: (AssignmentEventXMLObject | HolidayEventXMLObject | RegularEventXMLObject)[];
-        }
-      ];
+      EventLists:
+        | [
+            {
+              EventList: (AssignmentEventXMLObject | HolidayEventXMLObject | RegularEventXMLObject)[];
+            }
+          ]
+        | [''];
     }
   ];
 }

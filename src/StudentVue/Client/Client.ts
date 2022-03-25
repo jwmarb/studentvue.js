@@ -588,10 +588,13 @@ export default class Client extends soap.Client {
   }
 
   private fetchEventsWithinInterval(date: Date) {
-    return super.processRequest<CalendarXMLObject>({
-      methodName: 'StudentCalendar',
-      paramStr: { childIntId: 0, RequestDate: date.toISOString() },
-    });
+    return super.processRequest<CalendarXMLObject>(
+      {
+        methodName: 'StudentCalendar',
+        paramStr: { childIntId: 0, RequestDate: date.toISOString() },
+      },
+      (xml) => new XMLFactory(xml).encodeAttribute('Title', 'Icon').toString()
+    );
   }
 
   /**
@@ -606,14 +609,24 @@ export default class Client extends soap.Client {
    * console.log(calendar); // -> { schoolDate: {...}, outputRange: {...}, events: [...] }
    * ```
    */
-  public calendar(options: CalendarOptions): Promise<Calendar> {
+  public calendar(options: CalendarOptions = {}): Promise<Calendar> {
     const defaultOptions: CalendarOptions = {
       concurrency: 7,
       ...options,
     };
     return new Promise((res, rej) => {
-      const schoolStartDate: Date | number = options.interval.start;
-      const schoolEndDate: Date | number = options.interval.end;
+      let schoolStartDate: Date | number = Date.now();
+      let schoolEndDate: Date | number = Date.now();
+
+      if (
+        options.interval == null ||
+        (options.interval && (options.interval.start == null || options.interval.end == null))
+      ) {
+        this.fetchEventsWithinInterval(new Date()).then((cal) => {
+          schoolStartDate = options.interval?.start ?? new Date(cal.CalendarListing[0]['@_SchoolBegDate'][0]);
+          schoolEndDate = options.interval?.end ?? new Date(cal.CalendarListing[0]['@_SchoolEndDate'][0]);
+        });
+      }
 
       const monthsWithinSchoolYear = eachMonthOfInterval({ start: schoolStartDate, end: schoolEndDate });
       const getAllEventsWithinSchoolYear = (): Promise<CalendarXMLObject[]> =>
@@ -642,47 +655,51 @@ export default class Client extends soap.Client {
               ...memo, // This is to prevent re-initializing Date objects in order to improve performance
               events: [
                 ...(prev.events ? prev.events : []),
-                ...(events.CalendarListing[0].EventLists[0].EventList.map((event) => {
-                  switch (event['@_DayType'][0]) {
-                    case EventType.ASSIGNMENT: {
-                      const assignmentEvent = event as AssignmentEventXMLObject;
-                      return {
-                        title: assignmentEvent['@_Title'][0],
-                        addLinkData: assignmentEvent['@_AddLinkData'][0],
-                        agu: assignmentEvent['@_AGU'][0],
-                        date: new Date(assignmentEvent['@_Date'][0]),
-                        dgu: assignmentEvent['@_DGU'][0],
-                        link: assignmentEvent['@_Link'][0],
-                        startTime: assignmentEvent['@_StartTime'][0],
-                        type: EventType.ASSIGNMENT,
-                        viewType: assignmentEvent['@_ViewType'][0],
-                      } as AssignmentEvent;
-                    }
-                    case EventType.HOLIDAY: {
-                      return {
-                        title: event['@_Title'][0],
-                        type: EventType.HOLIDAY,
-                        startTime: event['@_StartTime'][0],
-                        date: new Date(event['@_Date'][0]),
-                      } as HolidayEvent;
-                    }
-                    case EventType.REGULAR: {
-                      const regularEvent = event as RegularEventXMLObject;
-                      return {
-                        title: regularEvent['@_Title'][0],
-                        agu: regularEvent['@_AGU'] ? regularEvent['@_AGU'] : undefined,
-                        date: new Date(regularEvent['@_Date'][0]),
-                        description: regularEvent['@_EvtDescription'] ? regularEvent['@_EvtDescription'][0] : undefined,
-                        dgu: regularEvent['@_DGU'] ? regularEvent['@_DGU'][0] : undefined,
-                        link: regularEvent['@_Link'] ? regularEvent['@_Link'][0] : undefined,
-                        startTime: regularEvent['@_StartTime'][0],
-                        type: EventType.REGULAR,
-                        viewType: regularEvent['@_ViewType'] ? regularEvent['@_ViewType'][0] : undefined,
-                        addLinkData: regularEvent['@_AddLinkData'] ? regularEvent['@_AddLinkData'][0] : undefined,
-                      } as RegularEvent;
-                    }
-                  }
-                }) as Event[]),
+                ...(typeof events.CalendarListing[0].EventLists[0] !== 'string'
+                  ? (events.CalendarListing[0].EventLists[0].EventList.map((event) => {
+                      switch (event['@_DayType'][0]) {
+                        case EventType.ASSIGNMENT: {
+                          const assignmentEvent = event as AssignmentEventXMLObject;
+                          return {
+                            title: decodeURIComponent(escape(assignmentEvent['@_Title'][0])),
+                            addLinkData: assignmentEvent['@_AddLinkData'][0],
+                            agu: assignmentEvent['@_AGU'][0],
+                            date: new Date(assignmentEvent['@_Date'][0]),
+                            dgu: assignmentEvent['@_DGU'][0],
+                            link: assignmentEvent['@_Link'][0],
+                            startTime: assignmentEvent['@_StartTime'][0],
+                            type: EventType.ASSIGNMENT,
+                            viewType: assignmentEvent['@_ViewType'][0],
+                          } as AssignmentEvent;
+                        }
+                        case EventType.HOLIDAY: {
+                          return {
+                            title: decodeURIComponent(escape(event['@_Title'][0])),
+                            type: EventType.HOLIDAY,
+                            startTime: event['@_StartTime'][0],
+                            date: new Date(event['@_Date'][0]),
+                          } as HolidayEvent;
+                        }
+                        case EventType.REGULAR: {
+                          const regularEvent = event as RegularEventXMLObject;
+                          return {
+                            title: decodeURIComponent(escape(regularEvent['@_Title'][0])),
+                            agu: regularEvent['@_AGU'] ? regularEvent['@_AGU'] : undefined,
+                            date: new Date(regularEvent['@_Date'][0]),
+                            description: regularEvent['@_EvtDescription']
+                              ? regularEvent['@_EvtDescription'][0]
+                              : undefined,
+                            dgu: regularEvent['@_DGU'] ? regularEvent['@_DGU'][0] : undefined,
+                            link: regularEvent['@_Link'] ? regularEvent['@_Link'][0] : undefined,
+                            startTime: regularEvent['@_StartTime'][0],
+                            type: EventType.REGULAR,
+                            viewType: regularEvent['@_ViewType'] ? regularEvent['@_ViewType'][0] : undefined,
+                            addLinkData: regularEvent['@_AddLinkData'] ? regularEvent['@_AddLinkData'][0] : undefined,
+                          } as RegularEvent;
+                        }
+                      }
+                    }) as Event[])
+                  : []),
               ] as Event[],
             };
 
