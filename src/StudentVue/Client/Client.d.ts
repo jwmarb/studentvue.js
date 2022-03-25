@@ -121,5 +121,5 @@ export default class Client extends soap.Client {
      * console.log(calendar); // -> { schoolDate: {...}, outputRange: {...}, events: [...] }
      * ```
      */
-    calendar(options: CalendarOptions): Promise<Calendar>;
+    calendar(options?: CalendarOptions): Promise<Calendar>;
 }

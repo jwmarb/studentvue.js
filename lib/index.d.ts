@@ -290,7 +290,7 @@ declare module 'studentvue/StudentVue/Client/Client' {
                 * console.log(calendar); // -> { schoolDate: {...}, outputRange: {...}, events: [...] }
                 * ```
                 */
-            calendar(options: CalendarOptions): Promise<Calendar>;
+            calendar(options?: CalendarOptions): Promise<Calendar>;
     }
 }
 
@@ -653,7 +653,7 @@ declare module 'studentvue/StudentVue/Client/Interfaces/Calendar' {
         /**
             * The interval between two dates in the calendar
             */
-        interval: {
+        interval?: {
             /**
                 * The start interval
                 */
