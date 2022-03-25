@@ -15,7 +15,7 @@ import { SchoolDistrict } from '../StudentVue/StudentVue.interfaces';
  */
 import credentials from './credentials.json';
 
-describe('StudentVue', () => {
+describe.skip('StudentVue', () => {
   it('Gets school districts', async () => {
     try {
       const synergy = await StudentVue.findDistricts('85757');
