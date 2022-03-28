@@ -661,7 +661,7 @@ export default class Client extends soap.Client {
                         case EventType.ASSIGNMENT: {
                           const assignmentEvent = event as AssignmentEventXMLObject;
                           return {
-                            title: decodeURIComponent(escape(assignmentEvent['@_Title'][0])),
+                            title: decodeURIComponent(escape(atob(assignmentEvent['@_Title'][0]))),
                             addLinkData: assignmentEvent['@_AddLinkData'][0],
                             agu: assignmentEvent['@_AGU'][0],
                             date: new Date(assignmentEvent['@_Date'][0]),
@@ -674,7 +674,7 @@ export default class Client extends soap.Client {
                         }
                         case EventType.HOLIDAY: {
                           return {
-                            title: decodeURIComponent(escape(event['@_Title'][0])),
+                            title: decodeURIComponent(escape(atob(event['@_Title'][0]))),
                             type: EventType.HOLIDAY,
                             startTime: event['@_StartTime'][0],
                             date: new Date(event['@_Date'][0]),
@@ -683,7 +683,7 @@ export default class Client extends soap.Client {
                         case EventType.REGULAR: {
                           const regularEvent = event as RegularEventXMLObject;
                           return {
-                            title: decodeURIComponent(escape(regularEvent['@_Title'][0])),
+                            title: decodeURIComponent(escape(atob(regularEvent['@_Title'][0]))),
                             agu: regularEvent['@_AGU'] ? regularEvent['@_AGU'] : undefined,
                             date: new Date(regularEvent['@_Date'][0]),
                             description: regularEvent['@_EvtDescription']
