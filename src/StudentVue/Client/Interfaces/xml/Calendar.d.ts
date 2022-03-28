@@ -26,7 +26,7 @@ export declare interface AssignmentEventXMLObject {
   '@_DayType': [EventType.ASSIGNMENT];
   '@_StartTime': [string];
   '@_Icon': [string];
-  '@_AGU': [string];
+  '@_AGU'?: [string];
   '@_Link': [string];
   '@_DGU': [string];
   '@_ViewType': [string];
@@ -46,7 +46,7 @@ export declare interface RegularEventXMLObject {
   '@_DayType': [EventType.REGULAR];
   '@_StartTime': [string];
   '@_Icon'?: [string];
-  '@_AGU'?: string;
+  '@_AGU'?: [string];
   '@_Link'?: [string];
   '@_DGU'?: [string];
   '@_ViewType'?: [string];
