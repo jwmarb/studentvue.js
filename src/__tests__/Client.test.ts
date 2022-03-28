@@ -70,7 +70,7 @@ beforeAll(() => {
       return Promise.all([
         session,
         session.messages(),
-        session.calendar({ interval: { start: Date.now(), end: Date.now() } }),
+        session.calendar(),
         session.gradebook(),
         session.attendance(),
         session.reportCards(),
