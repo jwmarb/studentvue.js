@@ -24,6 +24,7 @@ import ReportCard from '../ReportCard/ReportCard';
 import Document from '../Document/Document';
 import RequestException from '../RequestException/RequestException';
 import XMLFactory from '../../utils/XMLFactory/XMLFactory';
+import isBase64 from '../../utils/isBase64';
 
 /**
  * The StudentVUE Client to access the API
@@ -593,7 +594,7 @@ export default class Client extends soap.Client {
         methodName: 'StudentCalendar',
         paramStr: { childIntId: 0, RequestDate: date.toISOString() },
       },
-      (xml) => new XMLFactory(xml).encodeAttribute('Title', 'Icon').encodeAttribute('Title', 'DayType').toString()
+      (xml) => new XMLFactory(xml).encodeAttribute('Title', 'Icon').toString()
     );
   }
 
@@ -661,7 +662,9 @@ export default class Client extends soap.Client {
                         case EventType.ASSIGNMENT: {
                           const assignmentEvent = event as AssignmentEventXMLObject;
                           return {
-                            title: decodeURIComponent(escape(atob(assignmentEvent['@_Title'][0]))),
+                            title: isBase64(assignmentEvent['@_Title'][0])
+                              ? decodeURIComponent(escape(atob(assignmentEvent['@_Title'][0])))
+                              : assignmentEvent['@_Title'][0],
                             addLinkData: assignmentEvent['@_AddLinkData'][0],
                             agu: assignmentEvent['@_AGU'] ? assignmentEvent['@_AGU'][0] : undefined,
                             date: new Date(assignmentEvent['@_Date'][0]),
@@ -673,15 +676,10 @@ export default class Client extends soap.Client {
                           } as AssignmentEvent;
                         }
                         case EventType.HOLIDAY: {
-                          // try {
-                          //   decodeURIComponent(escape(atob(event['@_Title'][0])));
-                          // } catch (e) {
-                          //   console.log(event['@_Title'][0]);
-                          //   console.log(events.CalendarListing[0]['@_MonthBegDate'][0]);
-                          //   console.log(events.CalendarListing[0]['@_MonthEndDate'][0]);
-                          // }
                           return {
-                            title: decodeURIComponent(escape(atob(event['@_Title'][0]))),
+                            title: isBase64(event['@_Title'][0])
+                              ? decodeURIComponent(escape(atob(event['@_Title'][0])))
+                              : event['@_Title'][0],
                             type: EventType.HOLIDAY,
                             startTime: event['@_StartTime'][0],
                             date: new Date(event['@_Date'][0]),
@@ -690,7 +688,9 @@ export default class Client extends soap.Client {
                         case EventType.REGULAR: {
                           const regularEvent = event as RegularEventXMLObject;
                           return {
-                            title: decodeURIComponent(escape(atob(regularEvent['@_Title'][0]))),
+                            title: isBase64(regularEvent['@_Title'][0])
+                              ? decodeURIComponent(escape(atob(regularEvent['@_Title'][0])))
+                              : regularEvent['@_Title'][0],
                             agu: regularEvent['@_AGU'] ? regularEvent['@_AGU'][0] : undefined,
                             date: new Date(regularEvent['@_Date'][0]),
                             description: regularEvent['@_EvtDescription']
