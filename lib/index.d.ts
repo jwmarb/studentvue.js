@@ -12,6 +12,7 @@ declare module 'studentvue' {
     export { default as Attachment } from 'studentvue/StudentVue/Attachment/Attachment';
     export { default as File } from 'studentvue/StudentVue/File/File';
     export { default as XMLFactory } from 'studentvue/utils/XMLFactory/XMLFactory';
+    export { default as isBase64 } from 'studentvue/utils/isBase64';
     export { default as soap } from 'studentvue/utils/soap/soap';
     export * from 'studentvue/StudentVue/ReportCard';
     export * from 'studentvue/StudentVue/Document';
@@ -395,6 +396,10 @@ declare module 'studentvue/utils/XMLFactory/XMLFactory' {
             toString(): string;
     }
     export default XMLFactory;
+}
+
+declare module 'studentvue/utils/isBase64' {
+    export default function isBase64(str: string): boolean;
 }
 
 declare module 'studentvue/utils/soap/soap' {
