@@ -12,3 +12,4 @@ export { default as ReportCard } from './StudentVue/ReportCard/ReportCard';
 export { default as Document } from './StudentVue/Document/Document';
 export { default as soap } from './utils/soap/soap';
 export { default as XMLFactory } from './utils/XMLFactory/XMLFactory';
+export { default as isBase64 } from './utils/isBase64';
