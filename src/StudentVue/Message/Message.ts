@@ -90,7 +90,7 @@ export default class Message extends soap.Client {
      * @public
      * @readonly
      */
-    this.htmlContent = decodeURIComponent(escape(atob(xmlObject['@_Content'][0])));
+    this.htmlContent = unescape(xmlObject['@_Content'][0]);
     /**
      * Whether the message has been read or not
      * @type {boolean}
