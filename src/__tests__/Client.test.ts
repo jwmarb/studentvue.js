@@ -39,7 +39,6 @@ import { Absence, AbsentPeriod, Attendance, PeriodInfo } from '../StudentVue/Cli
 import { ReportCard } from '..';
 import { ReportCardFile } from '../StudentVue/ReportCard';
 import Document from '../StudentVue/Document/Document';
-import isBase64 from '../utils/isBase64';
 import _ from 'lodash';
 
 jest.spyOn(StudentVue, 'login').mockImplementation((districtUrl, credentials) => {
@@ -189,13 +188,6 @@ describe('StudentInfo', () => {
 });
 
 describe('User Messages', () => {
-  it('Message content greater than 200 characters', () => {
-    const lessThan100Chars: Message[] = [];
-    for (const msg of messages) {
-      if (msg.htmlContent.length < 100) lessThan100Chars.push(msg);
-    }
-    expect(lessThan100Chars.length).toBe(0);
-  });
   it('Fetches a list of messages', () => {
     expect(messages).toBeDefined();
   });
@@ -241,6 +233,7 @@ describe('Calendar events', () => {
   });
 
   it('fetch all events within school year', async () => {
+    expect.assertions(1);
     const wholeSchoolYear = await client.calendar({
       concurrency: null,
     });
@@ -248,9 +241,11 @@ describe('Calendar events', () => {
   });
   it('events are not in base64', () => {
     for (const event of calendar.events) {
-      expect(isBase64(event.title)).toBeFalsy();
-      // console.log(event.title);
+      expect(event.title).toBe(decodeURI(event.title));
     }
+  });
+  it('output range is throughout the school year', () => {
+    expect(calendar.outputRange.start === calendar.outputRange.end).toBeFalsy();
   });
 });
 

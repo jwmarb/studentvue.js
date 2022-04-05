@@ -1,7 +1,8 @@
+import cache from '../utils/cache/cache';
 import XMLFactory from '../utils/XMLFactory/XMLFactory';
 
 describe('XMLFactory', () => {
-  it('Properly converts xml attribute to base64', () => {
+  it('Properly escapes xml', () => {
     const factory =
       new XMLFactory(`<Assignment GradebookID="" Measure="Lab: x vs. t of a Toy Car" Type="Laboratory" Date="8/9/2021" DueDate="8/11/2021" Score="20 out of 20.0000" ScoreType="Raw Score" Points="20.00 / 
     20.0000" Notes="" TeacherID="" StudentID="" MeasureDescription="We did this lab together, so just turning it in gives full credit. To turn in, take a good picture of the lab in your lab notebook and upload it onto the Class Notebook page under the assignment in Teams. Then click "Turn In" on the assignment on Teams." HasDropBox="false" DropStartDate="8/24/2021" DropEndDate="8/25/2021">`);
@@ -11,16 +12,16 @@ describe('XMLFactory', () => {
     const encoded = factory.encodeAttribute('MeasureDescription', 'HasDropBox');
     expect(encoded.toString())
       .toBe(`<Assignment GradebookID="" Measure="Lab: x vs. t of a Toy Car" Type="Laboratory" Date="8/9/2021" DueDate="8/11/2021" Score="20 out of 20.0000" ScoreType="Raw Score" Points="20.00 / 
-    20.0000" Notes="" TeacherID="" StudentID="" MeasureDescription="V2UgZGlkIHRoaXMgbGFiIHRvZ2V0aGVyLCBzbyBqdXN0IHR1cm5pbmcgaXQgaW4gZ2l2ZXMgZnVsbCBjcmVkaXQuIFRvIHR1cm4gaW4sIHRha2UgYSBnb29kIHBpY3R1cmUgb2YgdGhlIGxhYiBpbiB5b3VyIGxhYiBub3RlYm9vayBhbmQgdXBsb2FkIGl0IG9udG8gdGhlIENsYXNzIE5vdGVib29rIHBhZ2UgdW5kZXIgdGhlIGFzc2lnbm1lbnQgaW4gVGVhbXMuIFRoZW4gY2xpY2sgIlR1cm4gSW4iIG9uIHRoZSBhc3NpZ25tZW50IG9uIFRlYW1zLg==" HasDropBox="false" DropStartDate="8/24/2021" DropEndDate="8/25/2021">`);
+    20.0000" Notes="" TeacherID="" StudentID="" MeasureDescription="We%20did%20this%20lab%20together,%20so%20just%20turning%20it%20in%20gives%20full%20credit.%20To%20turn%20in,%20take%20a%20good%20picture%20of%20the%20lab%20in%20your%20lab%20notebook%20and%20upload%20it%20onto%20the%20Class%20Notebook%20page%20under%20the%20assignment%20in%20Teams.%20Then%20click%20%22Turn%20In%22%20on%20the%20assignment%20on%20Teams." HasDropBox="false" DropStartDate="8/24/2021" DropEndDate="8/25/2021">`);
     expect(factory.encodeAttribute).toHaveBeenCalledTimes(1);
   });
 
-  it('unique base64 values', () => {
+  it('unique encoded attribute values', () => {
     function decodeAttribute(xml: string, attributeName: string, followingAttributeName: string): string {
       const regexp = new RegExp(`${attributeName}=".*" ${followingAttributeName}`, 'g');
       return xml.replace(regexp, (found) => {
-        const regular = decodeURIComponent(
-          escape(atob(found.substring(attributeName.length + 2, found.length - followingAttributeName.length - 2)))
+        const regular = decodeURI(
+          found.substring(attributeName.length + 2, found.length - followingAttributeName.length - 2)
         );
         return `${attributeName}="${regular}" ${followingAttributeName}`;
       });
@@ -54,5 +55,24 @@ describe('XMLFactory', () => {
     factory.encodeAttribute('Measure', 'Type');
 
     expect(decodeAttribute(factory.toString(), 'Measure', 'Type')).toStrictEqual(xml);
+  });
+});
+
+describe('memo', () => {
+  const fn = () => new Promise<boolean>((res) => setTimeout(() => res(true), 200));
+  const memoize = jest.spyOn({ fn }, 'fn');
+  it('memoizes value', async () => {
+    const sample = await cache.memo(fn);
+    expect(sample).toBe(true);
+  });
+
+  it('successfully adds value to cache', () => {
+    expect(cache.isMemo(fn.toString())).toBe(true);
+  });
+
+  it('returns memoized value', async () => {
+    const sample = await cache.memo(fn);
+    expect(sample).toBe(true);
+    expect(memoize).toHaveBeenCalledTimes(0); // expect it to only have been called none at this point. if it has been called once, that would mean that it had to execute the function again because the value did not exist in cache (this would also mean that the previous test would also fail)
   });
 });
