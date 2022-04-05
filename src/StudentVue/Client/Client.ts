@@ -6,7 +6,7 @@ import Message from '../Message/Message';
 import { MessageXMLObject } from '../Message/Message.xml';
 import { AssignmentEventXMLObject, CalendarXMLObject, RegularEventXMLObject } from './Interfaces/xml/Calendar';
 import { AssignmentEvent, Calendar, CalendarOptions, Event, HolidayEvent, RegularEvent } from './Interfaces/Calendar';
-import { add, eachMonthOfInterval, parse, sub } from 'date-fns';
+import { eachMonthOfInterval, parse } from 'date-fns';
 import { FileResourceXMLObject, GradebookXMLObject, URLResourceXMLObject } from './Interfaces/xml/Gradebook';
 import { AttendanceXMLObject } from './Interfaces/xml/Attendance';
 import EventType from '../../Constants/EventType';
