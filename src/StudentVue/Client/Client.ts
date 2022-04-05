@@ -6,7 +6,7 @@ import Message from '../Message/Message';
 import { MessageXMLObject } from '../Message/Message.xml';
 import { AssignmentEventXMLObject, CalendarXMLObject, RegularEventXMLObject } from './Interfaces/xml/Calendar';
 import { AssignmentEvent, Calendar, CalendarOptions, Event, HolidayEvent, RegularEvent } from './Interfaces/Calendar';
-import { eachMonthOfInterval, parse } from 'date-fns';
+import { add, eachMonthOfInterval, parse, sub } from 'date-fns';
 import { FileResourceXMLObject, GradebookXMLObject, URLResourceXMLObject } from './Interfaces/xml/Gradebook';
 import { AttendanceXMLObject } from './Interfaces/xml/Attendance';
 import EventType from '../../Constants/EventType';
@@ -24,7 +24,7 @@ import ReportCard from '../ReportCard/ReportCard';
 import Document from '../Document/Document';
 import RequestException from '../RequestException/RequestException';
 import XMLFactory from '../../utils/XMLFactory/XMLFactory';
-import isBase64 from '../../utils/isBase64';
+import cache from '../../utils/cache/cache';
 
 /**
  * The StudentVUE Client to access the API
@@ -396,7 +396,7 @@ export default class Client extends soap.Client {
                   typeof mark.Assignments[0] !== 'string'
                     ? (mark.Assignments[0].Assignment.map((assignment) => ({
                         gradebookId: assignment['@_GradebookID'][0],
-                        name: decodeURIComponent(escape(atob(assignment['@_Measure'][0]))),
+                        name: decodeURI(assignment['@_Measure'][0]),
                         type: assignment['@_Type'][0],
                         date: {
                           start: new Date(assignment['@_Date'][0]),
@@ -409,7 +409,7 @@ export default class Client extends soap.Client {
                         points: assignment['@_Points'][0],
                         notes: assignment['@_Notes'][0],
                         teacherId: assignment['@_TeacherID'][0],
-                        description: decodeURIComponent(escape(atob(assignment['@_MeasureDescription'][0]))),
+                        description: decodeURI(assignment['@_MeasureDescription'][0]),
                         hasDropbox: JSON.parse(assignment['@_HasDropBox'][0]),
                         studentId: assignment['@_StudentID'][0],
                         dropboxDate: {
@@ -610,25 +610,18 @@ export default class Client extends soap.Client {
    * console.log(calendar); // -> { schoolDate: {...}, outputRange: {...}, events: [...] }
    * ```
    */
-  public calendar(options: CalendarOptions = {}): Promise<Calendar> {
+  public async calendar(options: CalendarOptions = {}): Promise<Calendar> {
     const defaultOptions: CalendarOptions = {
       concurrency: 7,
       ...options,
     };
+    const cal = await cache.memo(() => this.fetchEventsWithinInterval(new Date()));
+    const schoolEndDate: Date | number =
+      options.interval?.end ?? new Date(cal.CalendarListing[0]['@_SchoolEndDate'][0]);
+    const schoolStartDate: Date | number =
+      options.interval?.start ?? new Date(cal.CalendarListing[0]['@_SchoolBegDate'][0]);
+
     return new Promise((res, rej) => {
-      let schoolStartDate: Date | number = Date.now();
-      let schoolEndDate: Date | number = Date.now();
-
-      if (
-        options.interval == null ||
-        (options.interval && (options.interval.start == null || options.interval.end == null))
-      ) {
-        this.fetchEventsWithinInterval(new Date()).then((cal) => {
-          schoolStartDate = options.interval?.start ?? new Date(cal.CalendarListing[0]['@_SchoolBegDate'][0]);
-          schoolEndDate = options.interval?.end ?? new Date(cal.CalendarListing[0]['@_SchoolEndDate'][0]);
-        });
-      }
-
       const monthsWithinSchoolYear = eachMonthOfInterval({ start: schoolStartDate, end: schoolEndDate });
       const getAllEventsWithinSchoolYear = (): Promise<CalendarXMLObject[]> =>
         defaultOptions.concurrency == null
@@ -662,9 +655,7 @@ export default class Client extends soap.Client {
                         case EventType.ASSIGNMENT: {
                           const assignmentEvent = event as AssignmentEventXMLObject;
                           return {
-                            title: isBase64(assignmentEvent['@_Title'][0])
-                              ? decodeURIComponent(escape(atob(assignmentEvent['@_Title'][0])))
-                              : assignmentEvent['@_Title'][0],
+                            title: decodeURI(assignmentEvent['@_Title'][0]),
                             addLinkData: assignmentEvent['@_AddLinkData'][0],
                             agu: assignmentEvent['@_AGU'] ? assignmentEvent['@_AGU'][0] : undefined,
                             date: new Date(assignmentEvent['@_Date'][0]),
@@ -677,9 +668,7 @@ export default class Client extends soap.Client {
                         }
                         case EventType.HOLIDAY: {
                           return {
-                            title: isBase64(event['@_Title'][0])
-                              ? decodeURIComponent(escape(atob(event['@_Title'][0])))
-                              : event['@_Title'][0],
+                            title: decodeURI(event['@_Title'][0]),
                             type: EventType.HOLIDAY,
                             startTime: event['@_StartTime'][0],
                             date: new Date(event['@_Date'][0]),
@@ -688,9 +677,7 @@ export default class Client extends soap.Client {
                         case EventType.REGULAR: {
                           const regularEvent = event as RegularEventXMLObject;
                           return {
-                            title: isBase64(regularEvent['@_Title'][0])
-                              ? decodeURIComponent(escape(atob(regularEvent['@_Title'][0])))
-                              : regularEvent['@_Title'][0],
+                            title: decodeURI(regularEvent['@_Title'][0]),
                             agu: regularEvent['@_AGU'] ? regularEvent['@_AGU'][0] : undefined,
                             date: new Date(regularEvent['@_Date'][0]),
                             description: regularEvent['@_EvtDescription']
