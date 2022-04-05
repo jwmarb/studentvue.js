@@ -388,12 +388,12 @@
 <pre class="prettyprint source lang-xml"><code>&lt;Assignment MeasureDescription=&quot;We did this lab together, so just turning it in gives full credit. To turn in, take a good picture of the lab in your lab notebook and upload it onto the Class Notebook page under the assignment in Teams. Then click &quot;Turn In&quot; on the assignment on Teams.&quot; HasDropBox=&quot;false&quot;>
 </code></pre>
 <p>As you can see, <code>MeasureDescription</code> has non-escaped quotation marks around <strong>Turn In</strong>, therefore <code>fast-xml-parser</code> throws an error.
-This method fixes this issue by replacing <code>MeasureDescription</code>'s value with an encoded base64 string. This is how we would call this method and return a string:</p>
+This method fixes this issue by replacing <code>MeasureDescription</code>'s value with an escaped string. This is how we would call this method and return a string:</p>
 <pre class="prettyprint source lang-js"><code>new XMLFactory(assignmentXML)
  .encodeAttribute(&quot;MeasureDescription&quot;, &quot;HasDropBox&quot;)
  .toString();
 </code></pre>
-<p>After encoding it to base64, <code>fast-xml-parser</code> will now work. The downside of this method is that <code>atob</code> must be called to get the actual value of the attribute.</p>
+<p>After escaping the characters in the string, <code>fast-xml-parser</code> will now work. The downside of this method is that <code>decodeURI</code> must be called to get the actual value of the attribute.</p>
     </div>
     
 
