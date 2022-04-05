@@ -27,24 +27,20 @@ class XMLFactory {
    * <Assignment MeasureDescription="We did this lab together, so just turning it in gives full credit. To turn in, take a good picture of the lab in your lab notebook and upload it onto the Class Notebook page under the assignment in Teams. Then click "Turn In" on the assignment on Teams." HasDropBox="false">
    * ```
    * As you can see, `MeasureDescription` has non-escaped quotation marks around **Turn In**, therefore `fast-xml-parser` throws an error.
-   * This method fixes this issue by replacing `MeasureDescription`'s value with an encoded base64 string. This is how we would call this method and return a string:
+   * This method fixes this issue by replacing `MeasureDescription`'s value with an escaped string. This is how we would call this method and return a string:
    * ```js
    * new XMLFactory(assignmentXML)
    *  .encodeAttribute("MeasureDescription", "HasDropBox")
    *  .toString();
    * ```
-   * After encoding it to base64, `fast-xml-parser` will now work. The downside of this method is that `atob` must be called to get the actual value of the attribute.
+   * After escaping the characters in the string, `fast-xml-parser` will now work. The downside of this method is that `decodeURI` must be called to get the actual value of the attribute.
    */
   public encodeAttribute(attributeName: string, followingAttributeName: string) {
     const regexp = new RegExp(`${attributeName}=".*" ${followingAttributeName}`, 'g');
 
     this.xml = this.xml.replace(regexp, (found) => {
-      const base64 = btoa(
-        unescape(
-          encodeURIComponent(
-            found.substring(attributeName.length + 2, found.length - followingAttributeName.length - 2)
-          )
-        )
+      const base64 = encodeURI(
+        found.substring(attributeName.length + 2, found.length - followingAttributeName.length - 2)
       );
       return `${attributeName}="${base64}" ${followingAttributeName}`;
     });
