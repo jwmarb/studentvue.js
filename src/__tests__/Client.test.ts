@@ -260,13 +260,14 @@ describe('Gradebook', () => {
   });
 
   it('resources have a valid URI', () => {
+    if (resources.length === 0) return console.warn('Resources has a length of 0. Skipping...');
     expect(resources).toStrictEqual(
       expect.arrayContaining([expect.objectContaining({ file: expect.objectContaining({ uri: expect.any(String) }) })])
     );
   });
 
   it('URL resources have a URL', () => {
-    if (resources.some((rsrc) => rsrc.type !== ResourceType.URL))
+    if (resources.some((rsrc) => rsrc.type !== ResourceType.URL) || resources.length === 0)
       return console.warn('No URL resources found. Skipping...');
     expect(resources).toStrictEqual(
       expect.arrayContaining([expect.objectContaining<Partial<URLResource>>({ url: expect.any(String) })])
@@ -347,6 +348,33 @@ describe('Schedule', () => {
   it('matches type', async () => {
     const schedule = await client.schedule();
     expectTypeOf(schedule).toMatchTypeOf<Schedule>();
+    if (schedule.today.length === 0)
+      return expect(schedule).toStrictEqual<Schedule>({
+        error: expect.any(String),
+        term: { index: expect.any(Number), name: expect.any(String) },
+        classes: expect.arrayContaining<ClassInfo>([
+          {
+            name: expect.any(String),
+            period: expect.any(Number),
+            room: expect.any(String),
+            sectionGu: expect.any(String),
+            teacher: {
+              email: expect.any(String),
+              name: expect.any(String),
+              staffGu: expect.any(String),
+            },
+          },
+        ]),
+        terms: expect.arrayContaining<TermInfo>([
+          {
+            date: { start: expect.any(Date), end: expect.any(Date) },
+            index: expect.any(Number),
+            name: expect.any(String),
+            schoolYearTermCodeGu: expect.any(String),
+          },
+        ]),
+        today: expect.any(Array),
+      });
     expect(schedule).toStrictEqual<Schedule>({
       error: expect.any(String),
       term: { index: expect.any(Number), name: expect.any(String) },
