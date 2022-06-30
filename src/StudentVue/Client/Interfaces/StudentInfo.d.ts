@@ -21,24 +21,24 @@ export declare interface StudentInfo {
     lastName: string;
   };
   /**
-   * The student's ID. Can be their metric number
+   * The student's ID. Can be their matric number
    */
-  id: string;
+  id?: string;
 
   /**
    * The student's address
    */
-  address: string;
+  address?: string;
 
   /**
    * The student's gender
    */
-  gender: string;
+  gender?: string;
 
   /**
    * The grade level of the student
    */
-  grade: string;
+  grade?: string;
 
   /**
    * The birth date of the student
@@ -46,56 +46,56 @@ export declare interface StudentInfo {
   birthDate: Date;
 
   /**
-   * The email of the student
+   * The email of the student provided by the school
    */
-  email: string;
+  email?: string;
 
   /**
    * The student's parent phone number
    */
-  phone: string;
+  phone?: string;
 
   /**
    * The student's primary language
    */
-  homeLanguage: string;
+  homeLanguage?: string;
 
   /**
    * The school the student goes to
    */
-  currentSchool: string;
+  currentSchool?: string;
 
   /**
    * The track the student is in
    */
-  track: string;
+  track?: string;
 
   /**
    * The student's homeroom teacher
    * @type {Staff}
    */
-  homeRoomTeacher: Staff;
+  homeRoomTeacher?: Staff;
 
   /**
    * The organization year Gu. it is unknown what this does
    */
-  orgYearGu: string;
+  orgYearGu?: string;
 
   /**
    * The student's homeroom location/name
    */
-  homeRoom: string;
+  homeRoom?: string;
 
   /**
    * The student's counselor
    * @type {Staff}
    */
-  counselor: Staff;
+  counselor?: Staff;
 
   /**
    * The student's photo. It is a base64 string
    */
-  photo: string;
+  photo?: string;
 
   /**
    * A list of contacts in case of emergency
@@ -106,7 +106,7 @@ export declare interface StudentInfo {
   /**
    * The student's physician
    */
-  physician: {
+  physician?: {
     name: string;
     phone: string;
     extn: string;
@@ -116,7 +116,7 @@ export declare interface StudentInfo {
   /**
    * The student's dentist
    */
-  dentist: {
+  dentist?: {
     name: string;
     phone: string;
     extn: string;
@@ -126,7 +126,7 @@ export declare interface StudentInfo {
   /**
    * The info about the student's lockers
    */
-  lockerInfoRecords: string;
+  lockerInfoRecords?: string;
 
   /**
    * Additional information about the student such as transportation information
@@ -200,35 +200,35 @@ export declare interface EmergencyContact {
   /**
    * The name of the contacter
    */
-  name: string;
+  name?: string;
 
   /**
    * The contacter's relationship with the student
    */
-  relationship: string;
+  relationship?: string;
 
   /**
    * The contacter's phone
    */
-  phone: {
+  phone?: {
     /**
      * The home phone number of the contacter
      */
-    home: string;
+    home?: string;
 
     /**
      * The work phone number of the contacter
      */
-    work: string;
+    work?: string;
 
     /**
      * A phone number of the contacter
      */
-    other: string;
+    other?: string;
 
     /**
      * The contacter's mobile phone number
      */
-    mobile: string;
+    mobile?: string;
   };
 }

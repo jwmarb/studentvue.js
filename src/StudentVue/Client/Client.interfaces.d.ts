@@ -12,15 +12,15 @@ export declare interface Staff {
   /**
    * The name of the staff
    */
-  name: string;
+  name?: string;
 
   /**
    * The staff's email
    */
-  email: string;
+  email?: string;
 
   /**
    * The staffGu of the staff member
    */
-  staffGu: string;
+  staffGu?: string;
 }
