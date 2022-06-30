@@ -72,7 +72,7 @@ describe('StudentVue', () => {
   it('Throws an error on invalid login credentials', () => {
     return Promise.all([
       StudentVue.login(credentials.district, { username: credentials.username, password: 'abc123' }).catch((e) => {
-        expect((e as RequestException).message).toBe('The user name or password is incorrect.');
+        expect((e as RequestException).message).toBe('The user name or password is incorrect.&#xD;&#xA;');
       }),
       StudentVue.login(credentials.district, { username: 'abc123', password: credentials.password }).catch((e) => {
         expect((e as RequestException).message).toBe('Invalid user id or password');
