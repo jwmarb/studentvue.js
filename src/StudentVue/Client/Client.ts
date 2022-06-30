@@ -519,69 +519,80 @@ export default class Client extends soap.Client {
               nickname: xmlObjectData.StudentInfo[0].Address[0].NickName[0],
             },
             birthDate: new Date(xmlObjectData.StudentInfo[0].Address[0].BirthDate[0]),
-            track: xmlObjectData.StudentInfo[0].Address[0].Track[0],
-            address: xmlObjectData.StudentInfo[0].Address[0].br[0],
-            photo: xmlObjectData.StudentInfo[0].Address[0].Photo[0],
-            counselor: {
-              name: xmlObjectData.StudentInfo[0].Address[0].CounselorName[0],
-              email: xmlObjectData.StudentInfo[0].Address[0].CounselorEmail[0],
-              staffGu: xmlObjectData.StudentInfo[0].Address[0].CounselorStaffGU[0],
-            },
+            track: this.optional(xmlObjectData.StudentInfo[0].Address[0].Track),
+            address: this.optional(xmlObjectData.StudentInfo[0].Address[0].br),
+            photo: this.optional(xmlObjectData.StudentInfo[0].Address[0].Photo),
+            counselor:
+              xmlObjectData.StudentInfo[0].Address[0].CounselorName &&
+              xmlObjectData.StudentInfo[0].Address[0].CounselorEmail &&
+              xmlObjectData.StudentInfo[0].Address[0].CounselorStaffGU
+                ? {
+                    name: xmlObjectData.StudentInfo[0].Address[0].CounselorName[0],
+                    email: xmlObjectData.StudentInfo[0].Address[0].CounselorEmail[0],
+                    staffGu: xmlObjectData.StudentInfo[0].Address[0].CounselorStaffGU[0],
+                  }
+                : undefined,
             currentSchool: xmlObjectData.StudentInfo[0].Address[0].CurrentSchool[0],
-            dentist: {
-              name: xmlObjectData.StudentInfo[0].Address[0].Dentist[0]['@_Name'][0],
-              phone: xmlObjectData.StudentInfo[0].Address[0].Dentist[0]['@_Phone'][0],
-              extn: xmlObjectData.StudentInfo[0].Address[0].Dentist[0]['@_Extn'][0],
-              office: xmlObjectData.StudentInfo[0].Address[0].Dentist[0]['@_Office'][0],
-            },
-            physician: {
-              name: xmlObjectData.StudentInfo[0].Address[0].Physician[0]['@_Name'][0],
-              phone: xmlObjectData.StudentInfo[0].Address[0].Physician[0]['@_Phone'][0],
-              extn: xmlObjectData.StudentInfo[0].Address[0].Physician[0]['@_Extn'][0],
-              hospital: xmlObjectData.StudentInfo[0].Address[0].Physician[0]['@_Hospital'][0],
-            },
-            id: xmlObjectData.StudentInfo[0].PermID[0],
-            orgYearGu: xmlObjectData.StudentInfo[0].Address[0].OrgYearGU[0],
-            phone: xmlObjectData.StudentInfo[0].Address[0].Phone[0],
-            email: xmlObjectData.StudentInfo[0].Address[0].EMail[0],
-            emergencyContacts: xmlObjectData.StudentInfo[0].Address[0].EmergencyContacts[0].EmergencyContact.map(
-              (contact) => ({
-                name: contact['@_Name'][0],
-                phone: {
-                  home: contact['@_HomePhone'][0],
-                  mobile: contact['@_MobilePhone'][0],
-                  other: contact['@_OtherPhone'][0],
-                  work: contact['@_WorkPhone'][0],
-                },
-                relationship: contact['@_Relationship'][0],
-              })
-            ),
-            gender: xmlObjectData.StudentInfo[0].Gender[0],
-            grade: xmlObjectData.StudentInfo[0].Grade[0],
-            lockerInfoRecords: xmlObjectData.StudentInfo[0].LockerInfoRecords[0],
-            homeLanguage: xmlObjectData.StudentInfo[0].Address[0].HomeLanguage[0],
-            homeRoom: xmlObjectData.StudentInfo[0].Address[0].HomeRoom[0],
-            homeRoomTeacher: {
-              email: xmlObjectData.StudentInfo[0].Address[0].HomeRoomTchEMail[0],
-              name: xmlObjectData.StudentInfo[0].Address[0].HomeRoomTch[0],
-              staffGu: xmlObjectData.StudentInfo[0].Address[0].HomeRoomTchStaffGU[0],
-            },
-            additionalInfo: xmlObjectData.StudentInfo[0].Address[0].UserDefinedGroupBoxes[0].UserDefinedGroupBox.map(
-              (definedBox) => ({
-                id: definedBox['@_GroupBoxID'][0],
-                type: definedBox['@_GroupBoxLabel'][0],
-                vcId: definedBox['@_VCID'][0],
-                items: definedBox.UserDefinedItems[0].UserDefinedItem.map((item) => ({
-                  source: {
-                    element: item['@_SourceElement'][0],
-                    object: item['@_SourceObject'][0],
+            dentist: xmlObjectData.StudentInfo[0].Address[0].Dentist
+              ? {
+                  name: xmlObjectData.StudentInfo[0].Address[0].Dentist[0]['@_Name'][0],
+                  phone: xmlObjectData.StudentInfo[0].Address[0].Dentist[0]['@_Phone'][0],
+                  extn: xmlObjectData.StudentInfo[0].Address[0].Dentist[0]['@_Extn'][0],
+                  office: xmlObjectData.StudentInfo[0].Address[0].Dentist[0]['@_Office'][0],
+                }
+              : undefined,
+            physician: xmlObjectData.StudentInfo[0].Address[0].Physician
+              ? {
+                  name: xmlObjectData.StudentInfo[0].Address[0].Physician[0]['@_Name'][0],
+                  phone: xmlObjectData.StudentInfo[0].Address[0].Physician[0]['@_Phone'][0],
+                  extn: xmlObjectData.StudentInfo[0].Address[0].Physician[0]['@_Extn'][0],
+                  hospital: xmlObjectData.StudentInfo[0].Address[0].Physician[0]['@_Hospital'][0],
+                }
+              : undefined,
+            id: this.optional(xmlObjectData.StudentInfo[0].PermID),
+            orgYearGu: this.optional(xmlObjectData.StudentInfo[0].Address[0].OrgYearGU),
+            phone: this.optional(xmlObjectData.StudentInfo[0].Address[0].Phone),
+            email: this.optional(xmlObjectData.StudentInfo[0].Address[0].EMail),
+            emergencyContacts: xmlObjectData.StudentInfo[0].Address[0].EmergencyContacts
+              ? xmlObjectData.StudentInfo[0].Address[0].EmergencyContacts[0].EmergencyContact.map((contact) => ({
+                  name: this.optional(contact['@_Name']),
+                  phone: {
+                    home: this.optional(contact['@_HomePhone']),
+                    mobile: this.optional(contact['@_MobilePhone']),
+                    other: this.optional(contact['@_OtherPhone']),
+                    work: this.optional(contact['@_WorkPhone']),
                   },
-                  vcId: item['@_VCID'][0],
-                  value: item['@_Value'][0],
-                  type: item['@_ItemType'][0],
-                })) as AdditionalInfoItem[],
-              })
-            ) as AdditionalInfo[],
+                  relationship: this.optional(contact['@_Relationship']),
+                }))
+              : [],
+            gender: this.optional(xmlObjectData.StudentInfo[0].Gender),
+            grade: this.optional(xmlObjectData.StudentInfo[0].Grade),
+            lockerInfoRecords: this.optional(xmlObjectData.StudentInfo[0].LockerInfoRecords),
+            homeLanguage: this.optional(xmlObjectData.StudentInfo[0].Address[0].HomeLanguage),
+            homeRoom: this.optional(xmlObjectData.StudentInfo[0].Address[0].HomeRoom),
+            homeRoomTeacher: {
+              email: this.optional(xmlObjectData.StudentInfo[0].Address[0].HomeRoomTchEMail),
+              name: this.optional(xmlObjectData.StudentInfo[0].Address[0].HomeRoomTch),
+              staffGu: this.optional(xmlObjectData.StudentInfo[0].Address[0].HomeRoomTchStaffGU),
+            },
+            additionalInfo: xmlObjectData.StudentInfo[0].Address[0].UserDefinedGroupBoxes[0].UserDefinedGroupBox
+              ? (xmlObjectData.StudentInfo[0].Address[0].UserDefinedGroupBoxes[0].UserDefinedGroupBox.map(
+                  (definedBox) => ({
+                    id: definedBox['@_GroupBoxID'][0],
+                    type: definedBox['@_GroupBoxLabel'][0],
+                    vcId: definedBox['@_VCID'][0],
+                    items: definedBox.UserDefinedItems[0].UserDefinedItem.map((item) => ({
+                      source: {
+                        element: item['@_SourceElement'][0],
+                        object: item['@_SourceObject'][0],
+                      },
+                      vcId: item['@_VCID'][0],
+                      value: item['@_Value'][0],
+                      type: item['@_ItemType'][0],
+                    })) as AdditionalInfoItem[],
+                  })
+                ) as AdditionalInfo[])
+              : [],
           } as StudentInfo);
         })
         .catch(rej);
@@ -596,6 +607,10 @@ export default class Client extends soap.Client {
       },
       (xml) => new XMLFactory(xml).encodeAttribute('Title', 'Icon').toString()
     );
+  }
+
+  private optional<T>(xmlArr?: T[]): T | undefined {
+    return xmlArr ? xmlArr[0] : undefined;
   }
 
   /**
