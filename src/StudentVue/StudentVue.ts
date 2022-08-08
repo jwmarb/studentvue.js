@@ -3,7 +3,6 @@ import Client from './Client/Client';
 import soap from '../utils/soap/soap';
 import { DistrictListXMLObject } from './StudentVue.xml';
 import RequestException from './RequestException/RequestException';
-import url from 'url';
 
 /** @module StudentVue */
 
@@ -17,7 +16,7 @@ export function login(districtUrl: string, credentials: UserCredentials): Promis
   return new Promise((res, rej) => {
     if (districtUrl.length === 0)
       return rej(new RequestException({ message: 'District URL cannot be an empty string' }));
-    const host = url.parse(districtUrl).host;
+    const host = new URL(districtUrl).host;
     const endpoint = `https://${host}/Service/PXPCommunication.asmx`;
     const client = new Client(
       {

@@ -15,7 +15,6 @@ import {
 } from '../StudentVue/Client/Client.interfaces';
 import RequestException from '../StudentVue/RequestException/RequestException';
 import { SchoolDistrict } from '../StudentVue/StudentVue.interfaces';
-import url from 'url';
 import readable from '../utils/readable';
 import { expectTypeOf } from 'expect-type';
 import Message from '../StudentVue/Message/Message';
@@ -42,7 +41,7 @@ import Document from '../StudentVue/Document/Document';
 import _ from 'lodash';
 
 jest.spyOn(StudentVue, 'login').mockImplementation((districtUrl, credentials) => {
-  const host = url.parse(districtUrl).host;
+  const host = new URL(districtUrl).host;
   const endpoint: string = `https://${host}/Service/PXPCommunication.asmx`;
   const client = new Client(
     { username: credentials.username, password: credentials.password, districtUrl: endpoint },
