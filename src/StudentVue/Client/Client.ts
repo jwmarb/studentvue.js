@@ -267,27 +267,29 @@ export default class Client extends soap.Client {
               end: Number(xmlObject['@_EndPeriod'][0]),
             },
             schoolName: xmlObject['@_SchoolName'][0],
-            absences: xmlObject.Absences[0].Absence.map((absence) => ({
-              date: new Date(absence['@_AbsenceDate'][0]),
-              reason: absence['@_Reason'][0],
-              note: absence['@_Note'][0],
-              description: absence['@_CodeAllDayDescription'][0],
-              periods: absence.Periods[0].Period.map(
-                (period) =>
-                  ({
-                    period: Number(period['@_Number'][0]),
-                    name: period['@_Name'][0],
-                    reason: period['@_Reason'][0],
-                    course: period['@_Course'][0],
-                    staff: {
-                      name: period['@_Staff'][0],
-                      staffGu: period['@_StaffGU'][0],
-                      email: period['@_StaffEMail'][0],
-                    },
-                    orgYearGu: period['@_OrgYearGU'][0],
-                  } as AbsentPeriod)
-              ),
-            })),
+            absences: xmlObject.Absences[0].Absence
+              ? xmlObject.Absences[0].Absence.map((absence) => ({
+                  date: new Date(absence['@_AbsenceDate'][0]),
+                  reason: absence['@_Reason'][0],
+                  note: absence['@_Note'][0],
+                  description: absence['@_CodeAllDayDescription'][0],
+                  periods: absence.Periods[0].Period.map(
+                    (period) =>
+                      ({
+                        period: Number(period['@_Number'][0]),
+                        name: period['@_Name'][0],
+                        reason: period['@_Reason'][0],
+                        course: period['@_Course'][0],
+                        staff: {
+                          name: period['@_Staff'][0],
+                          staffGu: period['@_StaffGU'][0],
+                          email: period['@_StaffEMail'][0],
+                        },
+                        orgYearGu: period['@_OrgYearGU'][0],
+                      } as AbsentPeriod)
+                  ),
+                }))
+              : [],
             periodInfos: xmlObject.TotalActivities[0].PeriodTotal.map((pd, i) => ({
               period: Number(pd['@_Number'][0]),
               total: {
