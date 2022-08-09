@@ -17,6 +17,7 @@ import RequestException from '../StudentVue/RequestException/RequestException';
 import { SchoolDistrict } from '../StudentVue/StudentVue.interfaces';
 import url from 'url';
 import readable from '../utils/readable';
+import 'jest-extended';
 import { expectTypeOf } from 'expect-type';
 import Message from '../StudentVue/Message/Message';
 jest.setTimeout(60000);
@@ -291,24 +292,27 @@ describe('Gradebook', () => {
 describe('Attendance', () => {
   it('properties match type', () => {
     expect(attendance).toStrictEqual<Attendance>({
-      absences: expect.arrayContaining<Absence>([
-        {
-          date: expect.any(Date),
-          description: expect.any(String),
-          note: expect.any(String),
-          periods: expect.arrayContaining<AbsentPeriod>([
-            {
-              course: expect.any(String),
-              name: expect.any(String),
-              orgYearGu: expect.any(String),
-              period: expect.any(Number),
-              reason: expect.any(String),
-              staff: { email: expect.any(String), name: expect.any(String), staffGu: expect.any(String) },
-            },
-          ]),
-          reason: expect.any(String),
-        },
-      ]),
+      absences: expect.toBeOneOf([
+        expect.toBeArrayOfSize(0),
+        expect.arrayContaining<Absence>([
+          {
+            date: expect.any(Date),
+            description: expect.any(String),
+            note: expect.any(String),
+            periods: expect.arrayContaining<AbsentPeriod>([
+              {
+                course: expect.any(String),
+                name: expect.any(String),
+                orgYearGu: expect.any(String),
+                period: expect.any(Number),
+                reason: expect.any(String),
+                staff: { email: expect.any(String), name: expect.any(String), staffGu: expect.any(String) },
+              },
+            ]),
+            reason: expect.any(String),
+          },
+        ]),
+      ]) as any,
       period: {
         total: expect.any(Number),
         start: expect.any(Number),
