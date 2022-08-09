@@ -8,20 +8,22 @@ import { ReportCardBase64XMLObject, ReportCardsXMLObject } from './ReportCard.xm
  * @class
  * @extends {File<ReportCardFile>}
  */
-export default class ReportCard extends File<ReportCardFile> {
+export default class ReportCard extends File<ReportCardFile | undefined> {
   public readonly date: Date;
 
   public readonly periodName: string;
 
-  protected parseXMLObject(xmlObject: ReportCardBase64XMLObject): ReportCardFile {
-    return {
-      document: {
-        name: xmlObject.DocumentData[0]['@_DocFileName'][0],
-        type: xmlObject.DocumentData[0]['@_DocType'][0],
-      },
-      name: xmlObject.DocumentData[0]['@_FileName'][0],
-      base64: xmlObject.DocumentData[0].Base64Code[0],
-    };
+  protected parseXMLObject(xmlObject: ReportCardBase64XMLObject): ReportCardFile | undefined {
+    if ('DocumentData' in xmlObject)
+      return {
+        document: {
+          name: xmlObject.DocumentData[0]['@_DocFileName'][0],
+          type: xmlObject.DocumentData[0]['@_DocType'][0],
+        },
+        name: xmlObject.DocumentData[0]['@_FileName'][0],
+        base64: xmlObject.DocumentData[0].Base64Code[0],
+      };
+    return undefined;
   }
   public constructor(
     xmlObj: ReportCardsXMLObject['RCReportingPeriodData'][0]['RCReportingPeriods'][0]['RCReportingPeriod'][0],
