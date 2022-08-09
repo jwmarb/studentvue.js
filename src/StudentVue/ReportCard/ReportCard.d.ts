@@ -7,9 +7,9 @@ import { ReportCardBase64XMLObject, ReportCardsXMLObject } from './ReportCard.xm
  * @class
  * @extends {File<ReportCardFile>}
  */
-export default class ReportCard extends File<ReportCardFile> {
+export default class ReportCard extends File<ReportCardFile | undefined> {
     readonly date: Date;
     readonly periodName: string;
-    protected parseXMLObject(xmlObject: ReportCardBase64XMLObject): ReportCardFile;
+    protected parseXMLObject(xmlObject: ReportCardBase64XMLObject): ReportCardFile | undefined;
     constructor(xmlObj: ReportCardsXMLObject['RCReportingPeriodData'][0]['RCReportingPeriods'][0]['RCReportingPeriod'][0], credentials: LoginCredentials);
 }
