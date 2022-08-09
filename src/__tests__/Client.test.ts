@@ -474,8 +474,10 @@ describe('Report Card', () => {
     const reportCard = reportCards[index];
     expectTypeOf(reportCard).toMatchTypeOf<ReportCard>();
     const file = await reportCard.get();
-    expect(file.base64).toMatch(/^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/);
-    expectTypeOf(file).toMatchTypeOf<ReportCardFile>();
+    if (file) {
+      expect(file.base64).toMatch(/^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/);
+      expectTypeOf(file).toMatchTypeOf<ReportCardFile>();
+    }
   });
 });
 
