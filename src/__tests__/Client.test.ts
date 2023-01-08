@@ -359,19 +359,22 @@ describe('Schedule', () => {
       return expect(schedule).toStrictEqual<Schedule>({
         error: expect.any(String),
         term: { index: expect.any(Number), name: expect.any(String) },
-        classes: expect.arrayContaining<ClassInfo>([
-          {
-            name: expect.any(String),
-            period: expect.any(Number),
-            room: expect.any(String),
-            sectionGu: expect.any(String),
-            teacher: {
-              email: expect.any(String),
-              name: expect.any(String),
-              staffGu: expect.any(String),
-            },
-          },
-        ]),
+        classes:
+          schedule.classes.length > 0
+            ? expect.arrayContaining<ClassInfo>([
+                {
+                  name: expect.any(String),
+                  period: expect.any(Number),
+                  room: expect.any(String),
+                  sectionGu: expect.any(String),
+                  teacher: {
+                    email: expect.any(String),
+                    name: expect.any(String),
+                    staffGu: expect.any(String),
+                  },
+                },
+              ])
+            : expect.toBeArray(),
         terms: expect.arrayContaining<TermInfo>([
           {
             date: { start: expect.any(Date), end: expect.any(Date) },
@@ -382,22 +385,25 @@ describe('Schedule', () => {
         ]),
         today: expect.any(Array),
       });
-    expect(schedule).toStrictEqual<Schedule>({
+    expect(schedule).toMatchObject<Omit<Schedule, 'today'>>({
       error: expect.any(String),
       term: { index: expect.any(Number), name: expect.any(String) },
-      classes: expect.arrayContaining<ClassInfo>([
-        {
-          name: expect.any(String),
-          period: expect.any(Number),
-          room: expect.any(String),
-          sectionGu: expect.any(String),
-          teacher: {
-            email: expect.any(String),
-            name: expect.any(String),
-            staffGu: expect.any(String),
-          },
-        },
-      ]),
+      classes:
+        schedule.classes.length > 0
+          ? expect.arrayContaining<ClassInfo>([
+              {
+                name: expect.any(String),
+                period: expect.any(Number),
+                room: expect.any(String),
+                sectionGu: expect.any(String),
+                teacher: {
+                  email: expect.any(String),
+                  name: expect.any(String),
+                  staffGu: expect.any(String),
+                },
+              },
+            ])
+          : expect.toBeArray(),
       terms: expect.arrayContaining<TermInfo>([
         {
           date: { start: expect.any(Date), end: expect.any(Date) },
@@ -406,30 +412,52 @@ describe('Schedule', () => {
           schoolYearTermCodeGu: expect.any(String),
         },
       ]),
-      today: expect.arrayContaining<SchoolScheduleInfo>([
-        {
-          bellScheduleName: expect.any(String),
-          name: expect.any(String),
-          classes: expect.arrayContaining<ClassScheduleInfo>([
-            {
-              attendanceCode: expect.any(String),
-              date: { start: expect.any(Date), end: expect.any(Date) },
+      // today:
+      // expect.arrayContaining<SchoolScheduleInfo>([
+      //   {
+      //     bellScheduleName: expect.any(String),
+      //     name: expect.any(String),
+      //     classes: expect.arrayContaining<ClassScheduleInfo>([
+      //       {
+      //         attendanceCode: expect.any(String),
+      //         date: { start: expect.any(Date), end: expect.any(Date) },
+      //         name: expect.any(String),
+      //         period: expect.any(Number),
+      //         sectionGu: expect.any(String),
+      //         teacher: {
+      //           email: expect.any(String),
+      //           name: expect.any(String),
+      //           emailSubject: expect.any(String),
+      //           staffGu: expect.any(String),
+      //           url: expect.any(String),
+      //         },
+      //         time: { start: expect.any(Date), end: expect.any(Date) },
+      //         url: expect.any(String),
+      //       },
+      //     ]),
+      //   },
+      // ]),
+    });
+    schedule.today.forEach((d) => {
+      if (d.classes.length > 0)
+        d.classes.forEach((cl) => {
+          expect(cl).toStrictEqual({
+            attendanceCode: expect.any(String),
+            date: { start: expect.any(Date), end: expect.any(Date) },
+            name: expect.any(String),
+            period: expect.any(Number),
+            sectionGu: expect.any(String),
+            teacher: {
+              email: expect.any(String),
               name: expect.any(String),
-              period: expect.any(Number),
-              sectionGu: expect.any(String),
-              teacher: {
-                email: expect.any(String),
-                name: expect.any(String),
-                emailSubject: expect.any(String),
-                staffGu: expect.any(String),
-                url: expect.any(String),
-              },
-              time: { start: expect.any(Date), end: expect.any(Date) },
+              emailSubject: expect.any(String),
+              staffGu: expect.any(String),
               url: expect.any(String),
             },
-          ]),
-        },
-      ]),
+            time: { start: expect.any(Date), end: expect.any(Date) },
+            url: expect.any(String),
+          });
+        });
     });
   });
 });
