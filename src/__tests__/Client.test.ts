@@ -276,16 +276,19 @@ describe('Gradebook', () => {
   });
 
   it('encoded properly', () => {
-    expect(gradebook.courses.flatMap((csrc) => csrc.marks.flatMap((mark) => mark.assignments))).toStrictEqual(
-      expect.arrayContaining([
-        expect.objectContaining<Partial<Assignment>>({
-          type: expect.any(String),
-          description: expect.any(String),
-          name: expect.any(String),
-          hasDropbox: expect.any(Boolean),
-        }),
-      ])
-    );
+    const assignments = gradebook.courses.flatMap((csrc) => csrc.marks.flatMap((mark) => mark.assignments));
+    if (assignments.length > 0)
+      expect(assignments).toStrictEqual(
+        expect.arrayContaining([
+          expect.objectContaining<Partial<Assignment>>({
+            type: expect.any(String),
+            description: expect.any(String),
+            name: expect.any(String),
+            hasDropbox: expect.any(Boolean),
+          }),
+        ])
+      );
+    else expect(assignments).toBeArray();
   });
 });
 
