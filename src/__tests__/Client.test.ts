@@ -63,51 +63,45 @@ let schoolInfo: SchoolInfo;
 let resources: (URLResource | FileResource)[];
 let studentInfo: StudentInfo;
 
-beforeAll(() => {
-  return StudentVue.login(credentials.district, {
+beforeAll(async () => {
+  const session = await StudentVue.login(credentials.district, {
     username: credentials.username,
     password: credentials.password,
-  })
-    .then((session) => {
-      return Promise.all([
-        session,
-        session.messages(),
-        session.calendar(),
-        session.gradebook(),
-        session.attendance(),
-        session.reportCards(),
-        session.documents(),
-        session.schoolInfo(),
-        session.studentInfo(),
-      ]);
-    })
-    .then(
-      ([
-        session,
-        _messages,
-        _calendar,
-        _gradebook,
-        _attendance,
-        _reportCards,
-        _documents,
-        _schoolInfo,
-        _studentInfo,
-      ]) => {
-        studentInfo = _studentInfo;
-        calendar = _calendar;
-        client = session;
-        gradebook = _gradebook;
-        messages = _messages;
-        attendance = _attendance;
-        reportCards = _reportCards;
-        documents = _documents;
-        schoolInfo = _schoolInfo;
-        resources = gradebook.courses
-          .map((course) => course.marks.map((mark) => mark.assignments.map((assignment) => assignment.resources)))
-          .flat(4);
-        client = session;
-      }
-    );
+  });
+  const [
+    session_1,
+    _messages,
+    _calendar,
+    _gradebook,
+    _attendance,
+    _reportCards,
+    _documents,
+    _schoolInfo,
+    _studentInfo,
+  ] = await Promise.all([
+    session,
+    session.messages(),
+    session.calendar(),
+    session.gradebook(),
+    session.attendance(),
+    session.reportCards(),
+    session.documents(),
+    session.schoolInfo(),
+    session.studentInfo(),
+  ]);
+  studentInfo = _studentInfo;
+  calendar = _calendar;
+  client = session_1;
+  gradebook = _gradebook;
+  messages = _messages;
+  attendance = _attendance;
+  reportCards = _reportCards;
+  documents = _documents;
+  schoolInfo = _schoolInfo;
+  resources = gradebook.courses
+    .map((course) => course.marks.map((mark) => mark.assignments.map((assignment) => assignment.resources)))
+    .flat(4);
+  client = session_1;
 });
 
 describe('StudentInfo', () => {
