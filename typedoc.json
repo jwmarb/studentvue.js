@@ -1,0 +1,18 @@
+{
+  "exclude": ["**/*.xml.d.ts", "./src/StudentVue/Client/Interfaces/xml/**"],
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "entryPoints": ["./src/StudentVue", "./src/Constants"],
+  "includes": "./tutorials",
+  "out": "docs",
+  "name": "StudentVUE.js",
+  "entryPointStrategy": "expand",
+  "pluginPages": {
+    "pages": [
+      {
+        "title": "Getting Started",
+        "source": "getting-started.md"
+      }
+    ]
+  }
+}
