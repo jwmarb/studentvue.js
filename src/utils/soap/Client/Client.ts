@@ -73,7 +73,10 @@ export default class Client {
 </soap:Envelope>
    * ```
    */
-  protected processRequest<T>(options: RequestOptions, preparse: (xml: string) => string = (xml) => xml): Promise<T> {
+  protected processRequest<T extends object | undefined>(
+    options: RequestOptions,
+    preparse: (xml: string) => string = (xml) => xml
+  ): Promise<T> {
     const defaultOptions: RequestOptions = {
       validateErrors: true,
       skipLoginLog: 0,
@@ -124,7 +127,8 @@ export default class Client {
             )
           );
 
-          if (defaultOptions.validateErrors && 'RT_ERROR' in obj) return reject(new RequestException(obj));
+          if (defaultOptions.validateErrors && typeof obj === 'object' && 'RT_ERROR' in obj)
+            return reject(new RequestException(obj));
 
           res(obj as T);
         })
@@ -143,7 +147,7 @@ export default class Client {
     return xml;
   }
 
-  public static processAnonymousRequest<T>(
+  public static processAnonymousRequest<T extends object | undefined>(
     url: string,
     options: Partial<RequestOptions> = {},
     preparse: (xml: string) => string = (d) => d.replace(/&gt;/g, '>').replace(/&lt;/g, '<')
@@ -193,7 +197,8 @@ export default class Client {
             )
           );
 
-          if (defaultOptions.validateErrors && 'RT_ERROR' in obj) return reject(new RequestException(obj));
+          if (defaultOptions.validateErrors && typeof obj === 'object' && 'RT_ERROR' in obj)
+            return reject(new RequestException(obj));
 
           res(obj as T);
         })

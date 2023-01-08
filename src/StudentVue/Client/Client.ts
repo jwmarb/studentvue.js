@@ -26,6 +26,18 @@ import RequestException from '../RequestException/RequestException';
 import XMLFactory from '../../utils/XMLFactory/XMLFactory';
 import cache from '../../utils/cache/cache';
 
+async function asyncPoolAll<IN, OUT>(
+  poolLimit: number,
+  array: readonly IN[],
+  iteratorFn: (generator: IN) => Promise<OUT>
+) {
+  const results = [];
+  for await (const result of asyncPool(poolLimit, array, iteratorFn)) {
+    results.push(result);
+  }
+  return results;
+}
+
 /**
  * The StudentVUE Client to access the API
  * @constructor
@@ -523,46 +535,46 @@ export default class Client extends soap.Client {
           res({
             student: {
               name: xmlObjectData.StudentInfo[0].FormattedName[0],
-              lastName: xmlObjectData.StudentInfo[0].Address[0].LastNameGoesBy[0],
-              nickname: xmlObjectData.StudentInfo[0].Address[0].NickName[0],
+              lastName: xmlObjectData.StudentInfo[0].LastNameGoesBy[0],
+              nickname: xmlObjectData.StudentInfo[0].NickName[0],
             },
-            birthDate: new Date(xmlObjectData.StudentInfo[0].Address[0].BirthDate[0]),
-            track: this.optional(xmlObjectData.StudentInfo[0].Address[0].Track),
-            address: this.optional(xmlObjectData.StudentInfo[0].Address[0].br),
-            photo: this.optional(xmlObjectData.StudentInfo[0].Address[0].Photo),
+            birthDate: new Date(xmlObjectData.StudentInfo[0].BirthDate[0]),
+            track: this.optional(xmlObjectData.StudentInfo[0].Track),
+            address: this.optional(xmlObjectData.StudentInfo[0].Address),
+            photo: this.optional(xmlObjectData.StudentInfo[0].Photo),
             counselor:
-              xmlObjectData.StudentInfo[0].Address[0].CounselorName &&
-              xmlObjectData.StudentInfo[0].Address[0].CounselorEmail &&
-              xmlObjectData.StudentInfo[0].Address[0].CounselorStaffGU
+              xmlObjectData.StudentInfo[0].CounselorName &&
+              xmlObjectData.StudentInfo[0].CounselorEmail &&
+              xmlObjectData.StudentInfo[0].CounselorStaffGU
                 ? {
-                    name: xmlObjectData.StudentInfo[0].Address[0].CounselorName[0],
-                    email: xmlObjectData.StudentInfo[0].Address[0].CounselorEmail[0],
-                    staffGu: xmlObjectData.StudentInfo[0].Address[0].CounselorStaffGU[0],
+                    name: xmlObjectData.StudentInfo[0].CounselorName[0],
+                    email: xmlObjectData.StudentInfo[0].CounselorEmail[0],
+                    staffGu: xmlObjectData.StudentInfo[0].CounselorStaffGU[0],
                   }
                 : undefined,
-            currentSchool: xmlObjectData.StudentInfo[0].Address[0].CurrentSchool[0],
-            dentist: xmlObjectData.StudentInfo[0].Address[0].Dentist
+            currentSchool: xmlObjectData.StudentInfo[0].CurrentSchool[0],
+            dentist: xmlObjectData.StudentInfo[0].Dentist
               ? {
-                  name: xmlObjectData.StudentInfo[0].Address[0].Dentist[0]['@_Name'][0],
-                  phone: xmlObjectData.StudentInfo[0].Address[0].Dentist[0]['@_Phone'][0],
-                  extn: xmlObjectData.StudentInfo[0].Address[0].Dentist[0]['@_Extn'][0],
-                  office: xmlObjectData.StudentInfo[0].Address[0].Dentist[0]['@_Office'][0],
+                  name: xmlObjectData.StudentInfo[0].Dentist[0]['@_Name'][0],
+                  phone: xmlObjectData.StudentInfo[0].Dentist[0]['@_Phone'][0],
+                  extn: xmlObjectData.StudentInfo[0].Dentist[0]['@_Extn'][0],
+                  office: xmlObjectData.StudentInfo[0].Dentist[0]['@_Office'][0],
                 }
               : undefined,
-            physician: xmlObjectData.StudentInfo[0].Address[0].Physician
+            physician: xmlObjectData.StudentInfo[0].Physician
               ? {
-                  name: xmlObjectData.StudentInfo[0].Address[0].Physician[0]['@_Name'][0],
-                  phone: xmlObjectData.StudentInfo[0].Address[0].Physician[0]['@_Phone'][0],
-                  extn: xmlObjectData.StudentInfo[0].Address[0].Physician[0]['@_Extn'][0],
-                  hospital: xmlObjectData.StudentInfo[0].Address[0].Physician[0]['@_Hospital'][0],
+                  name: xmlObjectData.StudentInfo[0].Physician[0]['@_Name'][0],
+                  phone: xmlObjectData.StudentInfo[0].Physician[0]['@_Phone'][0],
+                  extn: xmlObjectData.StudentInfo[0].Physician[0]['@_Extn'][0],
+                  hospital: xmlObjectData.StudentInfo[0].Physician[0]['@_Hospital'][0],
                 }
               : undefined,
             id: this.optional(xmlObjectData.StudentInfo[0].PermID),
-            orgYearGu: this.optional(xmlObjectData.StudentInfo[0].Address[0].OrgYearGU),
-            phone: this.optional(xmlObjectData.StudentInfo[0].Address[0].Phone),
-            email: this.optional(xmlObjectData.StudentInfo[0].Address[0].EMail),
-            emergencyContacts: xmlObjectData.StudentInfo[0].Address[0].EmergencyContacts
-              ? xmlObjectData.StudentInfo[0].Address[0].EmergencyContacts[0].EmergencyContact.map((contact) => ({
+            orgYearGu: this.optional(xmlObjectData.StudentInfo[0].OrgYearGU),
+            phone: this.optional(xmlObjectData.StudentInfo[0].Phone),
+            email: this.optional(xmlObjectData.StudentInfo[0].EMail),
+            emergencyContacts: xmlObjectData.StudentInfo[0].EmergencyContacts
+              ? xmlObjectData.StudentInfo[0].EmergencyContacts[0].EmergencyContact.map((contact) => ({
                   name: this.optional(contact['@_Name']),
                   phone: {
                     home: this.optional(contact['@_HomePhone']),
@@ -576,30 +588,28 @@ export default class Client extends soap.Client {
             gender: this.optional(xmlObjectData.StudentInfo[0].Gender),
             grade: this.optional(xmlObjectData.StudentInfo[0].Grade),
             lockerInfoRecords: this.optional(xmlObjectData.StudentInfo[0].LockerInfoRecords),
-            homeLanguage: this.optional(xmlObjectData.StudentInfo[0].Address[0].HomeLanguage),
-            homeRoom: this.optional(xmlObjectData.StudentInfo[0].Address[0].HomeRoom),
+            homeLanguage: this.optional(xmlObjectData.StudentInfo[0].HomeLanguage),
+            homeRoom: this.optional(xmlObjectData.StudentInfo[0].HomeRoom),
             homeRoomTeacher: {
-              email: this.optional(xmlObjectData.StudentInfo[0].Address[0].HomeRoomTchEMail),
-              name: this.optional(xmlObjectData.StudentInfo[0].Address[0].HomeRoomTch),
-              staffGu: this.optional(xmlObjectData.StudentInfo[0].Address[0].HomeRoomTchStaffGU),
+              email: this.optional(xmlObjectData.StudentInfo[0].HomeRoomTchEMail),
+              name: this.optional(xmlObjectData.StudentInfo[0].HomeRoomTch),
+              staffGu: this.optional(xmlObjectData.StudentInfo[0].HomeRoomTchStaffGU),
             },
-            additionalInfo: xmlObjectData.StudentInfo[0].Address[0].UserDefinedGroupBoxes[0].UserDefinedGroupBox
-              ? (xmlObjectData.StudentInfo[0].Address[0].UserDefinedGroupBoxes[0].UserDefinedGroupBox.map(
-                  (definedBox) => ({
-                    id: definedBox['@_GroupBoxID'][0],
-                    type: definedBox['@_GroupBoxLabel'][0],
-                    vcId: definedBox['@_VCID'][0],
-                    items: definedBox.UserDefinedItems[0].UserDefinedItem.map((item) => ({
-                      source: {
-                        element: item['@_SourceElement'][0],
-                        object: item['@_SourceObject'][0],
-                      },
-                      vcId: item['@_VCID'][0],
-                      value: item['@_Value'][0],
-                      type: item['@_ItemType'][0],
-                    })) as AdditionalInfoItem[],
-                  })
-                ) as AdditionalInfo[])
+            additionalInfo: xmlObjectData.StudentInfo[0].UserDefinedGroupBoxes[0].UserDefinedGroupBox
+              ? (xmlObjectData.StudentInfo[0].UserDefinedGroupBoxes[0].UserDefinedGroupBox.map((definedBox) => ({
+                  id: definedBox['@_GroupBoxID'][0],
+                  type: definedBox['@_GroupBoxLabel'][0],
+                  vcId: definedBox['@_VCID'][0],
+                  items: definedBox.UserDefinedItems[0].UserDefinedItem.map((item) => ({
+                    source: {
+                      element: item['@_SourceElement'][0],
+                      object: item['@_SourceObject'][0],
+                    },
+                    vcId: item['@_VCID'][0],
+                    value: item['@_Value'][0],
+                    type: item['@_ItemType'][0],
+                  })) as AdditionalInfoItem[],
+                })) as AdditionalInfo[])
               : [],
           } as StudentInfo);
         })
@@ -649,7 +659,7 @@ export default class Client extends soap.Client {
       const getAllEventsWithinSchoolYear = (): Promise<CalendarXMLObject[]> =>
         defaultOptions.concurrency == null
           ? Promise.all(monthsWithinSchoolYear.map((date) => this.fetchEventsWithinInterval(date)))
-          : asyncPool(defaultOptions.concurrency, monthsWithinSchoolYear, (date) =>
+          : asyncPoolAll(defaultOptions.concurrency, monthsWithinSchoolYear, (date) =>
               this.fetchEventsWithinInterval(date)
             );
       let memo: Calendar | null = null;
