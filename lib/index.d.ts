@@ -2010,8 +2010,8 @@ declare module 'studentvue/utils/soap/Client/Client' {
       </soap:Envelope>
           * ```
           */
-        protected processRequest<T>(options: RequestOptions, preparse?: (xml: string) => string): Promise<T>;
-        static processAnonymousRequest<T>(url: string, options?: Partial<RequestOptions>, preparse?: (xml: string) => string): Promise<T>;
+        protected processRequest<T extends object | undefined>(options: RequestOptions, preparse?: (xml: string) => string): Promise<T>;
+        static processAnonymousRequest<T extends object | undefined>(url: string, options?: Partial<RequestOptions>, preparse?: (xml: string) => string): Promise<T>;
     }
 }
 
