@@ -187,42 +187,48 @@ export default class Client extends soap.Client {
                     (school) => ({
                       name: school['@_SchoolName'][0],
                       bellScheduleName: school['@_BellSchedName'][0],
-                      classes: school.Classes[0].ClassInfo.map<ClassScheduleInfo>((course) => ({
-                        period: Number(course['@_Period'][0]),
-                        attendanceCode: course.AttendanceCode[0],
-                        date: {
-                          start: new Date(course['@_StartDate'][0]),
-                          end: new Date(course['@_EndDate'][0]),
-                        },
-                        name: course['@_ClassName'][0],
-                        sectionGu: course['@_SectionGU'][0],
-                        teacher: {
-                          email: course['@_TeacherEmail'][0],
-                          emailSubject: course['@_EmailSubject'][0],
-                          name: course['@_TeacherName'][0],
-                          staffGu: course['@_StaffGU'][0],
-                          url: course['@_TeacherURL'][0],
-                        },
-                        url: course['@_ClassURL'][0],
-                        time: {
-                          start: parse(course['@_StartTime'][0], 'hh:mm a', Date.now()),
-                          end: parse(course['@_EndTime'][0], 'hh:mm a', Date.now()),
-                        },
-                      })),
+                      classes:
+                        typeof school.Classes[0] !== 'string'
+                          ? school.Classes[0].ClassInfo.map<ClassScheduleInfo>((course) => ({
+                              period: Number(course['@_Period'][0]),
+                              attendanceCode: course.AttendanceCode[0],
+                              date: {
+                                start: new Date(course['@_StartDate'][0]),
+                                end: new Date(course['@_EndDate'][0]),
+                              },
+                              name: course['@_ClassName'][0],
+                              sectionGu: course['@_SectionGU'][0],
+                              teacher: {
+                                email: course['@_TeacherEmail'][0],
+                                emailSubject: course['@_EmailSubject'][0],
+                                name: course['@_TeacherName'][0],
+                                staffGu: course['@_StaffGU'][0],
+                                url: course['@_TeacherURL'][0],
+                              },
+                              url: course['@_ClassURL'][0],
+                              time: {
+                                start: parse(course['@_StartTime'][0], 'hh:mm a', Date.now()),
+                                end: parse(course['@_EndTime'][0], 'hh:mm a', Date.now()),
+                              },
+                            }))
+                          : [],
                     })
                   )
                 : [],
-            classes: xmlObject.StudentClassSchedule[0].ClassLists[0].ClassListing.map((studentClass) => ({
-              name: studentClass['@_CourseTitle'][0],
-              period: Number(studentClass['@_Period'][0]),
-              room: studentClass['@_RoomName'][0],
-              sectionGu: studentClass['@_SectionGU'][0],
-              teacher: {
-                name: studentClass['@_Teacher'][0],
-                email: studentClass['@_TeacherEmail'][0],
-                staffGu: studentClass['@_TeacherStaffGU'][0],
-              },
-            })),
+            classes:
+              typeof xmlObject.StudentClassSchedule[0].ClassLists[0] !== 'string'
+                ? xmlObject.StudentClassSchedule[0].ClassLists[0].ClassListing.map((studentClass) => ({
+                    name: studentClass['@_CourseTitle'][0],
+                    period: Number(studentClass['@_Period'][0]),
+                    room: studentClass['@_RoomName'][0],
+                    sectionGu: studentClass['@_SectionGU'][0],
+                    teacher: {
+                      name: studentClass['@_Teacher'][0],
+                      email: studentClass['@_TeacherEmail'][0],
+                      staffGu: studentClass['@_TeacherStaffGU'][0],
+                    },
+                  }))
+                : [],
             terms: xmlObject.StudentClassSchedule[0].TermLists[0].TermListing.map((term) => ({
               date: {
                 start: new Date(term['@_BeginDate'][0]),
