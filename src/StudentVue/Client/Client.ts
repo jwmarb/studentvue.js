@@ -12,7 +12,6 @@ import { AttendanceXMLObject } from './Interfaces/xml/Attendance';
 import EventType from '../../Constants/EventType';
 import _ from 'lodash';
 import { Assignment, FileResource, Gradebook, Mark, URLResource, WeightedCategory } from './Interfaces/Gradebook';
-import asyncPool from 'tiny-async-pool';
 import ResourceType from '../../Constants/ResourceType';
 import { AbsentPeriod, Attendance, PeriodInfo } from './Interfaces/Attendance';
 import { ScheduleXMLObject } from './Interfaces/xml/Schedule';
@@ -25,18 +24,7 @@ import Document from '../Document/Document';
 import RequestException from '../RequestException/RequestException';
 import XMLFactory from '../../utils/XMLFactory/XMLFactory';
 import cache from '../../utils/cache/cache';
-
-async function asyncPoolAll<IN, OUT>(
-  poolLimit: number,
-  array: readonly IN[],
-  iteratorFn: (generator: IN) => Promise<OUT>
-) {
-  const results = [];
-  for await (const result of asyncPool(poolLimit, array, iteratorFn)) {
-    results.push(result);
-  }
-  return results;
-}
+import { optional, asyncPoolAll } from './Client.helpers';
 
 /**
  * The StudentVUE Client to access the API
@@ -539,9 +527,9 @@ export default class Client extends soap.Client {
               nickname: xmlObjectData.StudentInfo[0].NickName[0],
             },
             birthDate: new Date(xmlObjectData.StudentInfo[0].BirthDate[0]),
-            track: this.optional(xmlObjectData.StudentInfo[0].Track),
-            address: this.optional(xmlObjectData.StudentInfo[0].Address),
-            photo: this.optional(xmlObjectData.StudentInfo[0].Photo),
+            track: optional(xmlObjectData.StudentInfo[0].Track),
+            address: optional(xmlObjectData.StudentInfo[0].Address),
+            photo: optional(xmlObjectData.StudentInfo[0].Photo),
             counselor:
               xmlObjectData.StudentInfo[0].CounselorName &&
               xmlObjectData.StudentInfo[0].CounselorEmail &&
@@ -569,37 +557,37 @@ export default class Client extends soap.Client {
                   hospital: xmlObjectData.StudentInfo[0].Physician[0]['@_Hospital'][0],
                 }
               : undefined,
-            id: this.optional(xmlObjectData.StudentInfo[0].PermID),
-            orgYearGu: this.optional(xmlObjectData.StudentInfo[0].OrgYearGU),
-            phone: this.optional(xmlObjectData.StudentInfo[0].Phone),
-            email: this.optional(xmlObjectData.StudentInfo[0].EMail),
+            id: optional(xmlObjectData.StudentInfo[0].PermID),
+            orgYearGu: optional(xmlObjectData.StudentInfo[0].OrgYearGU),
+            phone: optional(xmlObjectData.StudentInfo[0].Phone),
+            email: optional(xmlObjectData.StudentInfo[0].EMail),
             emergencyContacts: xmlObjectData.StudentInfo[0].EmergencyContacts
               ? xmlObjectData.StudentInfo[0].EmergencyContacts[0].EmergencyContact.map((contact) => ({
-                  name: this.optional(contact['@_Name']),
+                  name: optional(contact['@_Name']),
                   phone: {
-                    home: this.optional(contact['@_HomePhone']),
-                    mobile: this.optional(contact['@_MobilePhone']),
-                    other: this.optional(contact['@_OtherPhone']),
-                    work: this.optional(contact['@_WorkPhone']),
+                    home: optional(contact['@_HomePhone']),
+                    mobile: optional(contact['@_MobilePhone']),
+                    other: optional(contact['@_OtherPhone']),
+                    work: optional(contact['@_WorkPhone']),
                   },
-                  relationship: this.optional(contact['@_Relationship']),
+                  relationship: optional(contact['@_Relationship']),
                 }))
               : [],
-            gender: this.optional(xmlObjectData.StudentInfo[0].Gender),
-            grade: this.optional(xmlObjectData.StudentInfo[0].Grade),
-            lockerInfoRecords: this.optional(xmlObjectData.StudentInfo[0].LockerInfoRecords),
-            homeLanguage: this.optional(xmlObjectData.StudentInfo[0].HomeLanguage),
-            homeRoom: this.optional(xmlObjectData.StudentInfo[0].HomeRoom),
+            gender: optional(xmlObjectData.StudentInfo[0].Gender),
+            grade: optional(xmlObjectData.StudentInfo[0].Grade),
+            lockerInfoRecords: optional(xmlObjectData.StudentInfo[0].LockerInfoRecords),
+            homeLanguage: optional(xmlObjectData.StudentInfo[0].HomeLanguage),
+            homeRoom: optional(xmlObjectData.StudentInfo[0].HomeRoom),
             homeRoomTeacher: {
-              email: this.optional(xmlObjectData.StudentInfo[0].HomeRoomTchEMail),
-              name: this.optional(xmlObjectData.StudentInfo[0].HomeRoomTch),
-              staffGu: this.optional(xmlObjectData.StudentInfo[0].HomeRoomTchStaffGU),
+              email: optional(xmlObjectData.StudentInfo[0].HomeRoomTchEMail),
+              name: optional(xmlObjectData.StudentInfo[0].HomeRoomTch),
+              staffGu: optional(xmlObjectData.StudentInfo[0].HomeRoomTchStaffGU),
             },
             additionalInfo: xmlObjectData.StudentInfo[0].UserDefinedGroupBoxes[0].UserDefinedGroupBox
               ? (xmlObjectData.StudentInfo[0].UserDefinedGroupBoxes[0].UserDefinedGroupBox.map((definedBox) => ({
-                id: this.optional(definedBox['@_GroupBoxID']), // string | undefined
-                type: definedBox['@_GroupBoxLabel'][0], // string
-                vcId: this.optional(definedBox['@_VCID']), // string | undefined
+                  id: optional(definedBox['@_GroupBoxID']), // string | undefined
+                  type: definedBox['@_GroupBoxLabel'][0], // string
+                  vcId: optional(definedBox['@_VCID']), // string | undefined
                   items: definedBox.UserDefinedItems[0].UserDefinedItem.map((item) => ({
                     source: {
                       element: item['@_SourceElement'][0],
@@ -625,10 +613,6 @@ export default class Client extends soap.Client {
       },
       (xml) => new XMLFactory(xml).encodeAttribute('Title', 'Icon').toString()
     );
-  }
-
-  private optional<T>(xmlArr?: T[]): T | undefined {
-    return xmlArr ? xmlArr[0] : undefined;
   }
 
   /**
