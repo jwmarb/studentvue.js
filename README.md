@@ -10,7 +10,7 @@ StudentVUE is a tool for students to` access classroom information from their in
 
 ## Disclaimer
 
-Some methods will throw an erorr because some properties may be county-specific (See https://github.com/EGGaming/studentvue.js/pull/4). If you encounter a method that does not work, please [open an issue](https://github.com/EGGaming/studentvue.js/issues) or [create a pull request](https://github.com/EGGaming/studentvue.js/pulls) fixing your issue. (See [CONTRIBUTING](/CONTRIBUTING.md))
+Some methods will throw an error because some properties may be county-specific (See https://github.com/EGGaming/studentvue.js/pull/4). If you encounter a method that does not work, please [open an issue](https://github.com/EGGaming/studentvue.js/issues) or [create a pull request](https://github.com/EGGaming/studentvue.js/pulls) fixing your issue. (See [CONTRIBUTING](/CONTRIBUTING.md))
 
 ## Installation
 
