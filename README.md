@@ -20,6 +20,12 @@ Some methods will throw an erorr because some properties may be county-specific 
 npm install studentvue
 ```
 
+### yarn
+
+```sh
+yarn add studentvue
+```
+
 ---
 
 ## Usage
