@@ -4,7 +4,7 @@
 
 [Documentation](https://eggaming.github.io/studentvue.js/)
 
-StudentVUE is a tool for students to` access classroom information from their institution or district. It uses a [SOAP](https://en.wikipedia.org/wiki/SOAP) API, sending data in the form of XML. But, to access XML as usable data, it must be parsed which can be a tedious process. Thus, this library was created to let you use StudentVUE's API without needing to worry about parsing XML.
+StudentVUE is a tool for students to access classroom information from their institution or district. It uses a [SOAP](https://en.wikipedia.org/wiki/SOAP) API, sending data in the form of XML. But, to access XML as usable data, it must be parsed which can be a tedious process. Thus, this library was created to let you use StudentVUE's API without needing to worry about parsing XML.
 
 ---
 
