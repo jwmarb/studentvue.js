@@ -109,7 +109,6 @@ export default class Client extends soap.Client {
      */
     studentInfo(): Promise<StudentInfo>;
     private fetchEventsWithinInterval;
-    private optional;
     /**
      *
      * @param {CalendarOptions} options Options to provide for calendar method. An interval is required.
