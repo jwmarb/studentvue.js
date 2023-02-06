@@ -18,8 +18,13 @@
 </a>
 <p><a href="https://github.com/EGGaming/studentvue.js/blob/main/LICENSE"><img src="https://img.shields.io/github/license/EGGaming/studentvue.js" alt="license"></a> <a href="https://www.npmjs.com/package/studentvue"><img src="https://img.shields.io/npm/v/studentvue" alt="npm package"></a></p>
 <p><a href="https://eggaming.github.io/studentvue.js/">Documentation</a></p>
-<p>StudentVUE is a tool for students to access classroom information from their institution or district. It uses a <a href="https://en.wikipedia.org/wiki/SOAP">SOAP</a> API, sending data in the form of XML. But, to access XML as usable data, it must be parsed which can be a tedious process. Thus, this library was created to let you use StudentVUE&#39;s API without needing to worry about parsing XML.</p>
+<p>StudentVUE is a tool for students to` access classroom information from their institution or district. It uses a <a href="https://en.wikipedia.org/wiki/SOAP">SOAP</a> API, sending data in the form of XML. But, to access XML as usable data, it must be parsed which can be a tedious process. Thus, this library was created to let you use StudentVUE&#39;s API without needing to worry about parsing XML.</p>
 <hr>
+
+<a href="#disclaimer" id="disclaimer" style="color: inherit; text-decoration: none;">
+  <h2>Disclaimer</h2>
+</a>
+<p>Some methods will throw an erorr because some properties may be county-specific (See <a href="https://github.com/EGGaming/studentvue.js/pull/4">https://github.com/EGGaming/studentvue.js/pull/4</a>). If you encounter a method that does not work, please <a href="https://github.com/EGGaming/studentvue.js/issues">open an issue</a> or <a href="https://github.com/EGGaming/studentvue.js/pulls">create a pull request</a> fixing your issue. (See <a href="/CONTRIBUTING.md">CONTRIBUTING</a>)</p>
 
 <a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
   <h2>Installation</h2>
@@ -29,6 +34,12 @@
   <h3>npm</h3>
 </a>
 <pre><code class="language-sh"><span class="hl-0">npm </span><span class="hl-1">install</span><span class="hl-0"> </span><span class="hl-1">studentvue</span>
+</code></pre>
+
+<a href="#yarn" id="yarn" style="color: inherit; text-decoration: none;">
+  <h3>yarn</h3>
+</a>
+<pre><code class="language-sh"><span class="hl-0">yarn </span><span class="hl-1">add</span><span class="hl-0"> </span><span class="hl-1">studentvue</span>
 </code></pre>
 <hr>
 
@@ -40,6 +51,11 @@
 </code></pre>
 <p>Once we are logged in, we can access any method within the API. Refer to <a href="https://eggaming.github.io/studentvue.js/Client.html">Client</a> documentation to see valid methods</p>
 <p>--</p>
+
+<a href="#contributing" id="contributing" style="color: inherit; text-decoration: none;">
+  <h2>Contributing</h2>
+</a>
+<p>See <a href="/CONTRIBUTING.md">CONTRIBUTING</a></p>
 
 <a href="#license" id="license" style="color: inherit; text-decoration: none;">
   <h2>License</h2>
