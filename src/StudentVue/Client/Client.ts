@@ -597,9 +597,9 @@ export default class Client extends soap.Client {
             },
             additionalInfo: xmlObjectData.StudentInfo[0].UserDefinedGroupBoxes[0].UserDefinedGroupBox
               ? (xmlObjectData.StudentInfo[0].UserDefinedGroupBoxes[0].UserDefinedGroupBox.map((definedBox) => ({
-                  id: definedBox['@_GroupBoxID'][0],
-                  type: definedBox['@_GroupBoxLabel'][0],
-                  vcId: definedBox['@_VCID'][0],
+                id: this.optional(definedBox['@_GroupBoxID']), // string | undefined
+                type: definedBox['@_GroupBoxLabel'][0], // string
+                vcId: this.optional(definedBox['@_VCID']), // string | undefined
                   items: definedBox.UserDefinedItems[0].UserDefinedItem.map((item) => ({
                     source: {
                       element: item['@_SourceElement'][0],
