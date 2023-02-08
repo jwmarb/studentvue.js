@@ -1,4 +1,5 @@
 import * as StudentVue from './StudentVue/StudentVue';
+export * from './StudentVue/StudentVue';
 export default StudentVue;
 export { default as ResourceType } from './Constants/ResourceType';
 export { default as EventType } from './Constants/EventType';
