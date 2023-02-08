@@ -2,6 +2,7 @@
 
 declare module 'studentvue' {
     import * as StudentVue from 'studentvue/StudentVue/StudentVue';
+    export * from 'studentvue/StudentVue/StudentVue';
     export default StudentVue;
     export { default as ResourceType } from 'studentvue/Constants/ResourceType';
     export { default as EventType } from 'studentvue/Constants/EventType';
