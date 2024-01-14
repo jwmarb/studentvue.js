@@ -547,7 +547,7 @@ declare module 'studentvue/utils/soap/Client/Client.interfaces' {
         RT_ERROR: [
             {
                 '@_ERROR_MESSAGE': [string];
-                STACK_TRACE: [string];
+                STACK_TRACE?: [string];
             }
         ];
     }
