@@ -100,7 +100,7 @@ export declare interface ParsedRequestError {
   RT_ERROR: [
     {
       '@_ERROR_MESSAGE': [string];
-      STACK_TRACE: [string];
+      STACK_TRACE?: [string];
     }
   ];
 }
